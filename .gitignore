@@ -1,0 +1,19 @@
+/bin/
+/.gradle/
+/.settings/
+/build/
+/logs/
+# IntelliJ
+*.iml
+.idea/
+atlassian-ide-plugin.xml
+/static/
+/work/
+out-*.log
+*.project
+.project
+.classpath
+target/
+.DS_Store
+*/bin/
+*/.settings/
