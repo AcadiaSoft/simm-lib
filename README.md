@@ -18,6 +18,15 @@ calculate initial margin for their or their clients’ non-cleared
 derivatives transactions. Please contact isdalegal@isda.org for more
 information on licensing the ISDA SIMM™.
 
+### Updates
+Simm-Lib now includes IM-Tree functionality for non-Additional-IM Sensitivities.
+An `IMTree` data structure, which parses directly to the standard IM-Tree
+CSV format, has been added to carry the IM-Tree structure. Simm-Lib has added the
+Base Correlation Sensitivity Type to the Credit Qualifying risk class;
+also, this library takes a stricter view of the 'Bucket' level of IM-Tree than previously,
+and doesn't distinguish between different currencies in the FX risk class as all currencies
+are in the same bucket per ISDA's documentation.
+
 ## Getting Started
 Simm-Lib is built with Apache Maven, so one must get Maven
 installed on their machine.
@@ -56,7 +65,7 @@ OS name: "mac os x", version: "10.11.6", arch: "x86_64", family: "mac"
 #### Installing
 Simm-Lib's sources have to be moved onto a local machine. This
 can be accomplished by either downloading them as a zip file from
-[GitHub](), or by running in a terminal:
+GitHub, or by running in a terminal:
 ```
 $ git clone <repo> simm-lib
 ```

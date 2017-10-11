@@ -22,9 +22,11 @@
 
 package com.acadiasoft.simm.engine.margin.vega;
 
+import com.acadiasoft.simm.model.product.ProductClass;
 import com.acadiasoft.simm.model.risk.RiskClass;
 import com.acadiasoft.simm.engine.margin.IMargin;
 import com.acadiasoft.simm.model.sensitivity.BucketWeightedAggregation;
+import com.acadiasoft.simm.model.sensitivity.IMTree;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;
 import com.acadiasoft.simm.model.sensitivity.WeightedSensitivity;
 import com.acadiasoft.simm.util.BucketWeightedAggregationUtils;
@@ -50,6 +52,24 @@ public class VegaMargin implements IMargin {
     List<WeightedSensitivity> nettedSensitivities = WeightedSensitivityUtils.netSensitivitiesByRiskFactor(riskClass, volWeightSensitivities);
     List<WeightedSensitivity> riskWeightSensitivities = VegaMarginWeightUtils.weightSensitivitiesRisk(riskClass, nettedSensitivities);
     List<BucketWeightedAggregation> aggregateByBucket = VegaMarginBucketUtils.aggregateByBucket(riskClass, riskWeightSensitivities);
+    BigDecimal crossBucket = VegaMarginAcrossBucketUtils.aggregateCrossBucket(riskClass, aggregateByBucket);
+    BigDecimal totalVegaMargin = BucketWeightedAggregationUtils.addResidual(riskClass, aggregateByBucket, crossBucket);
+    return totalVegaMargin;
+  }
+
+  @Override
+  public BigDecimal calculateIMTree(ProductClass productClass, RiskClass riskClass, List<Sensitivity> allSensitivities, List<IMTree> list) {
+    List<Sensitivity> vegaSensitivities = VegaSensitivityUtils.filterForVegaSensitivitiesOnly(allSensitivities);
+    List<WeightedSensitivity> volWeightSensitivities = VegaMarginWeightUtils.weightSensitivitiesVol(riskClass, vegaSensitivities);
+    List<WeightedSensitivity> nettedSensitivities = WeightedSensitivityUtils.netSensitivitiesByRiskFactor(riskClass, volWeightSensitivities);
+    List<WeightedSensitivity> riskWeightSensitivities = VegaMarginWeightUtils.weightSensitivitiesRisk(riskClass, nettedSensitivities);
+    List<BucketWeightedAggregation> aggregateByBucket = VegaMarginBucketUtils.aggregateByBucket(riskClass, riskWeightSensitivities);
+
+    // NOTE: All buckets (including residual are in the weighted aggregation list)
+    for (BucketWeightedAggregation bwa : aggregateByBucket) {
+      list.add(0, new IMTree("6.Bucket", "SIMM-P", productClass.getLabel(), riskClass.getLabel(), "Vega", bwa.getBucket(), bwa.getAggregate()));
+    }
+
     BigDecimal crossBucket = VegaMarginAcrossBucketUtils.aggregateCrossBucket(riskClass, aggregateByBucket);
     BigDecimal totalVegaMargin = BucketWeightedAggregationUtils.addResidual(riskClass, aggregateByBucket, crossBucket);
     return totalVegaMargin;

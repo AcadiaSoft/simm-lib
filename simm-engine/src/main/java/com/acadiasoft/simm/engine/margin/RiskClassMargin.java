@@ -22,8 +22,13 @@
 
 package com.acadiasoft.simm.engine.margin;
 
+import com.acadiasoft.simm.engine.margin.basecorr.BaseCorrSensitivityUtil;
+import com.acadiasoft.simm.engine.margin.delta.DeltaSensitivityUtils;
 import com.acadiasoft.simm.engine.margin.vega.VegaMargin;
+import com.acadiasoft.simm.engine.margin.vega.VegaSensitivityUtils;
+import com.acadiasoft.simm.model.product.ProductClass;
 import com.acadiasoft.simm.model.risk.RiskClass;
+import com.acadiasoft.simm.model.sensitivity.IMTree;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;
 import com.acadiasoft.simm.engine.margin.basecorr.BaseCorrMargin;
 import com.acadiasoft.simm.engine.margin.curvature.CurvatureMargin;
@@ -65,6 +70,35 @@ public class RiskClassMargin implements IMargin {
     // handle base corr margin when riskClass is Credit Qualifying
     if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
       BigDecimal base = baseMargin.calculate(riskClass, allSensitivities);
+      return delta.add(vega).add(curvature).add(base);
+    } else {
+      return delta.add(vega).add(curvature);
+    }
+  }
+
+  @Override
+  public BigDecimal calculateIMTree(ProductClass productClass, RiskClass riskClass, List<Sensitivity> allSensitivities, List<IMTree> list) {
+    BigDecimal delta = deltaMargin.calculateIMTree(productClass, riskClass, allSensitivities, list);
+    if (!DeltaSensitivityUtils.filterForDeltaSensitivitiesOnly(allSensitivities).isEmpty()) {
+      list.add(0, new IMTree("5.Sensitivity Type", "SIMM-P", productClass.getLabel(), riskClass.getLabel(), "Delta", "", delta));
+    }
+
+    BigDecimal vega = vegaMargin.calculateIMTree(productClass, riskClass, allSensitivities, list);
+    if (!VegaSensitivityUtils.filterForVegaSensitivitiesOnly(allSensitivities).isEmpty()) {
+      list.add(0, new IMTree("5.Sensitivity Type", "SIMM-P", productClass.getLabel(), riskClass.getLabel(), "Vega", "", vega));
+    }
+
+    BigDecimal curvature = curvatureMargin.calculateIMTree(productClass, riskClass, allSensitivities, list);
+    if (!VegaSensitivityUtils.filterForVegaSensitivitiesOnly(allSensitivities).isEmpty()) {
+      list.add(0, new IMTree("5.Sensitivity Type", "SIMM-P", productClass.getLabel(), riskClass.getLabel(), "Curvature", "", curvature));
+    }
+
+    // handle base corr margin when riskClass is Credit Qualifying
+    if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
+      BigDecimal base = baseMargin.calculateIMTree(productClass, riskClass, allSensitivities, list);
+      if (!BaseCorrSensitivityUtil.filterForBaseCorrSensitivitiesOnly(allSensitivities).isEmpty() ) {
+        list.add(0, new IMTree("5.Sensitivity Type", "SIMM-P", productClass.getLabel(), riskClass.getLabel(), "Base Correlation", "", base));
+      }
       return delta.add(vega).add(curvature).add(base);
     } else {
       return delta.add(vega).add(curvature);

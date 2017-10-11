@@ -24,8 +24,10 @@ package com.acadiasoft.simm.engine.margin.curvature;
 
 import com.acadiasoft.simm.engine.margin.IMargin;
 import com.acadiasoft.simm.engine.margin.vega.VegaSensitivityUtils;
+import com.acadiasoft.simm.model.product.ProductClass;
 import com.acadiasoft.simm.model.risk.RiskClass;
 import com.acadiasoft.simm.model.sensitivity.BucketWeightedAggregation;
+import com.acadiasoft.simm.model.sensitivity.IMTree;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;
 import com.acadiasoft.simm.util.WeightedSensitivityUtils;
 import com.acadiasoft.simm.model.sensitivity.WeightedSensitivity;
@@ -49,6 +51,26 @@ public class CurvatureMargin implements IMargin {
     List<WeightedSensitivity> weightSensitivities = CurvatureMarginWeightUtils.weightSensitivities(riskClass, vegaSensitivities);
     List<WeightedSensitivity> nettedSensitivities = WeightedSensitivityUtils.netSensitivitiesByRiskFactor(riskClass, weightSensitivities);
     List<BucketWeightedAggregation> aggregateByBucket = CurvatureMarginBucketUtils.aggregateByBucket(riskClass, nettedSensitivities);
+    BigDecimal crossBucket = CurvatureMarginAcrossBucketUtils.aggregateCrossBucket(riskClass, aggregateByBucket);
+    BigDecimal curvatureMarginResidual = CurvatureMarginResidualUtils.calculateCurvatureMarginResidual(aggregateByBucket);
+    BigDecimal totalCurvatureMargin = crossBucket.add(curvatureMarginResidual);
+    if (RiskClass.INTEREST_RATE.equals(riskClass)) {
+      totalCurvatureMargin = totalCurvatureMargin.multiply(INTEREST_RATE_SCALE_FACTOR);
+    }
+    return totalCurvatureMargin;
+  }
+
+  @Override
+  public BigDecimal calculateIMTree(ProductClass productClass, RiskClass riskClass, List<Sensitivity> allSensitivities, List<IMTree> list) {
+    List<Sensitivity> vegaSensitivities = VegaSensitivityUtils.filterForVegaSensitivitiesOnly(allSensitivities);
+    List<WeightedSensitivity> weightSensitivities = CurvatureMarginWeightUtils.weightSensitivities(riskClass, vegaSensitivities);
+    List<WeightedSensitivity> nettedSensitivities = WeightedSensitivityUtils.netSensitivitiesByRiskFactor(riskClass, weightSensitivities);
+    List<BucketWeightedAggregation> aggregateByBucket = CurvatureMarginBucketUtils.aggregateByBucket(riskClass, nettedSensitivities);
+
+    for (BucketWeightedAggregation bwa : aggregateByBucket) {
+      list.add(0, new IMTree("6.Bucket", "SIMM-P", productClass.getLabel(), riskClass.getLabel(), "Curvature", bwa.getBucket(), bwa.getAggregate()));
+    }
+
     BigDecimal crossBucket = CurvatureMarginAcrossBucketUtils.aggregateCrossBucket(riskClass, aggregateByBucket);
     BigDecimal curvatureMarginResidual = CurvatureMarginResidualUtils.calculateCurvatureMarginResidual(aggregateByBucket);
     BigDecimal totalCurvatureMargin = crossBucket.add(curvatureMarginResidual);

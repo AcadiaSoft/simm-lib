@@ -24,7 +24,9 @@ package com.acadiasoft.simm.engine.margin.basecorr;
 
 import com.acadiasoft.simm.engine.margin.IMargin;
 import com.acadiasoft.simm.engine.param.RiskCorrelation;
+import com.acadiasoft.simm.model.product.ProductClass;
 import com.acadiasoft.simm.model.risk.RiskClass;
+import com.acadiasoft.simm.model.sensitivity.IMTree;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;
 import com.acadiasoft.simm.model.sensitivity.WeightedSensitivity;
 import com.acadiasoft.simm.util.SensitivityUtils;
@@ -42,7 +44,18 @@ public class BaseCorrMargin implements IMargin {
     List<Sensitivity> baseCorrSensitivities = BaseCorrSensitivityUtil.filterForBaseCorrSensitivitiesOnly(allSensitivities);
     List<Sensitivity> nettedSensitivities = SensitivityUtils.netSensitivitiesByRiskFactor(rc, baseCorrSensitivities);
     List<WeightedSensitivity> weightedSensitivities = BaseCorrWeightUtil.weightSensitivities(nettedSensitivities);
+    BigDecimal sumSquared = WeightedSensitivityUtils.sumSquared(weightedSensitivities);
+    BigDecimal crossCorrSum = calculateCrossCorr(weightedSensitivities);
+    BigDecimal totalSum = sumSquared.add(crossCorrSum);
+    return BigDecimalUtils.sqrt(totalSum);
+  }
 
+  @Override
+  public BigDecimal calculateIMTree(ProductClass productClass, RiskClass riskClass, List<Sensitivity> allSensitivities, List<IMTree> list) {
+    // NOTE: basecorr is only on the credit qualifying risk class, so we don't need riskClass as input
+    List<Sensitivity> baseCorrSensitivities = BaseCorrSensitivityUtil.filterForBaseCorrSensitivitiesOnly(allSensitivities);
+    List<Sensitivity> nettedSensitivities = SensitivityUtils.netSensitivitiesByRiskFactor(riskClass, baseCorrSensitivities);
+    List<WeightedSensitivity> weightedSensitivities = BaseCorrWeightUtil.weightSensitivities(nettedSensitivities);
     BigDecimal sumSquared = WeightedSensitivityUtils.sumSquared(weightedSensitivities);
     BigDecimal crossCorrSum = calculateCrossCorr(weightedSensitivities);
     BigDecimal totalSum = sumSquared.add(crossCorrSum);

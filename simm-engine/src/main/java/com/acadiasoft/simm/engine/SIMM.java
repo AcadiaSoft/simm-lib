@@ -29,12 +29,14 @@ import com.acadiasoft.simm.model.addon.AddOnNotional;
 import com.acadiasoft.simm.model.addon.AddOnNotionalFactor;
 import com.acadiasoft.simm.model.product.ProductClass;
 import com.acadiasoft.simm.model.risk.RiskClass;
+import com.acadiasoft.simm.model.sensitivity.IMTree;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;
 import com.acadiasoft.simm.util.SensitivityUtils;
 import com.acadiasoft.simm.engine.util.SIMMUtils;
 import com.acadiasoft.simm.model.addon.ProductMultiplier;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,12 +142,30 @@ public class SIMM {
 
     return sum.add(fixed.getAmountUSD());
   }
-  
-  /* TODO: add method to build a TriO like tree of calculation
-   * public Tree calculateTree(... normal inputs ...) {
-   * 	Tree tree = new Tree()
-   *    ... as we run through levels of calc add to tree (will need tree calc functions at each level to fill tree) ...
-   *    return tree
-   */
+
+  public List<IMTree> calculateStandardIMTree(List<Sensitivity> allSensitivities) {
+    BigDecimal sum = BigDecimal.ZERO;
+    List<IMTree> list = new ArrayList<>();
+
+    Map<ProductClass, List<Sensitivity>> mapByProductClass = SensitivityUtils.mapByProductClass(allSensitivities);
+    for (Entry<ProductClass, List<Sensitivity>> productMapEntry : mapByProductClass.entrySet()) {
+      Map<RiskClass, List<Sensitivity>> mapByRiskClass = SensitivityUtils.mapByRiskType(productMapEntry.getValue());
+      Map<RiskClass, BigDecimal> marginByRiskClass = new LinkedHashMap<>();
+      ProductClass productKey = productMapEntry.getKey();
+      for (Entry<RiskClass, List<Sensitivity>> riskMapEntry : mapByRiskClass.entrySet()) {
+        RiskClass riskKey = riskMapEntry.getKey();
+        BigDecimal riskClassMargin = margin.calculateIMTree(productKey, riskKey, riskMapEntry.getValue(), list);
+        list.add(0, new IMTree("4.Risk Class", "SIMM-P", productKey.getLabel(), riskKey.getLabel(), "", "", riskClassMargin));
+        SIMMUtils.addToRiskClassMap(marginByRiskClass, riskKey, riskClassMargin);
+      }
+      BigDecimal finalProductMargin = SIMMUtils.calculateProductMargin(marginByRiskClass);
+      list.add(0, new IMTree("3.Silo", "SIMM-P", productKey.getLabel(), "", "", "", finalProductMargin));
+      sum = sum.add(finalProductMargin);
+    }
+
+    list.add(0, new IMTree("2.Model", "SIMM-P", "", "", "", "", sum));
+    list.add(0, new IMTree("1.Total", "", "", "", "", "", sum));
+    return list;
+  }
 
 }

@@ -22,7 +22,9 @@
 
 package com.acadiasoft.simm.engine.margin;
 
+import com.acadiasoft.simm.model.product.ProductClass;
 import com.acadiasoft.simm.model.risk.RiskClass;
+import com.acadiasoft.simm.model.sensitivity.IMTree;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;
 
 import java.math.BigDecimal;
@@ -31,4 +33,7 @@ import java.util.List;
 public interface IMargin {
 
   public BigDecimal calculate(RiskClass riskClass, List<Sensitivity> allSensitivities);
+
+  public BigDecimal calculateIMTree(ProductClass productClass, RiskClass riskClass, List<Sensitivity> allSensitivities, List<IMTree> list);
+
 }

@@ -56,12 +56,12 @@ public class AcadiaVegaUnitTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
 
   @Test // tested: vega weighting (inflation), Curvature > 0
   public void testIRV4() {
-    Assert.assertEquals(new BigDecimal("647806952"), simm.calculateStandard(Arrays.asList(IRV7)).setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("224633128"), simm.calculateStandard(Arrays.asList(IRV7)).setScale(0, RoundingMode.HALF_UP));
   }
 
   @Test // tested: netting for InflationVol
   public void testIRV5() {
-    Assert.assertEquals(new BigDecimal("131106740"), simm.calculateStandard(Arrays.asList(IRV5, IRV6)).setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("73500000"), simm.calculateStandard(Arrays.asList(IRV5, IRV6)).setScale(0, RoundingMode.HALF_UP));
   }
 
   @Test // tested: vol weight in CR
@@ -71,12 +71,12 @@ public class AcadiaVegaUnitTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
 
   @Test // tested: intra-bucket
   public void testIRV7() {
-    Assert.assertEquals(new BigDecimal("834388517"), simm.calculateStandard(Arrays.asList(IRV1, IRV2, IRV7)).setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("410307997"), simm.calculateStandard(Arrays.asList(IRV1, IRV2, IRV7)).setScale(0, RoundingMode.HALF_UP));
   }
 
   @Test // tested: multiple buckets
   public void testIRV8() {
-    Assert.assertEquals(new BigDecimal("777441687"), simm.calculateStandard(Arrays.asList(IRV1, IRV2, IRV3, IRV4, IRV5, IRV6, IRV7)).setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("492798022"), simm.calculateStandard(Arrays.asList(IRV1, IRV2, IRV3, IRV4, IRV5, IRV6, IRV7)).setScale(0, RoundingMode.HALF_UP));
   }
 
   @Test // tested: vega weighting, Curvature > 0
@@ -277,7 +277,7 @@ public class AcadiaVegaUnitTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
   @Test // multiple product classes
   public void testRisk1() {
     List<Sensitivity> s = Arrays.asList(CMV1, CMV2, CMV3, CMV4, CMV5, CMV6, CQV1, CQV2, CQV3, CQV4, CQV5, CNQV1, CNQV2, CNQV3, CNQV4, CNQV5, EQV1, EQV2, EQV3, EQV4, EQV5, EQV6, EQV7, EQV8, EQV9, EQV10, FXV1, FXV2, FXV3, FXV4, FXV5, IRV1, IRV2, IRV3, IRV4, IRV5, IRV6, IRV7);
-    Assert.assertEquals(new BigDecimal("30183040996"), simm.calculateStandard(s).setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("29972996934"), simm.calculateStandard(s).setScale(0, RoundingMode.HALF_UP));
   }
 
 }

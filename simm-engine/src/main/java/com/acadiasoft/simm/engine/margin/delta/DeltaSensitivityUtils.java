@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 public class DeltaSensitivityUtils {
 
-  static List<Sensitivity> filterForDeltaSensitivitiesOnly(List<Sensitivity> allSensitivities) {
+  public static List<Sensitivity> filterForDeltaSensitivitiesOnly(List<Sensitivity> allSensitivities) {
     return allSensitivities.stream().filter((s) -> !StringUtils.contains(s.getRiskType(), VegaMargin.VEGA_SUFFIX))
       .filter((s) -> !s.getRiskType().equals(RiskType.RISK_TYPE_BASE_CORR)).collect(Collectors.toList());
   }

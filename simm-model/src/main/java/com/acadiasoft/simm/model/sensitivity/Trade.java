@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.acadiasoft.simm.model.trade;
+package com.acadiasoft.simm.model.sensitivity;
 
 import com.acadiasoft.simm.model.ReflectiveEqualObject;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;

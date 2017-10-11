@@ -23,8 +23,10 @@
 package com.acadiasoft.simm.engine.margin.delta;
 
 import com.acadiasoft.simm.engine.margin.IMargin;
+import com.acadiasoft.simm.model.product.ProductClass;
 import com.acadiasoft.simm.model.risk.RiskClass;
 import com.acadiasoft.simm.model.sensitivity.BucketWeightedAggregation;
+import com.acadiasoft.simm.model.sensitivity.IMTree;
 import com.acadiasoft.simm.model.sensitivity.Sensitivity;
 import com.acadiasoft.simm.model.sensitivity.WeightedSensitivity;
 import com.acadiasoft.simm.util.BucketWeightedAggregationUtils;
@@ -47,6 +49,23 @@ public class DeltaMargin implements IMargin {
     List<Sensitivity> nettedSensitivities = SensitivityUtils.netSensitivitiesByRiskFactor(riskClass, deltaSensitivities);
     List<WeightedSensitivity> weightSensitivities = DeltaMarginWeightUtils.weightSensitivities(riskClass, nettedSensitivities);
     List<BucketWeightedAggregation> aggregateByBucket = DeltaMarginBucketUtils.aggregateByBucket(riskClass, weightSensitivities);
+    BigDecimal crossBucket = DeltaMarginAcrossBucketUtils.aggregateCrossBucket(riskClass, aggregateByBucket);
+    BigDecimal totalDeltaMargin = BucketWeightedAggregationUtils.addResidual(riskClass, aggregateByBucket, crossBucket);
+    return totalDeltaMargin;
+  }
+
+  @Override
+  public BigDecimal calculateIMTree(ProductClass productClass, RiskClass riskClass, List<Sensitivity> allSensitivities, List<IMTree> list) {
+    List<Sensitivity> deltaSensitivities = DeltaSensitivityUtils.filterForDeltaSensitivitiesOnly(allSensitivities);
+    List<Sensitivity> nettedSensitivities = SensitivityUtils.netSensitivitiesByRiskFactor(riskClass, deltaSensitivities);
+    List<WeightedSensitivity> weightSensitivities = DeltaMarginWeightUtils.weightSensitivities(riskClass, nettedSensitivities);
+    List<BucketWeightedAggregation> aggregateByBucket = DeltaMarginBucketUtils.aggregateByBucket(riskClass, weightSensitivities);
+
+    // NOTE: All buckets (including residual are in the weighted aggregation list)
+    for (BucketWeightedAggregation bwa : aggregateByBucket) {
+      list.add(0, new IMTree("6.Bucket", "SIMM-P", productClass.getLabel(), riskClass.getLabel(), "Delta", bwa.getBucket(), bwa.getAggregate()));
+    }
+
     BigDecimal crossBucket = DeltaMarginAcrossBucketUtils.aggregateCrossBucket(riskClass, aggregateByBucket);
     BigDecimal totalDeltaMargin = BucketWeightedAggregationUtils.addResidual(riskClass, aggregateByBucket, crossBucket);
     return totalDeltaMargin;
