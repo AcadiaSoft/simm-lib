@@ -142,9 +142,9 @@ public abstract class AbstractAcadiaUnitTestV2_0 {
   public static final Sensitivity IRV2 = new Sensitivity("RatesFX", "Risk_IRVol", "USD", "", "1y", "", new BigDecimal("-300000000"));
   public static final Sensitivity IRV3 = new Sensitivity("RatesFX", "Risk_IRVol", "AUD", "", "2w", "", new BigDecimal("-130000000"));
   public static final Sensitivity IRV4 = new Sensitivity("RatesFX", "Risk_IRVol", "AUD", "", "2y", "", new BigDecimal("-25000000"));
-  public static final Sensitivity IRV5 = new Sensitivity("RatesFX", "Risk_InflationVol", "", "EUR", "5y", "", new BigDecimal("150000000"));
-  public static final Sensitivity IRV6 = new Sensitivity("RatesFX", "Risk_InflationVol", "", "EUR", "15y", "", new BigDecimal("-500000000"));
-  public static final Sensitivity IRV7 = new Sensitivity("RatesFX", "Risk_InflationVol", "", "USD", "20y", "", new BigDecimal("1000000000"));
+  public static final Sensitivity IRV5 = new Sensitivity("RatesFX", "Risk_InflationVol", "EUR", "", "5y", "", new BigDecimal("150000000"));
+  public static final Sensitivity IRV6 = new Sensitivity("RatesFX", "Risk_InflationVol", "EUR", "", "15y", "", new BigDecimal("-500000000"));
+  public static final Sensitivity IRV7 = new Sensitivity("RatesFX", "Risk_InflationVol", "USD", "", "20y", "", new BigDecimal("1000000000"));
 
   // vega FX
   public static final Sensitivity FXV1 = new Sensitivity("RatesFX", "Risk_FXVol", "USDEUR", "", "6m", "", new BigDecimal("25000000"));

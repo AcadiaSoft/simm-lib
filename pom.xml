@@ -116,6 +116,9 @@
           <excludes>
             <exclude>**/*IT.java</exclude>
           </excludes>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
       </plugin>
