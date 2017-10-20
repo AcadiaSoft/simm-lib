@@ -27,6 +27,8 @@ also, this library takes a stricter view of the 'Bucket' level of IM-Tree than p
 and doesn't distinguish between different currencies in the FX risk class as all currencies
 are in the same bucket per ISDA's documentation.
 
+Simm-Lib now passes ISDA's Unit Test for SIMM™ 2.0 confirming the accuracy of the calculated exposure.
+
 ## Getting Started
 Simm-Lib is built with Apache Maven, so one must get Maven
 installed on their machine.

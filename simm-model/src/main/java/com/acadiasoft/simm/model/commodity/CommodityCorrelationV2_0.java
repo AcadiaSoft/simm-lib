@@ -135,7 +135,7 @@ public class CommodityCorrelationV2_0 implements CMRiskCorrelation {
       new BigDecimal("0.14"), // Bucket 10
       new BigDecimal("0.15"), // Bucket 11
       new BigDecimal("-0.02"), // Bucket 12
-      new BigDecimal("0.14"), // Bucket 13
+      new BigDecimal("0.13"), // Bucket 13
       new BigDecimal("0.17"), // Bucket 14
       new BigDecimal("0.01"), // Bucket 15
       new BigDecimal("0.00"), // Bucket 16
@@ -163,8 +163,8 @@ public class CommodityCorrelationV2_0 implements CMRiskCorrelation {
       new BigDecimal("0.27"),  //Bucket 2
       new BigDecimal("0.19"),  //Bucket 3
       new BigDecimal("0.26"),  //Bucket 4
-      new BigDecimal("0.57"),  //Bucket 5
-      new BigDecimal("0.07"),  //Bucket 6
+      new BigDecimal("0.22"),  //Bucket 5
+      new BigDecimal("0.57"),  //Bucket 6
       new BigDecimal("0.07"),  //Bucket 7
       new BigDecimal("0.58"),  //Bucket 8
       new BigDecimal("0.13"),  //Bucket 9
