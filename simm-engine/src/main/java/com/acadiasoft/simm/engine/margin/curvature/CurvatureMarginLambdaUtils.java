@@ -28,6 +28,7 @@ import com.acadiasoft.util.BigDecimalUtils;
 import org.apache.commons.math3.special.Erf;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static java.math.BigDecimal.ONE;
@@ -46,8 +47,14 @@ public class CurvatureMarginLambdaUtils {
   public static BigDecimal calculateTheta(List<WeightedSensitivity> weightedSensitivies) {
     BigDecimal sumOfRiskExposures = WeightedSensitivityUtils.sumWeightSensitivities(weightedSensitivies);
     BigDecimal sumOfAbsRiskExposures = WeightedSensitivityUtils.sumAbsoluteValues(weightedSensitivies);
-    BigDecimal quotient = BigDecimalUtils.divideWithPrecision(sumOfRiskExposures, sumOfAbsRiskExposures);
-    return quotient.min(BigDecimal.ZERO);
+
+    // need to chack to make sure that sums are not equal to zero
+    if (sumOfAbsRiskExposures.stripTrailingZeros().equals(BigDecimal.ZERO)) {
+      return BigDecimal.ZERO;
+    } else {
+      BigDecimal quotient = BigDecimalUtils.divideWithPrecision(sumOfRiskExposures, sumOfAbsRiskExposures);
+      return quotient.min(BigDecimal.ZERO);
+    }
   }
 
 }

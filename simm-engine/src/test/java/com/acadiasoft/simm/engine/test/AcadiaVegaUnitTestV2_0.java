@@ -104,6 +104,12 @@ public class AcadiaVegaUnitTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
     Assert.assertEquals(new BigDecimal("742000935"), simm.calculateStandard(Arrays.asList(FXV1, FXV2, FXV3, FXV4, FXV5)).setScale(0, RoundingMode.HALF_UP));
   }
 
+  @Test // testing 0 value in FXV
+  public void testFXV6() {
+    Sensitivity zero = new Sensitivity("RatesFX", "Risk_FXVol", "USDJPY", "", "2w", "", BigDecimal.ZERO);
+    Assert.assertEquals(BigDecimal.ZERO, simm.calculateStandard(Arrays.asList(zero)).setScale(0, RoundingMode.HALF_UP));
+  }
+
   @Test // risk weight
   public void testEQV1() {
     Assert.assertEquals(new BigDecimal("227661155"), simm.calculateStandard(Arrays.asList(EQV1)).setScale(0, RoundingMode.HALF_UP));
