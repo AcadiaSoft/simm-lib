@@ -39,14 +39,14 @@ public class CurvatureMarginLambdaUtils {
    */
   public static final BigDecimal PHI_INV = new BigDecimal(Math.sqrt(2.0) * Erf.erfInv(2 * .995 - 1));
 
-  public static BigDecimal calculateLambda(List<WeightedSensitivity> weightedSensitivies) {
-    BigDecimal theta = CurvatureMarginLambdaUtils.calculateTheta(weightedSensitivies);
+  public static BigDecimal calculateLambda(List<WeightedSensitivity> weightedSensitivities) {
+    BigDecimal theta = CurvatureMarginLambdaUtils.calculateTheta(weightedSensitivities);
     return CurvatureMarginLambdaUtils.PHI_INV.pow(2).subtract(ONE).multiply(ONE.add(theta)).subtract(theta);
   }
 
-  public static BigDecimal calculateTheta(List<WeightedSensitivity> weightedSensitivies) {
-    BigDecimal sumOfRiskExposures = WeightedSensitivityUtils.sumWeightSensitivities(weightedSensitivies);
-    BigDecimal sumOfAbsRiskExposures = WeightedSensitivityUtils.sumAbsoluteValues(weightedSensitivies);
+  public static BigDecimal calculateTheta(List<WeightedSensitivity> weightedSensitivities) {
+    BigDecimal sumOfRiskExposures = WeightedSensitivityUtils.sumWeightSensitivities(weightedSensitivities);
+    BigDecimal sumOfAbsRiskExposures = WeightedSensitivityUtils.sumAbsoluteValues(weightedSensitivities);
 
     // need to chack to make sure that sums are not equal to zero
     if (sumOfAbsRiskExposures.stripTrailingZeros().equals(BigDecimal.ZERO)) {
