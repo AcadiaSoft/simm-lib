@@ -1,15 +1,14 @@
 package com.acadiasoft.simm.engine.test;
 
-import com.acadiasoft.simm.engine.SIMM;
-import com.acadiasoft.simm.model.sensitivity.Sensitivity;
+import com.acadiasoft.simm.engine.Simm;
+import com.acadiasoft.simm.model.object.Sensitivity;
+import com.acadiasoft.simm.model.object.imtree.ImTree;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class AcadiaIMTreeTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
-
-  private final SIMM simm = new SIMM();
+public class AcadiaImTreeTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
 
   @Test
   public void testIMTree1() {
@@ -25,15 +24,15 @@ public class AcadiaIMTreeTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
         CNQV1, CNQV2, CNQV3, CNQV4, CNQV5,
         EQV1, EQV2, EQV3, EQV4, EQV5, EQV6, EQV7, EQV8, EQV9, EQV10,
         FXV1, FXV2, FXV3, FXV4, FXV5,
-        IRV1, IRV2, IRV3, IRV4, IRV5, IRV6, IRV7);
-
-    System.out.println(simm.calculateStandardIMTree(s));
+        IRV1, IRV2, IRV3, IRV4, IRV5, IRV6, IRV7
+    );
+//    System.out.println(ImTree.parseToFlatCsv(Simm.calculateTreeStandard(s)));
   }
 
   @Test
   public void testIMTree2() {
     List<Sensitivity> s = Arrays.asList(IR1, IR2, IR3, IR4, IR5, IR6, IR7, IR8, IR9);
-    System.out.println(simm.calculateStandardIMTree(s));
+//    System.out.println(ImTree.parseToFlatCsv(Simm.calculateTreeStandard(s)));
   }
 
 }

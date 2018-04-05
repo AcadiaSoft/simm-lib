@@ -22,150 +22,52 @@
 
 package com.acadiasoft.simm.engine;
 
-import com.acadiasoft.simm.engine.margin.IMargin;
-import com.acadiasoft.simm.engine.margin.RiskClassMargin;
-import com.acadiasoft.simm.model.addon.AddOnFixedAmount;
-import com.acadiasoft.simm.model.addon.AddOnNotional;
-import com.acadiasoft.simm.model.addon.AddOnNotionalFactor;
-import com.acadiasoft.simm.model.product.ProductClass;
-import com.acadiasoft.simm.model.risk.RiskClass;
-import com.acadiasoft.simm.model.sensitivity.IMTree;
-import com.acadiasoft.simm.model.sensitivity.Sensitivity;
-import com.acadiasoft.simm.util.SensitivityUtils;
-import com.acadiasoft.simm.engine.util.SIMMUtils;
-import com.acadiasoft.simm.model.addon.ProductMultiplier;
+
+import com.acadiasoft.simm.engine.margin.SimmMargin;
+import com.acadiasoft.simm.engine.margin.TotalMargin;
+import com.acadiasoft.simm.model.object.AddOnFixedAmount;
+import com.acadiasoft.simm.model.object.AddOnNotional;
+import com.acadiasoft.simm.model.object.AddOnNotionalFactor;
+import com.acadiasoft.simm.model.object.ProductMultiplier;
+import com.acadiasoft.simm.model.object.imtree.ImTree;
+import com.acadiasoft.simm.model.object.imtree.identifiers.ProductClass;
+import com.acadiasoft.simm.model.object.Sensitivity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
- * @author joe.peterson
+ * @author alec.stewart
  */
-public class SIMM {
+public class Simm {
 
-  private IMargin margin = new RiskClassMargin();
-
-  public SIMM() {
-    super();
+  public static BigDecimal calculateStandard(List<Sensitivity> inputSensitivities) {
+    return SimmMargin.calculateStandard(inputSensitivities).getMargin();
   }
 
-  public SIMM(RiskClassMargin margin) {
-    super();
-    this.margin = margin;
+  public static BigDecimal calculateAdditional(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, AddOnFixedAmount fixed) {
+    return SimmMargin.calculateAdditional(inputSensitivities, multipliers, factors, notionals, fixed).getMargin();
   }
 
-  /**
-   * As defined in Appendix 1 section B.6 of doc/ISDA_SIMM_vR1.0_(PUBLIC).pdf
-   */
-  public BigDecimal calculateStandard(List<Sensitivity> allSensitivities) {
-    BigDecimal sum = BigDecimal.ZERO;
-
-    Map<ProductClass, List<Sensitivity>> mapByProductClass = SensitivityUtils.mapByProductClass(allSensitivities);
-    for (Entry<ProductClass, List<Sensitivity>> productMapEntry : mapByProductClass.entrySet()) {
-      Map<RiskClass, List<Sensitivity>> mapByRiskClass = SensitivityUtils.mapByRiskType(productMapEntry.getValue());
-      Map<RiskClass, BigDecimal> marginByRiskClass = new LinkedHashMap<>();
-      for (Entry<RiskClass, List<Sensitivity>> riskMapEntry : mapByRiskClass.entrySet()) {
-        RiskClass key = riskMapEntry.getKey();
-        BigDecimal riskClassMargin = margin.calculate(key, riskMapEntry.getValue());
-        SIMMUtils.addToRiskClassMap(marginByRiskClass, key, riskClassMargin);
-      }
-      BigDecimal finalProductMargin = SIMMUtils.calculateProductMargin(marginByRiskClass);
-      sum = sum.add(finalProductMargin);
-    }
-    return sum;
+  public static BigDecimal calculateTotal(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, AddOnFixedAmount fixed) {
+    return SimmMargin.calculateTotal(inputSensitivities, multipliers, factors, notionals, fixed).getMargin();
   }
 
-  public BigDecimal calculateAdditional(List<Sensitivity> allSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, AddOnFixedAmount fixed) {
-    BigDecimal sum = BigDecimal.ZERO;
-
-    Map<ProductClass, List<Sensitivity>> mapByProductClass = SensitivityUtils.mapByProductClass(allSensitivities);
-    for (Entry<ProductClass, List<Sensitivity>> productMapEntry : mapByProductClass.entrySet()) {
-      Map<RiskClass, List<Sensitivity>> mapByRiskClass = SensitivityUtils.mapByRiskType(productMapEntry.getValue());
-      Map<RiskClass, BigDecimal> marginByRiskClass = new LinkedHashMap<>();
-      for (Entry<RiskClass, List<Sensitivity>> riskMapEntry : mapByRiskClass.entrySet()) {
-        RiskClass key = riskMapEntry.getKey();
-        BigDecimal riskClassMargin = margin.calculate(key, riskMapEntry.getValue());
-        SIMMUtils.addToRiskClassMap(marginByRiskClass, key, riskClassMargin);
-      }
-      BigDecimal finalProductMargin = SIMMUtils.calculateProductMargin(marginByRiskClass);
-
-      // as in Annex A of v1.3.38, we subtract multilier by ONE to get only additional; also the default multiplier is ONE
-      BigDecimal multiplier = multipliers.containsKey(productMapEntry.getKey()) ?
-        multipliers.get(productMapEntry.getKey()).getMultiplier().subtract(BigDecimal.ONE) :
-        BigDecimal.ZERO;
-      sum = sum.add(finalProductMargin.multiply(multiplier));
-    }
-
-    // calculate Additonal IM
-    // NOTE: we run over the factors so that any notionals which don't have associated factor effectively get multiplied by ZERO
-    for (Entry<String, AddOnNotionalFactor> factorEntry : factors.entrySet()) {
-      BigDecimal notional = notionals.get(factorEntry.getKey()).stream().map((n) -> n.getNotionalUSD().abs()).reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
-      BigDecimal additional = notional.multiply(factorEntry.getValue().getPercentFactor());
-      sum = sum.add(additional);
-    }
-
-    return sum.add(fixed.getAmountUSD());
+  public static ImTree calculateTreeStandard(List<Sensitivity> inputSensitivities) {
+    ImTree simm = SimmMargin.calculateStandard(inputSensitivities);
+    return TotalMargin.build(simm.getMargin(), simm);
   }
 
-  public BigDecimal calculateTotal(List<Sensitivity> allSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, AddOnFixedAmount fixed) {
-    BigDecimal sum = BigDecimal.ZERO;
-
-    Map<ProductClass, List<Sensitivity>> mapByProductClass = SensitivityUtils.mapByProductClass(allSensitivities);
-    for (Entry<ProductClass, List<Sensitivity>> productMapEntry : mapByProductClass.entrySet()) {
-      Map<RiskClass, List<Sensitivity>> mapByRiskClass = SensitivityUtils.mapByRiskType(productMapEntry.getValue());
-      Map<RiskClass, BigDecimal> marginByRiskClass = new LinkedHashMap<>();
-      for (Entry<RiskClass, List<Sensitivity>> riskMapEntry : mapByRiskClass.entrySet()) {
-        RiskClass key = riskMapEntry.getKey();
-        BigDecimal riskClassMargin = margin.calculate(key, riskMapEntry.getValue());
-        SIMMUtils.addToRiskClassMap(marginByRiskClass, key, riskClassMargin);
-      }
-      BigDecimal finalProductMargin = SIMMUtils.calculateProductMargin(marginByRiskClass);
-
-      // the default multiplier is ONE
-      BigDecimal multiplier = multipliers.containsKey(productMapEntry.getKey()) ?
-        multipliers.get(productMapEntry.getKey()).getMultiplier() :
-        BigDecimal.ONE;
-      sum = sum.add(finalProductMargin.multiply(multiplier));
-    }
-
-    // calculate Additonal IM
-    // NOTE: we run over the factors so that any notionals which don't have associated factor effectively get multiplied by ZERO
-    for (Entry<String, AddOnNotionalFactor> factorEntry : factors.entrySet()) {
-      BigDecimal notional = notionals.get(factorEntry.getKey()).stream().map((n) -> n.getNotionalUSD().abs()).reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
-      BigDecimal additional = notional.multiply(factorEntry.getValue().getPercentFactor());
-      sum = sum.add(additional);
-    }
-
-    return sum.add(fixed.getAmountUSD());
+  public static ImTree calculateTreeAdditional(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, AddOnFixedAmount fixed) {
+    ImTree simm = SimmMargin.calculateAdditional(inputSensitivities, multipliers, factors, notionals, fixed);
+    return TotalMargin.build(simm.getMargin(), simm);
   }
 
-  public List<IMTree> calculateStandardIMTree(List<Sensitivity> allSensitivities) {
-    BigDecimal sum = BigDecimal.ZERO;
-    List<IMTree> list = new ArrayList<>();
-
-    Map<ProductClass, List<Sensitivity>> mapByProductClass = SensitivityUtils.mapByProductClass(allSensitivities);
-    for (Entry<ProductClass, List<Sensitivity>> productMapEntry : mapByProductClass.entrySet()) {
-      Map<RiskClass, List<Sensitivity>> mapByRiskClass = SensitivityUtils.mapByRiskType(productMapEntry.getValue());
-      Map<RiskClass, BigDecimal> marginByRiskClass = new LinkedHashMap<>();
-      ProductClass productKey = productMapEntry.getKey();
-      for (Entry<RiskClass, List<Sensitivity>> riskMapEntry : mapByRiskClass.entrySet()) {
-        RiskClass riskKey = riskMapEntry.getKey();
-        BigDecimal riskClassMargin = margin.calculateIMTree(productKey, riskKey, riskMapEntry.getValue(), list);
-        list.add(0, new IMTree("4.Risk Class", "SIMM-P", productKey.getLabel(), riskKey.getLabel(), "", "", riskClassMargin));
-        SIMMUtils.addToRiskClassMap(marginByRiskClass, riskKey, riskClassMargin);
-      }
-      BigDecimal finalProductMargin = SIMMUtils.calculateProductMargin(marginByRiskClass);
-      list.add(0, new IMTree("3.Silo", "SIMM-P", productKey.getLabel(), "", "", "", finalProductMargin));
-      sum = sum.add(finalProductMargin);
-    }
-
-    list.add(0, new IMTree("2.Model", "SIMM-P", "", "", "", "", sum));
-    list.add(0, new IMTree("1.Total", "", "", "", "", "", sum));
-    return list;
+  public static ImTree calculateTreeTotal(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, AddOnFixedAmount fixed) {
+    ImTree simm = SimmMargin.calculateTotal(inputSensitivities, multipliers, factors, notionals, fixed);
+    return TotalMargin.build(simm.getMargin(), simm);
   }
 
 }
+

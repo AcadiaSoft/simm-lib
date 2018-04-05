@@ -22,12 +22,12 @@
 
 package com.acadiasoft.simm.engine.test;
 
-import com.acadiasoft.simm.model.addon.AddOnFixedAmount;
-import com.acadiasoft.simm.model.addon.AddOnNotional;
-import com.acadiasoft.simm.model.addon.AddOnNotionalFactor;
-import com.acadiasoft.simm.model.product.ProductClass;
-import com.acadiasoft.simm.model.sensitivity.Sensitivity;
-import com.acadiasoft.simm.model.addon.ProductMultiplier;
+import com.acadiasoft.simm.model.object.AddOnFixedAmount;
+import com.acadiasoft.simm.model.object.AddOnNotional;
+import com.acadiasoft.simm.model.object.AddOnNotionalFactor;
+import com.acadiasoft.simm.model.object.imtree.identifiers.ProductClass;
+import com.acadiasoft.simm.model.object.Sensitivity;
+import com.acadiasoft.simm.model.object.ProductMultiplier;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
