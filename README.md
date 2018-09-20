@@ -1,8 +1,8 @@
 # Simm-Lib
 
-Simm-Lib is an implementation of version 2.0 of the value at risk Standard Initial
-Margin Model ([SIMM™ 2.0](https://www2.isda.org/functional-areas/wgmr-implementation/))
-developed by ISDA, see [here](https://www2.isda.org/functional-areas/wgmr-implementation/) for methodology specifications. 
+Simm-Lib is an implementation of version 2.1 of the value at risk Standard Initial
+Margin Model ([SIMM™ 2.1](https://www2.isda.org/functional-areas/wgmr-implementation/))
+developed by ISDA, see [here](https://www.isda.org/category/margin/isda-simm/) for methodology specifications.
 It has been built to be compatible with the Common
 Risk Interchange Format (CRIF) and it's correlation parameters and risk
 weights are interfaced to allow them to be easily exchanged. This makes
@@ -18,21 +18,18 @@ calculate initial margin for their or their clients’ non-cleared
 derivatives transactions. Please contact isdalegal@isda.org for more
 information on licensing the ISDA SIMM™.
 
-### Updates: Change Log
-#### 2018-4-4
-- Simm-lib has been restructured to be more easily parsed, and also to more easily implement `ImTree` functionality.
-As a result, ImTree functionality has been expanded to include Additional-IM sensitivities, and the strict 'Bucket' level
-view that the library took previously has been loosened.
-- `ImTree` is now an interface, and **no longer** parses directly to the standard IM-Tree CSV format. Instead, a CSV formatted `String`
-can be obtained from the `static` method `ImTree.parseToFlatCsv()` which takes an ImTree object as an input.
+### Updates
+The library has been expanded to now include both a Schedule IM calculation model, and
+a SIMM calculation model. Post and Collect regulation handling has been added, taking a
+'Worst-Of' approach, and along with this IM can now be calculated by role (either Pledgor
+or Secured) for both the SIMM and Schedule models.
 
-#### 2017-12-11
-- Simm-Lib now includes IM-Tree functionality for non-Additional-IM Sensitivities.
-An `ImTree` data structure, which parses directly to the standard IM-Tree CSV format, has been added to carry the IM-Tree structure.
-- `ImTree` takes a strict view of the 'Bucket' level of IM-Tree and doesn't distinguish between different
-currencies in the FX risk class as all currencies are in the same bucket per ISDA's documentation.
-- Simm-Lib has added the Base Correlation Sensitivity Type to the Credit Qualifying risk class.
-- Simm-Lib now passes ISDA's Unit Test for SIMM™ 2.0 confirming the accuracy of the calculated exposure.
+The Schedule IM model is (unsurprisingly) contained in the schedule model. Following the
+same format as the SIMM model, the main methods of the module can be found in the `Schedule`
+class. See below for more specifici information on the module.
+
+The 'Worst-Of' handling and role calculation is handled by the simm-ple module. The main calculation
+methods can again be found in the `Simmple` class. Again, see below for more specific details.
 
 ## Getting Started
 Simm-Lib is built with Apache Maven, so one must get Maven
@@ -106,10 +103,13 @@ public void test() {
     Assert.assertEquals(new BigDecimal("13400000000"), Simm.calculateStandard(Arrays.asList(IR1)).setScale(0, RoundingMode.HALF_UP));
 }
 ```
+
+With the addition of the `Schedule` and `Simmple` classes the CRIF formatted objects have expanded beyond the `Sensitivity` object
+however the format of the testing is still generally the same as this is the main use case of the model.
 #### Simm Class
 This section focuses on the tests for the top level functionality
 of the `Simm` class, as the methods of this class directly consume CRIF
-formatted data and return the calculated IM of those inputs. There are six
+formatted data in the form of the `Sensitivity` object and return the calculated IM of those inputs. There are six
 methods in the `Simm` class: `calculateStanard()`, `calculateAdditional()`,
  `calculateTotal()`, `calculateTreeStandard()`, `calculateTreeAdditional()`, and `calculateTreeTotal()`.
 The first method returns the IM of the input sensitivities, the second returns the Additional
@@ -132,3 +132,72 @@ Sensitivity(productClass, riskType, qualifier, bucket, label1, label2, amount, a
 For `Sensitivity`, `AddOnFixedAmount`, and `AddOnNotional` the "currency", and
 "amountUSD" can be omitted; however, the currency in this case will be assumed
 to be US Dollars.
+
+#### Schedule Class
+This section focuses on the `Schedule` class. As the Schdule model is focued on trade level data, unlike the SIMM model which uses
+sensitivities, new trade-level CRIF formatted objects have been added to the module to store this data. The `ScheduleNotional` object
+stores the notional amount of the trade (Note: the notional can be set to be positive or negative, and if multiple notionals exist
+for the same trade they will be netted, the absolute value of the netted notional is then used in the calculation itself).
+The `SchedulePv` is the Net Present Value of the trade (similarly, the PVs will be netted by trade, and the netted value will be used).
+```
+ScheduleNotional(tradeId, schduleProductClass, valuationDate, endDate, amount, amountCurrency, amountUsd)
+SchedulePv(tradeId, schduleProductClass, valuationDate, endDate, amount, amountCurrency, amountUsd)
+```
+The schdule module provides overloaded `calculate()` and `calculateTree()` methods
+to handle both calculating the net gross rate from the input net present values, and using an input NGR instead.
+All exposure amounts are returned in US Dollars.
+
+#### Simmple
+This section focuses on the `Simmple` class. The inputs to `Simmple` have been stream-lined at least from a CRIF object perspective.
+`Simmple` takes in `Crif` objects which are a super-set of all of the other CRIF formatted objects used by either the simm or schedule modules.
+The intent of the `Crif` object is to be able to directly translate a standard CRIF file into a `List<Crif>`.
+```
+Crif(tradeId, valuationDate, endDate, notional, notionalCurrency, imModel, productClass, riskType, qualifier, bucket, label1, label2, amount, amountCurrency, amountUsd, postRegulation, collectRegulation)
+```
+You'll notice that some fields added to the `Crif` object are not in any of the other CRIF formatted objects. The `imModel` field is simply a `String` which
+indicates which model (SIMM or Schedule) that line of data should be input into. The current allowed model strings are **"SIMM", "SIMM-P", "Schedule"**.
+The `notional` and `notionalCurrency` fields are for convenience when running a schedule calcualtion. If a trade only has `SchedulePv` inputs
+but the `notional` field is set for at least one of those PVs, a `ScheduleNotional` will be constructed using the `notional` value. The `productClass` is overloaded to be
+either the SIMM or Schedule product classes depending on the specified model. The `postRegulation` and `collectRegulation` fields are used for Pledgor and Secured regulation
+respecitively. There are three different modes of specifying regulation:
+- If all regulators are left blank for both post and collect, all `Crif` objects in the input list will be included in the calculation. A blank regulator string is considered
+to be the empty string **""**, any number of spaces with no other characters, or an empty set of brackets **"\[\]"** which may also conatin any number of spaces.
+- If some regulators are set **"include"** and all others are left blank, then all `Crif` objects which have **"include"** as one of its regulators will be included in the calcualtion.
+- Otherwise, the regualtors may be set to a single name (**"CFTC"** or **"\[SEC\]**) or a comma seperated list of names (**"CFTC,SEC"** or  **"\[CFTC,SEC\]"**). When calculating the exposure
+of a particular regulator, only `Crif` whose regulators are associated with the role you are running the calculation for will be included. An example of this would be if a `Crif` had its
+`postRegulation` set to "CFTC" and its `collectRegulation` set to "SEC". If you are running a calculation for the regulator "SEC" and the role is set to Pledgor, the example `Crif` would not
+be included in the calculation, but if the role was set to Secured the example `Crif` would be included.
+For simplicities sake, we call the regulator with the highest calculated exposure to be the 'winning' regulator of a 'Worst-Of' calcualtion.
+The output of every fucntion in the `Simmple` class is a `ImTreeResult` which contains the winning regulator, an `ImTree` breakdown of the exposure
+associated with the winning regulator, and finally the currency of all of the margins in the `ImTree`. The method names of the `Simmple` class should be fairly
+self-explanatory: `calculateSimmWorstOf()` returns the winning regulator calculating using only SIMM model `Crif`, `calculateScheduleWorstOf()` returns the winning regulator
+calculating using only Schedule model `Crif`, and `calculateWorstOf()` returns the winning regulator calculating over the `Crif` in both models.
+
+### Change Log
+#### 2018-09-14
+- `Schedule` class has been added to handle Schedule IM calculation. New CRIF formatted objects
+`ScheduleNotional` and `SchedulePv` are the inputs to the model. Methods for calculating Schedule IM
+both with an input Net Gross Rate, or with the NGR being calculated from the input PVs have been provided
+- `Simmple` class has been added to handle 'Worst-Of' regulator handling and calculation by role. The CRIF formatted
+object `Crif` which is a super-set of the `Sensitivity`, `ScheduleNotional`, `SchedulePv`, `ProductMultiplier`, etc.
+objects has been added to simm-ple to allow for easier translation from a standard CRIF file to the libraries objects
+- Simm-ple handles three modes of regulation handling: all regulators left blank, 'include', and standard regulator names.
+- The SIMM calculation models inputs have been changed slightly. Now instead of redundantly requiring a `Map` object of the
+input `AddOnType`s, the calculation methods instead take in a `List`. This streamlines testing and makes usage easier.
+- A calculation currency input has been added to the SIMM model with v2.1, so now the model explicitly
+filters out FX Delta risk to the calculation currency from the input sensitivities.
+- Simm-Lib passes ISDA's Unit Test for SIMM™ 2.1.
+#### 2018-04-04
+- Simm-lib has been restructured to be more easily parsed, and also to more easily implement `ImTree` functionality.
+As a result, ImTree functionality has been expanded to include Additional-IM sensitivities, and the strict `Bucket` level
+view that the library took previously has been loosened.
+- `ImTree` is now an interface, and **no longer** parses directly to the standard IM-Tree CSV format. Instead, a CSV formatted `String`
+can be obtained from the `static` method `ImTree.parseToFlatCsv()` which takes an ImTree object as an input.
+
+#### 2017-12-11
+- Simm-Lib now includes IM-Tree functionality for non-Additional-IM Sensitivities.
+An `ImTree` data structure, which parses directly to the standard IM-Tree CSV format, has been added to carry the IM-Tree structure.
+- `ImTree` takes a strict view of the 'Bucket' level of IM-Tree and doesn't distinguish between different
+currencies in the FX risk class as all currencies are in the same bucket per ISDA's documentation.
+- Simm-Lib has added the Base Correlation Sensitivity Type to the Credit Qualifying risk class.
+- Simm-Lib now passes ISDA's Unit Test for SIMM™ 2.0 confirming the accuracy of the calculated exposure.
