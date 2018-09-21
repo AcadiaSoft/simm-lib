@@ -49,10 +49,10 @@ public class GenerateCrifFromCsv {
   public GenerateCrifFromCsv(String fileName) {
     try (Reader reader = new InputStreamReader(new BOMInputStream(new FileInputStream(new File(fileName))), StandardCharsets.UTF_8)) {
       for (CSVRecord record: new CSVParser(reader, CSVFormat.EXCEL.withFirstRecordAsHeader())) {
-        crifs.add(new Crif(get(record,"valuation_date"), get(record, "end_date"), get(record, "trade_id"), get(record, "im_model"),
-            get(record, "product_class"), get(record, "risk_type"), get(record, "qualifier"), get(record, "bucket"), get(record, "label1"),
-            get(record, "label2"), get(record, "amount"), get(record, "amount_currency"), get(record, "amount_usd"), get(record, "post_regulations"),
-            get(record, "collect_regulations"), get(record, "notional"), get(record, "trade_currency")));
+        crifs.add(new Crif(get(record, "trade_id"), get(record,"valuation_date"), get(record, "end_date"), get(record, "notional"), get(record, "trade_currency"),
+            get(record, "im_model"), get(record, "product_class"), get(record, "risk_type"), get(record, "qualifier"), get(record, "bucket"),
+            get(record, "label1"), get(record, "label2"), get(record, "amount"), get(record, "amount_currency"), get(record, "amount_usd"),
+            get(record, "post_regulations"), get(record, "collect_regulations")));
       }
     } catch (IOException ioe) {
       throw new RuntimeException(ioe.getMessage());
