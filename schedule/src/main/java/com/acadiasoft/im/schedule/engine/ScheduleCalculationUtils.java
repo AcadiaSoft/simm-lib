@@ -23,12 +23,15 @@
 package com.acadiasoft.im.schedule.engine;
 
 import com.acadiasoft.im.base.util.BigDecimalUtils;
+import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
 import com.acadiasoft.im.schedule.models.parameters.ScheduleParameters;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ScheduleCalculationUtils {
 
@@ -59,6 +62,33 @@ public class ScheduleCalculationUtils {
   public static BigDecimal calculate(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
     // SCHEDULE_IM = GROSS_IM * (0.4 + (0.6 * NGR))
     return multiplyByParamsAndSum(notionals).multiply(STRAIGHT_FRACTION.add(NGR_FRACTION.multiply(netGrossRate)));
+  }
+
+
+  /**
+   * Helper method calculating NGR from PVs
+   * @param pvs The PVs of the trades
+   * @return returns the ngr based on the PVs as BigDecimal
+   */
+
+  public BigDecimal calculateNgr(List<SchedulePv> pvs)
+  {     
+      Map<ScheduleIdentifier, List<SchedulePv>> mappedPvs = pvs.stream()
+          .collect(Collectors.groupingBy(p -> p.getIdentifier(), Collectors.toList()));
+      
+      List<SchedulePv> nettedPvs = mappedPvs.entrySet().stream()
+          .map(e -> SchedulePv.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), p -> p.getAmountUSD())))
+          .collect(Collectors.toList());
+                                                                                                             
+      BigDecimal netReplacementCost = BigDecimalUtils.sum(nettedPvs, pv -> pv.getAmountUSD()).max(BigDecimal.ZERO);
+      BigDecimal grossReplacementCost = BigDecimalUtils.sum(nettedPvs, pv -> pv.getAmountUSD().max(BigDecimal.ZERO));  
+      BigDecimal ngr = BigDecimal.ONE;
+          
+      if (!grossReplacementCost.stripTrailingZeros().equals(BigDecimal.ZERO)) {
+          ngr = BigDecimalUtils.divideWithPrecision(netReplacementCost, grossReplacementCost);
+      }
+
+      return ngr;
   }
 
 }
