@@ -26,6 +26,7 @@ import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
 import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.param.SimmConcentrationThreshold;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -75,9 +76,10 @@ public class ConcentrationRiskGroup implements Serializable {
   /**
    *
    * @param concentrationGroup list of sensitivities all belonging to the same concentration class
+   * @param holdingPeriod
    * @return concentration class of the input sensitivities
    */
-  public static ConcentrationRiskGroup build(RiskClass riskClass, SensitivityClass sensitivityClass, String identifier, List<Sensitivity> concentrationGroup) {
+  public static ConcentrationRiskGroup build(RiskClass riskClass, SensitivityClass sensitivityClass, String identifier, List<Sensitivity> concentrationGroup, HoldingPeriod holdingPeriod) {
     // we need to remove Xccy Basis sensitivities from this sum
     // base corr sensitivities need to be removed as well, but we filter those out of other sensitivites earlier on
     if (riskClass.equals(RiskClass.INTEREST_RATE)) {
@@ -89,7 +91,7 @@ public class ConcentrationRiskGroup implements Serializable {
     BigDecimal absSum = BigDecimalUtils.sum(concentrationGroup, s -> s.getAmountUsd()).abs();
     BigDecimal threshold = SimmConcentrationThreshold.getThreshold(riskClass, sensitivityClass, identifier);
     BigDecimal concentration = BigDecimalUtils.divideWithPrecision(absSum, threshold);
-    return new ConcentrationRiskGroup(riskClass, sensitivityClass, identifier, BigDecimal.ONE.max(BigDecimalUtils.sqrt(concentration)));
+    return new ConcentrationRiskGroup(riskClass, sensitivityClass, identifier, holdingPeriod == HoldingPeriod.OneDay ? BigDecimal.ONE : BigDecimal.ONE.max(BigDecimalUtils.sqrt(concentration)));
   }
 
   public static ConcentrationRiskGroup findConcentrationClass(String identifier, Map<String, ConcentrationRiskGroup> mapByIdentifier) {

@@ -33,15 +33,20 @@ public interface SimmHvr {
   BigDecimal FX_HVR = new BigDecimal("0.63");
   BigDecimal IR_HVR = new BigDecimal("0.62");
 
-  public static BigDecimal get(RiskClass riskClass) {
+  BigDecimal CM_HVR_1D = new BigDecimal("0.71");
+  BigDecimal EQ_HVR_1D = new BigDecimal("0.54");
+  BigDecimal FX_HVR_1D = new BigDecimal("0.81");
+  BigDecimal IR_HVR_1D = new BigDecimal("0.67");
+
+  public static BigDecimal get(RiskClass riskClass, HoldingPeriod holdingPeriod) {
     if (riskClass.equals(RiskClass.COMMODITY)) {
-      return CM_HVR;
+      return holdingPeriod == HoldingPeriod.TenDay ? CM_HVR : CM_HVR_1D;
     } else if (riskClass.equals(RiskClass.EQUITY)) {
-      return EQ_HVR;
+      return holdingPeriod == HoldingPeriod.TenDay ? EQ_HVR : EQ_HVR_1D;
     } else if (riskClass.equals(RiskClass.FX)) {
-      return FX_HVR;
+      return holdingPeriod == HoldingPeriod.TenDay ? FX_HVR : FX_HVR_1D;
     } else if (riskClass.equals(RiskClass.INTEREST_RATE)) {
-      return IR_HVR;
+      return holdingPeriod == HoldingPeriod.TenDay ? IR_HVR : IR_HVR_1D;
     } else {
       throw new RuntimeException("tried to get HVR for non-HVR risk class: [" + riskClass + "]!");
     }

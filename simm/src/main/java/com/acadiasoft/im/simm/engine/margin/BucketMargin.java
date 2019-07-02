@@ -22,6 +22,7 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.ConcentrationRiskGroup;
 import com.acadiasoft.im.base.imtree.ImTree;
 import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
@@ -70,14 +71,14 @@ public class BucketMargin implements ImTree {
     this.children.addAll(marginByIdentifier);
   }
 
-  public static BucketMargin calculate(RiskClass riskClass, SensitivityClass sensitivityClass, BucketClass bucketClass, List<Sensitivity> sensitivities, Map<String, ConcentrationRiskGroup> concentrationClasses) {
+  public static BucketMargin calculate(RiskClass riskClass, SensitivityClass sensitivityClass, BucketClass bucketClass, List<Sensitivity> sensitivities, Map<String, ConcentrationRiskGroup> concentrationClasses, HoldingPeriod holdingPeriod) {
     List<WeightingMargin> weightMargins = getWeightingMargin(sensitivities, s -> {
       if (StringUtils.equalsIgnoreCase(s.getRiskType(), RiskClass.RISK_TYPE_XCCY_BASIS)) {
         return ConcentrationRiskGroup.buildWithConcentrationOfOne(riskClass, sensitivityClass, s.getConcentrationRiskIdentifier());
       } else {
         return ConcentrationRiskGroup.findConcentrationClass(s.getConcentrationRiskIdentifier(), concentrationClasses);
       }
-    });
+    }, holdingPeriod);
     BigDecimal sumSquared = BigDecimalUtils.sumSquared(weightMargins, m -> m.getMargin());
     BiFunction<WeightingMargin, WeightingMargin, BigDecimal> correlate = (r, s) -> {
        BigDecimal sensitivityCorrelation = SimmSensitivityCorrelation.get(riskClass, r.getWeightingClass(), s.getWeightingClass());
@@ -104,9 +105,9 @@ public class BucketMargin implements ImTree {
     }
   }
 
-  public static BucketMargin calculate(RiskClass riskClass, SensitivityClass sensitivityClass, BucketClass bucketClass, List<Sensitivity> sensitivities, ConcentrationRiskGroup one) {
+  public static BucketMargin calculate(RiskClass riskClass, SensitivityClass sensitivityClass, BucketClass bucketClass, List<Sensitivity> sensitivities, ConcentrationRiskGroup one, HoldingPeriod holdingPeriod) {
     // curvature sensitivities all have CR = 1
-    List<WeightingMargin> weightMargins = getWeightingMargin(sensitivities, s -> one);
+    List<WeightingMargin> weightMargins = getWeightingMargin(sensitivities, s -> one, holdingPeriod);
     BigDecimal sumSquared = BigDecimalUtils.sumSquared(weightMargins, m -> m.getMargin());
     // curvature uses the standard correlation squared
     BiFunction<WeightingMargin, WeightingMargin, BigDecimal> correlate = (r, s) -> BigDecimalUtils.square(SimmSensitivityCorrelation.get(riskClass, r.getWeightingClass(), s.getWeightingClass()));
@@ -147,8 +148,8 @@ public class BucketMargin implements ImTree {
 
   // UTIL FUNCTIONS
 
-  public static List<WeightingMargin> getWeightingMargin(List<Sensitivity> sensitivities, Function<Sensitivity, ConcentrationRiskGroup> convert) {
-    return sensitivities.stream().map(s -> WeightingMargin.calculate(s, convert.apply(s))).collect(Collectors.toList());
+  public static List<WeightingMargin> getWeightingMargin(List<Sensitivity> sensitivities, Function<Sensitivity, ConcentrationRiskGroup> convert, HoldingPeriod holdingPeriod) {
+    return sensitivities.stream().map(s -> WeightingMargin.calculate(s, convert.apply(s), holdingPeriod)).collect(Collectors.toList());
   }
 
   public static BigDecimal sumCorrelatedForWeight(List<WeightingMargin> margins, BiFunction<WeightingMargin, WeightingMargin, BigDecimal> correlate) {

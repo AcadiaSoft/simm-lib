@@ -28,6 +28,7 @@ import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 import com.acadiasoft.im.simm.model.*;
 import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
 
 import java.math.BigDecimal;
@@ -57,35 +58,35 @@ public class SimmMargin implements ImTree {
     this.children.addAll(marginByBucket);
   }
 
-  public static SimmMargin calculateStandard(List<Sensitivity> inputSensitivities) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities);
+  public static SimmMargin calculateStandard(List<Sensitivity> inputSensitivities, HoldingPeriod holdingPeriod) {
+    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, holdingPeriod);
     BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, m -> m.getMargin());
     return new SimmMargin(productSum, marginByProductClass);
   }
 
-  public static SimmMargin calculateAdditional(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities);
+  public static SimmMargin calculateAdditional(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed, HoldingPeriod holdingPeriod) {
+    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, holdingPeriod);
     AddOnMargin addOn = AddOnMargin.calculate(marginByProductClass, multipliers, factors, notionals, fixed);
     return new SimmMargin(addOn.getMargin(), addOn);
   }
 
-  public static SimmMargin calculateTotal(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities);
+  public static SimmMargin calculateTotal(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed, HoldingPeriod holdingPeriod) {
+    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, holdingPeriod);
     AddOnMargin addOn = AddOnMargin.calculate(marginByProductClass, multipliers, factors, notionals, fixed);
     BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, m -> m.getMargin());
     return new SimmMargin(productSum.add(addOn.getMargin()), marginByProductClass, addOn);
   }
 
-  private static List<ProductMargin> getMarginByProductClass(List<Sensitivity> inputSensitivities) {
+  private static List<ProductMargin> getMarginByProductClass(List<Sensitivity> inputSensitivities, HoldingPeriod holdingPeriod) {
     // get all input sensitivities on the same "level"
-    List<Sensitivity> allSensitivities = SensitivityUtils.handleInputSensitivities(inputSensitivities);
+    List<Sensitivity> allSensitivities = SensitivityUtils.handleInputSensitivities(inputSensitivities, holdingPeriod);
 
     // Now that we have gotten all of the input sensitivities on he same level and generate curvature sensitivities, we net
     List<Sensitivity> nettedSensitivities = SensitivityUtils.netSensitivitiesByRiskFactor(allSensitivities);
 
     // map sensitivities by product class, build the exposure of each product class
     return SensitivityUtils.listByMargin(
-        e -> ProductMargin.calculate(e.getKey(), e.getValue()),
+        e -> ProductMargin.calculate(e.getKey(), e.getValue(), holdingPeriod),
         SensitivityUtils.mapByIdentifier(s -> s.getProductIdentifier(), nettedSensitivities)
     );
   }

@@ -23,6 +23,7 @@
 package com.acadiasoft.im.simm.model.param.cq;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.param.SimmRiskWeightBaseCorr;
 import com.acadiasoft.im.simm.model.param.SimmSensitivityCorrelationBaseCorr;
 
@@ -31,10 +32,12 @@ import java.math.BigDecimal;
 public class BaseCorrRiskV2_1 implements SimmRiskWeightBaseCorr, SimmSensitivityCorrelationBaseCorr {
 
   @Override
-  public BigDecimal getRiskWeight(WeightingClass w) {
+  public BigDecimal getRiskWeight(WeightingClass w, HoldingPeriod holdingPeriod) {
     // currently only one org.acadiasoft.simm.model.risk weight for base corr but the method is here
     // to handle a more complex weighting system if necessary
-    return new BigDecimal("19");
+    return holdingPeriod == HoldingPeriod.TenDay
+            ? new BigDecimal("19")
+            : new BigDecimal("6.1");
   }
 
   @Override

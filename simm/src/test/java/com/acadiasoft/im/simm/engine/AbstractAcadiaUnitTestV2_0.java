@@ -256,4 +256,32 @@ public abstract class AbstractAcadiaUnitTestV2_0 {
   public static final AddOnFixedAmount AN10 = new AddOnFixedAmount(new BigDecimal("16500000"));
   public static final AddOnFixedAmount AN11 = new AddOnFixedAmount(new BigDecimal("20000000"));
 
+  // S_CRQ
+  public static final Sensitivity S_CRQ_1 = new Sensitivity("Credit", "Risk_CreditQ",  "ISIN:BE0934259525", "1", "1y", "USD", new BigDecimal("800000"));
+  public static final Sensitivity S_CRQ_1t = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:BE0934259525", "1", "2y", "USD", new BigDecimal("800000"));
+  public static final Sensitivity S_CRQ_2 = new Sensitivity("Credit", "Risk_CreditQ",  "ISIN:BE0934259525", "1", "2y", "USD", new BigDecimal("-300000"));
+  public static final Sensitivity S_CRQ_3 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CA112585AG91", "2", "2y", "USD", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_4 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CA112585AG91", "2", "2y", "EUR", new BigDecimal("-200000"));
+  public static final Sensitivity S_CRQ_5 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CA82028KAP62", "3", "3y", "GBP", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_6 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CA82028KAP62", "3", "5y", "JPY", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_7 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:FR0000108359", "4", "5y", "USD", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_8 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:FR0000108359", "4", "5y", "USD", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_9 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CH0010519475", "5", "10y", "USD", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_10 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CH9823105801", "5", "1y", "USD", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_11 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:DE4830528795", "6", "2y", "EUR", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_12 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:GB0862147969", "7", "3y", "GBP", new BigDecimal("-600000"));
+  public static final Sensitivity S_CRQ_13 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CA6515779866", "8", "5y", "USD", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_14 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:FR0003335977", "9", "10y", "USD", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_15 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CA2201568701", "10", "1y", "USD", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_16 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:CA6130123456", "11", "2y", "USD", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_17 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:FR0002226543", "12", "3y", "USD", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_18 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:UNKNOWN1", "Residual", "1y", "USD", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_19 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:UNKNOWN1", "Residual", "3y", "USD", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_20 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:UNKNOWN2", "Residual", "3y", "EUR", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_21 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:UNKNOWN3", "Residual", "5y", "USD", new BigDecimal("200000"));
+  public static final Sensitivity S_CRQ_22 = new Sensitivity("Credit", "Risk_CreditQ", "ISIN:UNKNOWN3", "Residual", "10y", "GBP", new BigDecimal("-100000"));
+  public static final Sensitivity S_CRQ_23 = new Sensitivity("Credit", "Risk_BaseCorr", "CDX IG", "", "", "", new BigDecimal("500000"));
+  public static final Sensitivity S_CRQ_24 = new Sensitivity("Credit", "Risk_BaseCorr", "CDX IG", "", "", "", new BigDecimal("-200000"));
+  public static final Sensitivity S_CRQ_25 = new Sensitivity("Credit", "Risk_BaseCorr", "iTraxx Main", "", "", "", new BigDecimal("400000"));
+
 }

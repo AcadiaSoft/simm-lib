@@ -108,3 +108,4 @@ public class InterestRateRiskWeightV2_1 implements SimmRiskWeight {
   }
 
 }
+

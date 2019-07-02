@@ -27,6 +27,7 @@ import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.param.SimmHvr;
 import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +50,7 @@ public class SensitivityUtils {
 
   // Curvature scaling constants
   private static final BigDecimal FOURTEEN = new BigDecimal("14.0");
+  private static final BigDecimal ONE_POINT_FOUR = new BigDecimal("1.4");
   private static final BigDecimal ONE_HALF = new BigDecimal("0.5");
 
   // Curvature scaling day-in counts
@@ -64,6 +66,7 @@ public class SensitivityUtils {
    */
   private static final BigDecimal VOL_ALPHA = BigDecimal.valueOf(Math.sqrt(2.0) * Erf.erfInv(2 * .99 - 1));
   private static final BigDecimal VOL_CONST = BigDecimal.valueOf(Math.sqrt(365.0 / 14.0));
+  private static final BigDecimal VOL_CONST_1DAY = BigDecimal.valueOf(Math.sqrt(365.0 / 1.4));
 
   public static List<Sensitivity> filterDeltaFxRiskInCalcCurrency(List<Sensitivity> list, String calculationCurrency) {
     return list.stream()
@@ -111,7 +114,7 @@ public class SensitivityUtils {
    * @param sensitivities input sensitivities
    * @return list of sensitivities which contains vol weighted and scaled curvature sensitivities as well as vol weighted vega sensitivities
    */
-  public static List<Sensitivity> handleInputSensitivities(List<Sensitivity> sensitivities) {
+  public static List<Sensitivity> handleInputSensitivities(List<Sensitivity> sensitivities, HoldingPeriod holdingPeriod) {
     Map<SensitivityClass, List<Sensitivity>> map = mapByIdentifier(s -> s.getSensitivityIdentifier(), sensitivities);
     // First, we make the curvature sensitivities from the vega sensitivities and then scale them by SF(t)
     // we get all the sensitivities on the same "level"
@@ -120,9 +123,9 @@ public class SensitivityUtils {
     List<Sensitivity> volWeightedVegas;
     List<Sensitivity> volWeightedCurvatures;
     if (map.containsKey(SensitivityClass.VEGA)) {
-      List<Sensitivity> scaledCurvatures = SensitivityUtils.makeAndScaleCurvatureSensitivities(map.get(SensitivityClass.VEGA));
-      volWeightedVegas = SensitivityUtils.volWeightSensitivities(map.get(SensitivityClass.VEGA));
-      volWeightedCurvatures = SensitivityUtils.volWeightSensitivities(scaledCurvatures);
+      List<Sensitivity> scaledCurvatures = SensitivityUtils.makeAndScaleCurvatureSensitivities(map.get(SensitivityClass.VEGA), holdingPeriod);
+      volWeightedVegas = SensitivityUtils.volWeightSensitivities(map.get(SensitivityClass.VEGA), holdingPeriod);
+      volWeightedCurvatures = SensitivityUtils.volWeightSensitivities(scaledCurvatures, holdingPeriod);
     } else {
       volWeightedVegas = new ArrayList<>();
       volWeightedCurvatures = new ArrayList<>();
@@ -140,10 +143,10 @@ public class SensitivityUtils {
     return allSensitivities;
   }
 
-  private static List<Sensitivity> volWeightSensitivities(List<Sensitivity> sensitivities) {
+  private static List<Sensitivity> volWeightSensitivities(List<Sensitivity> sensitivities, HoldingPeriod holdingPeriod) {
     // method is only called on vega and curvature sensitivites
     return sensitivities.stream()
-        .map(s -> Sensitivity.fromRiskFactorKey(s.getRiskFactorKey(), s.getAmountUsd().multiply(getVolatilityWeight(s))))
+        .map(s -> Sensitivity.fromRiskFactorKey(s.getRiskFactorKey(), s.getAmountUsd().multiply(getVolatilityWeight(s, holdingPeriod))))
         .collect(Collectors.toList());
   }
 
@@ -152,16 +155,16 @@ public class SensitivityUtils {
    * @param s the sensitivity that we are vol-weighting
    * @return the volatility weight which the input sensitivity amount needs to be multiplied by to get the vega x vol amount
    */
-  private static BigDecimal getVolatilityWeight(Sensitivity s) {
+  private static BigDecimal getVolatilityWeight(Sensitivity s, HoldingPeriod holdingPeriod) {
     RiskClass riskClass = s.getRiskIdentifier();
     if (riskClass.equals(RiskClass.COMMODITY) || riskClass.equals(RiskClass.EQUITY) || riskClass.equals(RiskClass.FX)) {
       // we need to multiply by RW, HVR, and volFactor to get weighting
-      BigDecimal volFactor = getVolatilityFactor();
+      BigDecimal volFactor = getVolatilityFactor(holdingPeriod);
       // curvature doesn't have HVR value so we set it to one
       BigDecimal hvr = BigDecimal.ONE;
-      if (s.getSensitivityIdentifier().equals(SensitivityClass.VEGA)) hvr = SimmHvr.get(riskClass);
+      if (s.getSensitivityIdentifier().equals(SensitivityClass.VEGA)) hvr = SimmHvr.get(riskClass, holdingPeriod);
       // need to get delta risk weight
-      BigDecimal riskWeight = SimmRiskWeight.get(SensitivityClass.DELTA, WeightingClass.determineWeightingClass(s.getWeightingClassIdentifier()));
+      BigDecimal riskWeight = SimmRiskWeight.get(SensitivityClass.DELTA, WeightingClass.determineWeightingClass(s.getWeightingClassIdentifier()), holdingPeriod);
       return hvr.multiply(volFactor).multiply(riskWeight);
     } else {
       // Credit, IR should already be vol-weighted so weighting is one
@@ -169,14 +172,15 @@ public class SensitivityUtils {
     }
   }
 
-  private static BigDecimal getVolatilityFactor() {
-    return BigDecimalUtils.divideWithPrecision(VOL_CONST, VOL_ALPHA);
+  private static BigDecimal getVolatilityFactor(HoldingPeriod holdingPeriod) {
+    BigDecimal volConst = holdingPeriod == HoldingPeriod.TenDay ? VOL_CONST : VOL_CONST_1DAY;
+    return BigDecimalUtils.divideWithPrecision(volConst, VOL_ALPHA);
   }
 
-  private static List<Sensitivity> makeAndScaleCurvatureSensitivities(List<Sensitivity> sensitivities) {
+  private static List<Sensitivity> makeAndScaleCurvatureSensitivities(List<Sensitivity> sensitivities, HoldingPeriod holdingPeriod) {
     return sensitivities.stream()
         .map(s -> Sensitivity.fromVegaToCurvature(s))
-        .map(s -> Sensitivity.fromRiskFactorKey(s.getRiskFactorKey(), getScalingFunction(s.getLabel1()).multiply(s.getAmountUsd())))
+        .map(s -> Sensitivity.fromRiskFactorKey(s.getRiskFactorKey(), getScalingFunction(s.getLabel1(), holdingPeriod).multiply(s.getAmountUsd())))
         .collect(Collectors.toList());
   }
 
@@ -190,9 +194,10 @@ public class SensitivityUtils {
     }
   }
 
-  private static BigDecimal getScalingFunction(String expiry) {
+  private static BigDecimal getScalingFunction(String expiry, HoldingPeriod holdingPeriod) {
     BigDecimal days = getNumberOfDays(expiry);
-    BigDecimal divide = BigDecimalUtils.divideWithPrecision(FOURTEEN, days);
+    BigDecimal dividend = holdingPeriod == HoldingPeriod.TenDay ? FOURTEEN : ONE_POINT_FOUR;
+    BigDecimal divide = BigDecimalUtils.divideWithPrecision(dividend, days);
     BigDecimal min = BigDecimal.ONE.min(divide);
     return ONE_HALF.multiply(min);
   }

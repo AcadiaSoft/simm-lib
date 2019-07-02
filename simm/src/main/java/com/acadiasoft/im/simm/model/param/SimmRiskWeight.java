@@ -25,45 +25,63 @@ package com.acadiasoft.im.simm.model.param;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
+import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingOneDayRiskWeightV2_1;
 import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingRiskWeightV2_1;
+import com.acadiasoft.im.simm.model.param.commodity.CommodityOneDayRiskWeightV2_1;
 import com.acadiasoft.im.simm.model.param.commodity.CommodityRiskWeightV2_1;
+import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingOneDayRiskWeightV2_1;
 import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingRiskWeightV2_1;
+import com.acadiasoft.im.simm.model.param.equity.EquityRiskOneDayWeightV2_1;
 import com.acadiasoft.im.simm.model.param.equity.EquityRiskWeightV2_1;
+import com.acadiasoft.im.simm.model.param.fx.FXRiskOneDayWeightV2_1;
 import com.acadiasoft.im.simm.model.param.fx.FXRiskWeightV2_1;
+import com.acadiasoft.im.simm.model.param.interestrate.InterestRateOneDayRiskWeightV2_1;
 import com.acadiasoft.im.simm.model.param.interestrate.InterestRateRiskWeightV2_1;
 
 import java.math.BigDecimal;
 
 public interface SimmRiskWeight {
 
-  public static BigDecimal get(SensitivityClass s, WeightingClass weightingClass) {
+  public static BigDecimal get(SensitivityClass s, WeightingClass weightingClass, HoldingPeriod holdingPeriod) {
     RiskClass r = weightingClass.getRiskClass();
     if (s.equals(SensitivityClass.DELTA)) {
-      return fromRiskClass(r).getDeltaRiskWeight(weightingClass);
+      return fromRiskClass(r, holdingPeriod).getDeltaRiskWeight(weightingClass);
     } else if (s.equals(SensitivityClass.VEGA)) {
-      return fromRiskClass(r).getVegaRiskWeight(weightingClass);
+      return fromRiskClass(r, holdingPeriod).getVegaRiskWeight(weightingClass);
     } else if (s.equals(SensitivityClass.CURVATURE)) {
       return BigDecimal.ONE;
     } else if (s.equals(SensitivityClass.BASECORR)) {
-      return SimmRiskWeightBaseCorr.get(weightingClass);
+      return SimmRiskWeightBaseCorr.get(weightingClass, holdingPeriod);
     } else {
       throw new IllegalStateException("tried to get risk weight for unexpected sensitivity type: " + s + "]!");
     }
   }
 
-  public static SimmRiskWeight fromRiskClass(RiskClass riskClass) {
+  static SimmRiskWeight fromRiskClass(RiskClass riskClass, HoldingPeriod hp) {
     if (riskClass.equals(RiskClass.INTEREST_RATE)) {
-      return new InterestRateRiskWeightV2_1();
+      return hp == HoldingPeriod.TenDay
+              ? new InterestRateRiskWeightV2_1()
+              : new InterestRateOneDayRiskWeightV2_1();
     } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
-      return new CreditQualifyingRiskWeightV2_1();
+      return hp == HoldingPeriod.TenDay
+              ? new CreditQualifyingRiskWeightV2_1()
+              : new CreditQualifyingOneDayRiskWeightV2_1();
     } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
-      return new CreditNonQualifyingRiskWeightV2_1();
+      return hp == HoldingPeriod.TenDay
+              ? new CreditNonQualifyingRiskWeightV2_1()
+              : new CreditNonQualifyingOneDayRiskWeightV2_1();
     } else if (riskClass.equals(RiskClass.EQUITY)) {
-      return new EquityRiskWeightV2_1();
+      return hp == HoldingPeriod.TenDay
+              ? new EquityRiskWeightV2_1()
+              : new EquityRiskOneDayWeightV2_1();
     } else if (riskClass.equals(RiskClass.COMMODITY)) {
-      return new CommodityRiskWeightV2_1();
+      return hp == HoldingPeriod.TenDay
+              ? new CommodityRiskWeightV2_1()
+              : new CommodityOneDayRiskWeightV2_1();
     } else if (riskClass.equals(RiskClass.FX)) {
-      return new FXRiskWeightV2_1();
+      return hp == HoldingPeriod.TenDay
+              ? new FXRiskWeightV2_1()
+              : new FXRiskOneDayWeightV2_1();
     } else {
       throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
     }

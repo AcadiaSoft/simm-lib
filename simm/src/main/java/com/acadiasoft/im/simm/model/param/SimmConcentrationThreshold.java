@@ -30,6 +30,7 @@ import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingConcentrationRiskV2
 import com.acadiasoft.im.simm.model.param.equity.EquityConcentrationRiskV2_1;
 import com.acadiasoft.im.simm.model.param.fx.FXConcentrationRiskV2_1;
 import com.acadiasoft.im.simm.model.param.interestrate.InterestRateConcentrationRiskV2_1;
+import com.acadiasoft.im.simm.model.utils.ConcentrationRiskGroup;
 
 import java.math.BigDecimal;
 

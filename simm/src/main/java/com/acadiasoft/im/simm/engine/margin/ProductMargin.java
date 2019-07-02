@@ -26,6 +26,7 @@ import com.acadiasoft.im.base.imtree.ImTree;
 import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
 import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.param.SimmRiskClassCorrelation;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
 import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
@@ -69,9 +70,9 @@ public class ProductMargin implements ImTree {
     return LEVEL;
   }
 
-  public static ProductMargin calculate(ProductClass product, List<Sensitivity> sensitivities) {
+  public static ProductMargin calculate(ProductClass product, List<Sensitivity> sensitivities, HoldingPeriod holdingPeriod) {
     List<RiskMargin> marginByRiskClass = SensitivityUtils.listByMargin(
-        e -> RiskMargin.calculate(e.getKey(), e.getValue()),
+        e -> RiskMargin.calculate(e.getKey(), e.getValue(), holdingPeriod),
         SensitivityUtils.mapByIdentifier(s -> s.getRiskIdentifier(), sensitivities)
     );
     BigDecimal sumSquared = BigDecimalUtils.sumSquared(marginByRiskClass, m -> m.getMargin());

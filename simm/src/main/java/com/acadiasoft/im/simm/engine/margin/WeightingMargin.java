@@ -25,6 +25,7 @@ package com.acadiasoft.im.simm.engine.margin;
 import com.acadiasoft.im.base.imtree.ImTree;
 import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.ConcentrationRiskGroup;
 import com.acadiasoft.im.simm.model.Sensitivity;
 import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
@@ -46,9 +47,9 @@ public class WeightingMargin implements ImTree {
     this.concentrationRiskClass = concentrationRiskClass;
   }
 
-  public static WeightingMargin calculate(Sensitivity sensitivity, ConcentrationRiskGroup concentrationRiskClass) {
+  public static WeightingMargin calculate(Sensitivity sensitivity, ConcentrationRiskGroup concentrationRiskClass, HoldingPeriod holdingPeriod) {
     WeightingClass weightingClass = WeightingClass.determineWeightingClass(sensitivity.getWeightingClassIdentifier());
-    BigDecimal riskWeight = SimmRiskWeight.get(sensitivity.getSensitivityIdentifier(), weightingClass);
+    BigDecimal riskWeight = SimmRiskWeight.get(sensitivity.getSensitivityIdentifier(), weightingClass, holdingPeriod);
     BigDecimal amountUsd = sensitivity.getAmountUsd();
     BigDecimal concentrationRisk = concentrationRiskClass.getConcentrationRisk();
     return new WeightingMargin(weightingClass, riskWeight.multiply(amountUsd).multiply(concentrationRisk), concentrationRiskClass);

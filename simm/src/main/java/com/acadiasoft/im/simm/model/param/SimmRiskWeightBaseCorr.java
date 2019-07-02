@@ -29,10 +29,10 @@ import java.math.BigDecimal;
 
 public interface SimmRiskWeightBaseCorr {
 
-  public static BigDecimal get(WeightingClass weightingClass) {
-    return new BaseCorrRiskV2_1().getRiskWeight(weightingClass);
+  public static BigDecimal get(WeightingClass weightingClass, HoldingPeriod holdingPeriod) {
+    return new BaseCorrRiskV2_1().getRiskWeight(weightingClass, holdingPeriod);
   }
 
-  public BigDecimal getRiskWeight(WeightingClass w);
+  public BigDecimal getRiskWeight(WeightingClass w, HoldingPeriod holdingPeriod);
 
 }

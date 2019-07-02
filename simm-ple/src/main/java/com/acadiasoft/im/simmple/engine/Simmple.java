@@ -26,6 +26,7 @@ import com.acadiasoft.im.base.fx.FxConverter;
 import com.acadiasoft.im.base.imtree.ImTree;
 import com.acadiasoft.im.base.imtree.TotalMargin;
 import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationType;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
 import com.acadiasoft.im.simmple.model.imtree.BlankImTree;
 import com.acadiasoft.im.simmple.model.Crif;
@@ -50,14 +51,14 @@ public class Simmple extends SimmpleForRegulator {
 
   // NOTE: post regulator applies to the pledgor, collect regulator applies to the secured
 
-  public static ImTreeResult calculateWorstOf(List<Crif> crifs, String calculationCurrency, FxConverter fx, String resultCurrency, ImRole role, SimmCalculationType simmType, ScheduleCalculationType scheduleType, Optional<BigDecimal> netGrossRate) {
+  public static ImTreeResult calculateWorstOf(List<Crif> crifs, String calculationCurrency, FxConverter fx, String resultCurrency, ImRole role, SimmCalculationType simmType, ScheduleCalculationType scheduleType, Optional<BigDecimal> netGrossRate, HoldingPeriod holdingPeriod) {
     Function<String, ImTreeResult> convert= reg -> {
       // These methods both return trees at the model level, we need to have them in the same function so we calculate
       //  the total margin of SIMM plus Schedule for the same regulator.
       // If we move these into two separate calls a different regulator could be worse for either individual model
       //  which would result in an incorrect overall worst of amount when everything is summed
       ImTree schedule = calculateScheduleForRegulator(crifs, fx, resultCurrency, role, reg, scheduleType, netGrossRate).getImTree();
-      ImTree simm = calculateSimmForRegulator(crifs, calculationCurrency, fx, resultCurrency, role, reg, simmType).getImTree();
+      ImTree simm = calculateSimmForRegulator(crifs, calculationCurrency, fx, resultCurrency, role, reg, simmType, holdingPeriod).getImTree();
       return new ImTreeResult(TotalMargin.build(simm, schedule), reg, resultCurrency);
     };
 
@@ -71,8 +72,8 @@ public class Simmple extends SimmpleForRegulator {
     return new ImTreeResult(TotalMargin.build(treeResult.getImTree()), treeResult.getRegulator(), treeResult.getCurrency());
   }
 
-  public static ImTreeResult calculateSimmWorstOf(List<Crif> crifs, String calculationCurrency, FxConverter fx, String resultCurrency, ImRole role, SimmCalculationType simmType) {
-    Function<String, ImTreeResult> convert = reg -> calculateSimmForRegulator(crifs, calculationCurrency, fx, resultCurrency, role, reg, simmType);
+  public static ImTreeResult calculateSimmWorstOf(List<Crif> crifs, String calculationCurrency, FxConverter fx, String resultCurrency, ImRole role, SimmCalculationType simmType, HoldingPeriod holdingPeriod) {
+    Function<String, ImTreeResult> convert = reg -> calculateSimmForRegulator(crifs, calculationCurrency, fx, resultCurrency, role, reg, simmType, holdingPeriod);
     ImTreeResult treeResult = worstOf(crifs, role, convert, resultCurrency);
     return new ImTreeResult(TotalMargin.build(treeResult.getImTree()), treeResult.getRegulator(), treeResult.getCurrency());
   }

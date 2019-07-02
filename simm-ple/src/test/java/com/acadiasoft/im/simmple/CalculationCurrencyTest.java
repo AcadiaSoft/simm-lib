@@ -26,6 +26,7 @@ import com.acadiasoft.im.base.fx.FxConverter;
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.fx.NoConversionFxRate;
 import com.acadiasoft.im.simm.engine.Simm;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
 import com.acadiasoft.im.simmple.engine.Simmple;
 import com.acadiasoft.im.simmple.model.Crif;
@@ -50,8 +51,8 @@ public class CalculationCurrencyTest {
   public void testCalculationCurrencyBasic() {
     Crif one = new Crif("1a","2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "USD", "", "", "","1000.00","USD","1000.00", "CFTC", "CFTC");
     Crif two = new Crif("1b","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "","5000.00","USD","5000.00", "CFTC", "CFTC");
-    BigDecimal simmLibAmount = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR)), "GBP").negate();
-    ImTreeResult simmpleAmount = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "EUR", fx, FxRate.USD, ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal simmLibAmount = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR)), "GBP", HoldingPeriod.TenDay).negate();
+    ImTreeResult simmpleAmount = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "EUR", fx, FxRate.USD, ImRole.PLEDGOR, SimmCalculationType.STANDARD, HoldingPeriod.TenDay);
     Assert.assertEquals(simmLibAmount, simmpleAmount.getImTree().getMargin());
   }
 

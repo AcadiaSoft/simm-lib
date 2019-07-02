@@ -31,6 +31,7 @@ import com.acadiasoft.im.schedule.models.SchedulePv;
 import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationType;
 import com.acadiasoft.im.simm.engine.Simm;
 import com.acadiasoft.im.simm.model.*;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
 import com.acadiasoft.im.simmple.model.Crif;
 import com.acadiasoft.im.simmple.model.ImRole;
@@ -55,9 +56,10 @@ public class SimmpleForRegulator {
    * @param role the role that calculation is being run for
    * @param regulator the regulator we are calculating for
    * @param type the type of SIMM calculation being run
+   * @param holdingPeriod
    * @return an ImTree at the model level with the model set to SIMM
    */
-  public static ImTreeResult calculateSimmForRegulator(List<Crif> crifs, String calculationCurrency, FxConverter fx, String resultCurrency, ImRole role, String regulator, SimmCalculationType type) {
+  public static ImTreeResult calculateSimmForRegulator(List<Crif> crifs, String calculationCurrency, FxConverter fx, String resultCurrency, ImRole role, String regulator, SimmCalculationType type, HoldingPeriod holdingPeriod) {
     // get all of the crif which are in the SIMM model class with the applied regualtor
     List<Crif> filteredForSimmAndRegulator = crifs.stream().filter(isSimm).filter(c -> containsRegulator(role, c, regulator)).collect(Collectors.toList());
     // get all of the add on type crif records and convert them to their SIMM equivalent
@@ -70,7 +72,7 @@ public class SimmpleForRegulator {
     List<Crif> filteredForSensitivity = filteredForSimmAndRegulator.stream().filter(isSensitivityType).collect(Collectors.toList());
     List<Sensitivity> sensitivities = filteredForSensitivity.stream().map(c -> SimmpleConversions.convertToSensitivity(c, fx, role)).collect(Collectors.toList());
     // recalculate tree in the result currency and set the sign so that pledgor negative
-    return new ImTreeResult(ConversionImTree.convert(role, Simm.calculate(sensitivities, multipliers, factors, notionals, fixed, calculationCurrency, type), fx, FxRate.USD, resultCurrency), regulator, resultCurrency);
+    return new ImTreeResult(ConversionImTree.convert(role, Simm.calculate(sensitivities, multipliers, factors, notionals, fixed, calculationCurrency, type, holdingPeriod), fx, FxRate.USD, resultCurrency), regulator, resultCurrency);
   }
 
   /**

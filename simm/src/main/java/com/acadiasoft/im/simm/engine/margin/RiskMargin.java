@@ -27,6 +27,7 @@ import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.Sensitivity;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
 
 import java.math.BigDecimal;
@@ -75,9 +76,9 @@ public class RiskMargin implements ImTree {
     return riskClass;
   }
 
-  public static RiskMargin calculate(RiskClass riskClass, List<Sensitivity> sensitivities) {
+  public static RiskMargin calculate(RiskClass riskClass, List<Sensitivity> sensitivities, HoldingPeriod holdingPeriod) {
     List<SensitivityMargin> marginBySensitivityClass = SensitivityUtils.listByMargin(
-        e -> SensitivityMargin.calculate(riskClass, e.getKey(), e.getValue()),
+        e -> SensitivityMargin.calculate(riskClass, e.getKey(), e.getValue(), holdingPeriod),
         SensitivityUtils.mapByIdentifier(s -> s.getSensitivityIdentifier(), sensitivities)
     );
     // we sum across the sensitivity margins in the Risk Class to get the total IM for that Risk Class

@@ -27,6 +27,7 @@ import com.acadiasoft.im.base.imtree.TotalMargin;
 import com.acadiasoft.im.simm.engine.margin.SimmMargin;
 import com.acadiasoft.im.simm.model.*;
 import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
 import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
 
@@ -40,40 +41,40 @@ import java.util.Map;
  */
 public class Simm {
 
-  public static BigDecimal calculateStandard(List<Sensitivity> inputSensitivities, String calculationCurrency) {
-    return calculate(inputSensitivities, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), calculationCurrency, SimmCalculationType.STANDARD).getMargin();
+  public static BigDecimal calculateStandard(List<Sensitivity> inputSensitivities, String calculationCurrency, HoldingPeriod holdingPeriod) {
+    return calculate(inputSensitivities, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), calculationCurrency, SimmCalculationType.STANDARD, holdingPeriod).getMargin();
   }
 
-  public static BigDecimal calculateAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.ADDITIONAL).getMargin();
+  public static BigDecimal calculateAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, HoldingPeriod holdingPeriod) {
+    return calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.ADDITIONAL, holdingPeriod).getMargin();
   }
 
-  public static BigDecimal calculateTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.TOTAL).getMargin();
+  public static BigDecimal calculateTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, HoldingPeriod holdingPeriod) {
+    return calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.TOTAL, holdingPeriod).getMargin();
   }
 
-  public static ImTree calculateTreeStandard(List<Sensitivity> inputSensitivities, String calculationCurrency) {
-    return TotalMargin.build(calculate(inputSensitivities, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), calculationCurrency, SimmCalculationType.STANDARD));
+  public static ImTree calculateTreeStandard(List<Sensitivity> inputSensitivities, String calculationCurrency, HoldingPeriod holdingPeriod) {
+    return TotalMargin.build(calculate(inputSensitivities, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), calculationCurrency, SimmCalculationType.STANDARD, holdingPeriod));
   }
 
-  public static ImTree calculateTreeAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return TotalMargin.build(calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.ADDITIONAL));
+  public static ImTree calculateTreeAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, HoldingPeriod holdingPeriod) {
+    return TotalMargin.build(calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.ADDITIONAL, holdingPeriod));
   }
 
-  public static ImTree calculateTreeTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return TotalMargin.build(calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.TOTAL));
+  public static ImTree calculateTreeTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, HoldingPeriod holdingPeriod) {
+    return TotalMargin.build(calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.TOTAL, holdingPeriod));
   }
 
-  public static ImTree calculate(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, SimmCalculationType type) {
+  public static ImTree calculate(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, SimmCalculationType type, HoldingPeriod holdingPeriod) {
     List<Sensitivity> filtered = SensitivityUtils.filterDeltaFxRiskInCalcCurrency(inputSensitivities, calculationCurrency);
-    if (type.equals(SimmCalculationType.STANDARD)) return SimmMargin.calculateStandard(filtered);
+    if (type.equals(SimmCalculationType.STANDARD)) return SimmMargin.calculateStandard(filtered, holdingPeriod);
     Map<ProductClass, ProductMultiplier> multiplierMap = SensitivityUtils.groupByThenTakeFirst(multipliers, ProductMultiplier::getProductClass);
     Map<String, AddOnNotionalFactor> factorMap = SensitivityUtils.groupByThenTakeFirst(factors, AddOnNotionalFactor::getProduct);
     Map<String, List<AddOnNotional>> notionalMap = SensitivityUtils.groupBy(notionals, AddOnNotional::getProduct);
     if (type.equals(SimmCalculationType.ADDITIONAL)) {
-      return SimmMargin.calculateAdditional(filtered, multiplierMap, factorMap, notionalMap, fixed);
+      return SimmMargin.calculateAdditional(filtered, multiplierMap, factorMap, notionalMap, fixed, holdingPeriod);
     } else if (type.equals(SimmCalculationType.TOTAL)) {
-      return SimmMargin.calculateTotal(filtered, multiplierMap, factorMap, notionalMap, fixed);
+      return SimmMargin.calculateTotal(filtered, multiplierMap, factorMap, notionalMap, fixed, holdingPeriod);
     } else {
       throw new RuntimeException("Called a SIMM calculation with unknown type: [" + type + "]");
     }

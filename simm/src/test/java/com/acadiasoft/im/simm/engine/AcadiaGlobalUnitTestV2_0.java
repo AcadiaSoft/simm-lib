@@ -27,6 +27,7 @@ import com.acadiasoft.im.simm.model.AddOnNotional;
 import com.acadiasoft.im.simm.model.AddOnNotionalFactor;
 import com.acadiasoft.im.simm.model.ProductMultiplier;
 import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,7 +52,22 @@ public class AcadiaGlobalUnitTestV2_0 extends AbstractAcadiaUnitTestV2_0 {
     notional.addAll(Arrays.asList(AN9));
     List<ProductMultiplier> multipliers = Arrays.asList(CM12, IR10, EQ12, CQ16);
     List<Sensitivity> s = Arrays.asList(CM1, CM2, CM3, CM4, CM5, CM6, CM7, CM8, CM9, CM10, CM11, CQ1, CQ2, CQ3, CQ4, CQ5, CQ6, CQ7, CQ8, CQ9, CQ10, CQ11, CQ12, CQ13, CQ14, CQ15, BC1, BC2, BC3, BC4, CNQ1, CNQ2, CNQ3, CNQ4, CNQ5, CNQ6, CNQ7, CNQ8, EQ1, EQ2, EQ3, EQ4, EQ5, EQ6, EQ7, EQ8, EQ9, EQ10, EQ11, IR1, IR2, IR3, IR4, IR5, IR6, IR7, IR8, IR9, FX1, FX2, FX3, FX4, CMV1, CMV2, CMV3, CMV4, CMV5, CMV6, CQV1, CQV2, CQV3, CQV4, CQV5, CNQV1, CNQV2, CNQV3, CNQV4, CNQV5, EQV1, EQV2, EQV3, EQV4, EQV5, EQV6, EQV7, EQV8, EQV9, EQV10, FXV1, FXV2, FXV3, FXV4, FXV5, IRV1, IRV2, IRV3, IRV4, IRV5, IRV6, IRV7);
-    Assert.assertEquals(new BigDecimal("190371821528"), Simm.calculateTotal(s, multipliers, factors, notional, Arrays.asList(AN10, AN11), FxRate.USD).setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("190371821528"), Simm.calculateTotal(s, multipliers, factors, notional, Arrays.asList(AN10, AN11), FxRate.USD, HoldingPeriod.TenDay).setScale(0, RoundingMode.HALF_UP));
   }
 
+  @Test
+  public void testCRQ_1Day()
+  {
+    List<Sensitivity> s = Arrays.asList(S_CRQ_1, S_CRQ_1, S_CRQ_2);
+    BigDecimal actual = Simm.calculateTotal(
+            s,
+            Arrays.asList(),
+            EMPTY_FACTORS,
+            EMPTY_NOTIONALS,
+            ZERO_FIXED,
+            FxRate.USD,
+            HoldingPeriod.OneDay)
+            .setScale(0, RoundingMode.HALF_UP);
+    Assert.assertEquals(new BigDecimal("24979039"), actual);
+  }
 }
