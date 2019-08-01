@@ -24,15 +24,19 @@ package com.acadiasoft.im.simmple.model.utils;
 
 import com.acadiasoft.im.base.fx.FxConverter;
 import com.acadiasoft.im.base.fx.FxRate;
+import com.acadiasoft.im.base.util.BigDecimalUtils;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
 import com.acadiasoft.im.simm.model.*;
+import com.acadiasoft.im.simm.model.param.HoldingPeriod;
 import com.acadiasoft.im.simmple.model.Crif;
 import com.acadiasoft.im.simmple.model.ImRole;
 
 import java.math.BigDecimal;
 
 public class SimmpleConversions {
+
+  static final BigDecimal SQRT10 = BigDecimalUtils.sqrt(BigDecimal.TEN);
 
   public static Sensitivity convertToSensitivity(Crif crif, FxConverter fx, ImRole role) {
     BigDecimal amountUSD = getCrifAmountUsd(crif, fx);
@@ -52,8 +56,9 @@ public class SimmpleConversions {
     return new AddOnNotional(crif.getQualifier(), getCrifAmountUsd(crif, fx));
   }
 
-  public static AddOnFixedAmount convertToFixed(Crif crif, FxConverter fx) {
-    return new AddOnFixedAmount(getCrifAmountUsd(crif, fx));
+  public static AddOnFixedAmount convertToFixed(Crif crif, FxConverter fx, HoldingPeriod holdingPeriod) {
+    return new AddOnFixedAmount(getCrifAmountUsd(crif, fx)
+            .divide(holdingPeriod == HoldingPeriod.TenDay ? BigDecimal.ONE : SQRT10));
   }
 
   public static ScheduleNotional convertToScheduleNotional(Crif crif, FxConverter fx) {
