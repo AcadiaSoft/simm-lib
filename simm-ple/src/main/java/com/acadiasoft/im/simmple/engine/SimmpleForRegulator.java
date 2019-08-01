@@ -67,7 +67,7 @@ public class SimmpleForRegulator {
     List<ProductMultiplier> multipliers = filteredForAddOnType.stream().filter(isProductMultiplier).map(SimmpleConversions::convertToMultiplier).collect(Collectors.toList());
     List<AddOnNotionalFactor> factors = filteredForAddOnType.stream().filter(isNotionalFactor).map(SimmpleConversions::convertToFactor).collect(Collectors.toList());
     List<AddOnNotional> notionals = filteredForAddOnType.stream().filter(isSimmNotional).map(c -> SimmpleConversions.convertToSimmNotional(c, fx)).collect(Collectors.toList());
-    List<AddOnFixedAmount> fixed = filteredForAddOnType.stream().filter(isFixedAmount).map(c -> SimmpleConversions.convertToFixed(c, fx)).collect(Collectors.toList());
+    List<AddOnFixedAmount> fixed = filteredForAddOnType.stream().filter(isFixedAmount).map(c -> SimmpleConversions.convertToFixed(c, fx, holdingPeriod)).collect(Collectors.toList());
     // get all of the regular sensitivities from crif and convert them
     List<Crif> filteredForSensitivity = filteredForSimmAndRegulator.stream().filter(isSensitivityType).collect(Collectors.toList());
     List<Sensitivity> sensitivities = filteredForSensitivity.stream().map(c -> SimmpleConversions.convertToSensitivity(c, fx, role)).collect(Collectors.toList());
@@ -86,7 +86,7 @@ public class SimmpleForRegulator {
    * @return an ImTree at the model level with the model set to Schedule
    */
   public static ImTreeResult calculateScheduleForRegulator(List<Crif> crifs, FxConverter fx, String resultCurrency, ImRole role, String regulator, ScheduleCalculationType type, Optional<BigDecimal> netGrossRate) {
-    // get all of the crif which are in the SCHEDLE model and have the applied regulator
+    // get all of the crif which are in the SCHEDULE model and have the applied regulator
     List<Crif> filteredForSimmAndRegulator = crifs.stream().filter(isSchedule).filter(c -> containsRegulator(role, c, regulator)).collect(Collectors.toList());
     // convert the CRIF objects to the schedule module's types
     List<ScheduleNotional> notionals = filteredForSimmAndRegulator.stream().filter(isScheduleNotional).map(c -> SimmpleConversions.convertToScheduleNotional(c, fx)).collect(Collectors.toList());
