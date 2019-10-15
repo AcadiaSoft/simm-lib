@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
 
 package com.acadiasoft.im.simmple.model.utils;
 
-import com.acadiasoft.im.base.fx.FxConverter;
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
@@ -34,7 +33,7 @@ import java.math.BigDecimal;
 
 public class SimmpleConversions {
 
-  public static Sensitivity convertToSensitivity(Crif crif, FxConverter fx, ImRole role) {
+  public static Sensitivity convertToSensitivity(Crif crif, FxRate fx, ImRole role) {
     BigDecimal amountUSD = getCrifAmountUsd(crif, fx);
     if (role.equals(ImRole.PLEDGOR)) amountUSD = amountUSD.negate();
     return new Sensitivity(crif.getProductClass(), crif.getRiskType(), crif.getQualifier(), crif.getBucket(), crif.getLabel1(), crif.getLabel2(), amountUSD);
@@ -48,26 +47,26 @@ public class SimmpleConversions {
     return new AddOnNotionalFactor(crif.getQualifier(), crif.getAmount());
   }
 
-  public static AddOnNotional convertToSimmNotional(Crif crif, FxConverter fx) {
+  public static AddOnNotional convertToSimmNotional(Crif crif, FxRate fx) {
     return new AddOnNotional(crif.getQualifier(), getCrifAmountUsd(crif, fx));
   }
 
-  public static AddOnFixedAmount convertToFixed(Crif crif, FxConverter fx) {
+  public static AddOnFixedAmount convertToFixed(Crif crif, FxRate fx) {
     return new AddOnFixedAmount(getCrifAmountUsd(crif, fx));
   }
 
-  public static ScheduleNotional convertToScheduleNotional(Crif crif, FxConverter fx) {
+  public static ScheduleNotional convertToScheduleNotional(Crif crif, FxRate fx) {
     return new ScheduleNotional(crif.getTradeId(), crif.getProductClass(), crif.getValuationDate(), crif.getEndDate(), getCrifAmountUsd(crif, fx).toPlainString());
   }
 
-  public static SchedulePv convertToPv(Crif crif, FxConverter fx, ImRole role) {
+  public static SchedulePv convertToPv(Crif crif, FxRate fx, ImRole role) {
     BigDecimal amountUsd = getCrifAmountUsd(crif, fx);
     if (role.equals(ImRole.SECURED)) amountUsd = amountUsd.negate(); // note that this is opposite the sensitivity conversion because it is an NPV (MTM)
     return new SchedulePv(crif.getTradeId(), crif.getProductClass(), crif.getValuationDate(), crif.getEndDate(), amountUsd.toPlainString());
 
   }
 
-  public static BigDecimal getCrifAmountUsd(Crif crif, FxConverter fx) {
+  public static BigDecimal getCrifAmountUsd(Crif crif, FxRate fx) {
     if (crif.getAmountUSDString().isEmpty()) {
       // for sensitivities and parameters amountUSD is optional; however, you must have either
       // amount and a currency or and amountUSD which would allow us to convert to USD
@@ -77,7 +76,7 @@ public class SimmpleConversions {
     }
   }
 
-  public static BigDecimal getCrifNotionalAmountUsd(Crif crif, FxConverter fx) {
+  public static BigDecimal getCrifNotionalAmountUsd(Crif crif, FxRate fx) {
     if (crif.getNotionalCurrency().equalsIgnoreCase(FxRate.USD)) {
       return crif.getNotional();
     } else {

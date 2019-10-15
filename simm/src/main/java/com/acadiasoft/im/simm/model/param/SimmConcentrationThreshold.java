@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@ package com.acadiasoft.im.simm.model.param;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
-import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingConcentrationRiskV2_1;
-import com.acadiasoft.im.simm.model.param.commodity.CommodityConcentrationRiskV2_1;
-import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingConcentrationRiskV2_1;
-import com.acadiasoft.im.simm.model.param.equity.EquityConcentrationRiskV2_1;
-import com.acadiasoft.im.simm.model.param.fx.FXConcentrationRiskV2_1;
-import com.acadiasoft.im.simm.model.param.interestrate.InterestRateConcentrationRiskV2_1;
+import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingConcentrationRisk;
+import com.acadiasoft.im.simm.model.param.commodity.CommodityConcentrationRisk;
+import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingConcentrationRisk;
+import com.acadiasoft.im.simm.model.param.equity.EquityConcentrationRisk;
+import com.acadiasoft.im.simm.model.param.fx.FXConcentrationRisk;
+import com.acadiasoft.im.simm.model.param.interestrate.InterestRateConcentrationRisk;
 
 import java.math.BigDecimal;
 
@@ -50,17 +50,17 @@ public interface SimmConcentrationThreshold {
 
   static SimmConcentrationThreshold fromRiskClass(RiskClass riskClass) {
     if (riskClass.equals(RiskClass.INTEREST_RATE)) {
-      return new InterestRateConcentrationRiskV2_1();
+      return new InterestRateConcentrationRisk();
     } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
-      return new CreditQualifyingConcentrationRiskV2_1();
+      return new CreditQualifyingConcentrationRisk();
     } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
-      return new CreditNonQualifyingConcentrationRiskV2_1();
+      return new CreditNonQualifyingConcentrationRisk();
     } else if (riskClass.equals(RiskClass.EQUITY)) {
-      return new EquityConcentrationRiskV2_1();
+      return new EquityConcentrationRisk();
     } else if (riskClass.equals(RiskClass.COMMODITY)) {
-      return new CommodityConcentrationRiskV2_1();
+      return new CommodityConcentrationRisk();
     } else if (riskClass.equals(RiskClass.FX)) {
-      return new FXConcentrationRiskV2_1();
+      return new FXConcentrationRisk();
     } else {
       throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
     }

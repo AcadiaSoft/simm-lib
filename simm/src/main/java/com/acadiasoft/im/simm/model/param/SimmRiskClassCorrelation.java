@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,14 @@
 package com.acadiasoft.im.simm.model.param;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
-import com.acadiasoft.im.simm.model.param.risk.RiskClassCorrelationV2_1;
+import com.acadiasoft.im.simm.model.param.risk.RiskClassCorrelation;
 
 import java.math.BigDecimal;
 
 public interface SimmRiskClassCorrelation {
 
   public static BigDecimal get(RiskClass r, RiskClass s) {
-    return new RiskClassCorrelationV2_1().getRiskClassCorrelation(r, s);
+    return new RiskClassCorrelation().getRiskClassCorrelation(r, s);
   }
 
   public BigDecimal getRiskClassCorrelation(RiskClass r, RiskClass s);

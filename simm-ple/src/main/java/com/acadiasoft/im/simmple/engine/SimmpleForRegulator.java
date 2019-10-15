@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,11 @@
 
 package com.acadiasoft.im.simmple.engine;
 
-import com.acadiasoft.im.base.fx.FxConverter;
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.schedule.engine.Schedule;
 import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
-import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationType;
 import com.acadiasoft.im.simm.engine.Simm;
 import com.acadiasoft.im.simm.model.*;
 import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
@@ -57,7 +55,7 @@ public class SimmpleForRegulator {
    * @param type the type of SIMM calculation being run
    * @return an ImTree at the model level with the model set to SIMM
    */
-  public static ImTreeResult calculateSimmForRegulator(List<Crif> crifs, String calculationCurrency, FxConverter fx, String resultCurrency, ImRole role, String regulator, SimmCalculationType type) {
+  public static ImTreeResult calculateSimmForRegulator(List<Crif> crifs, String calculationCurrency, FxRate fx, String resultCurrency, ImRole role, String regulator, SimmCalculationType type) {
     // get all of the crif which are in the SIMM model class with the applied regualtor
     List<Crif> filteredForSimmAndRegulator = crifs.stream().filter(isSimm).filter(c -> containsRegulator(role, c, regulator)).collect(Collectors.toList());
     // get all of the add on type crif records and convert them to their SIMM equivalent
@@ -67,8 +65,10 @@ public class SimmpleForRegulator {
     List<AddOnNotional> notionals = filteredForAddOnType.stream().filter(isSimmNotional).map(c -> SimmpleConversions.convertToSimmNotional(c, fx)).collect(Collectors.toList());
     List<AddOnFixedAmount> fixed = filteredForAddOnType.stream().filter(isFixedAmount).map(c -> SimmpleConversions.convertToFixed(c, fx)).collect(Collectors.toList());
     // get all of the regular sensitivities from crif and convert them
-    List<Crif> filteredForSensitivity = filteredForSimmAndRegulator.stream().filter(isSensitivityType).collect(Collectors.toList());
-    List<Sensitivity> sensitivities = filteredForSensitivity.stream().map(c -> SimmpleConversions.convertToSensitivity(c, fx, role)).collect(Collectors.toList());
+    List<Sensitivity> sensitivities = filteredForSimmAndRegulator.stream()
+        .filter(isSensitivityType)
+        .map(c -> SimmpleConversions.convertToSensitivity(c, fx, role))
+        .collect(Collectors.toList());
     // recalculate tree in the result currency and set the sign so that pledgor negative
     return new ImTreeResult(ConversionImTree.convert(role, Simm.calculate(sensitivities, multipliers, factors, notionals, fixed, calculationCurrency, type), fx, FxRate.USD, resultCurrency), regulator, resultCurrency);
   }
@@ -80,20 +80,19 @@ public class SimmpleForRegulator {
    * @param resultCurrency the currency the resulting trees margins are in
    * @param role the role that the calculation is being run for
    * @param regulator the regulator that the calculation is being run for
-   * @param netGrossRate an optional containing the NGR of the Schedule Calc if it is given
    * @return an ImTree at the model level with the model set to Schedule
    */
-  public static ImTreeResult calculateScheduleForRegulator(List<Crif> crifs, FxConverter fx, String resultCurrency, ImRole role, String regulator, ScheduleCalculationType type, Optional<BigDecimal> netGrossRate) {
-    // get all of the crif which are in the SCHEDLE model and have the applied regulator
-    List<Crif> filteredForSimmAndRegulator = crifs.stream().filter(isSchedule).filter(c -> containsRegulator(role, c, regulator)).collect(Collectors.toList());
+  public static ImTreeResult calculateScheduleForRegulatorWithPvs(List<Crif> crifs, FxRate fx, String resultCurrency, ImRole role, String regulator) {
+    // get all of the crif which are in the SCHEDULE model and have the applied regulator
+    List<Crif> filteredForScheduleAndRegulator = crifs.stream().filter(isSchedule).filter(c -> containsRegulator(role, c, regulator)).collect(Collectors.toList());
     // convert the CRIF objects to the schedule module's types
-    List<ScheduleNotional> notionals = filteredForSimmAndRegulator.stream().filter(isScheduleNotional).map(c -> SimmpleConversions.convertToScheduleNotional(c, fx)).collect(Collectors.toList());
+    List<ScheduleNotional> notionals = filteredForScheduleAndRegulator.stream().filter(isScheduleNotional).map(c -> SimmpleConversions.convertToScheduleNotional(c, fx)).collect(Collectors.toList());
     // we save the list of filtered CRIF lines because we might need it later (see later comments)
-    List<Crif> filteredForPvs = filteredForSimmAndRegulator.stream().filter(isSchedulePv).collect(Collectors.toList());
+    List<Crif> filteredForPvs = filteredForScheduleAndRegulator.stream().filter(isSchedulePv).collect(Collectors.toList());
     List<SchedulePv> pvs = filteredForPvs.stream().map(c -> SimmpleConversions.convertToPv(c, fx, role)).collect(Collectors.toList());
     // now we need to check if there are any PV lines with notional field filled in without a corresponding Notional line -> if so add a new Notional line
-    Set<ScheduleIdentifier> notionalIdentifiers = notionals.stream().map(n -> n.getIdentifier()).collect(Collectors.toSet());
-    Set<ScheduleIdentifier> pvIdentifiers = pvs.stream().map(p -> p.getIdentifier()).collect(Collectors.toSet());
+    Set<ScheduleIdentifier> notionalIdentifiers = notionals.stream().map(ScheduleNotional::getIdentifier).collect(Collectors.toSet());
+    Set<ScheduleIdentifier> pvIdentifiers = pvs.stream().map(SchedulePv::getIdentifier).collect(Collectors.toSet());
     if (pvIdentifiers.size() > notionalIdentifiers.size()) { // we have pv rows that need to be checked for the notional field
       pvIdentifiers.removeAll(notionalIdentifiers); // remove all of the duplicates so that we can work with only the surplus
       pvIdentifiers.forEach(id -> {
@@ -106,7 +105,24 @@ public class SimmpleForRegulator {
     }
 
     // now we can calculate schedule im as normal, convert the tree to result currency and make it negative if role = pledgor
-    return new ImTreeResult(ConversionImTree.convert(role, Schedule.calculate(notionals, pvs, type, netGrossRate), fx, FxRate.USD, resultCurrency), regulator, resultCurrency);
+    return new ImTreeResult(ConversionImTree.convert(role, Schedule.calculateWithPvs(notionals, pvs), fx, FxRate.USD, resultCurrency), regulator, resultCurrency);
   }
 
+  /**
+   *
+   * @param crifs the input lines of CRIF formatted data
+   * @param fx an fx conversion implementation
+   * @param resultCurrency the currency the resulting trees margins are in
+   * @param role the role that the calculation is being run for
+   * @param regulator the regulator that the calculation is being run for
+   * @param netGrossRate the NGR of the Schedule Calc which defaults to one if null
+   * @return an ImTree at the model level with the model set to Schedule
+   */
+  public static ImTreeResult calculateScheduleForRegulatorWithoutPvs(List<Crif> crifs, FxRate fx, String resultCurrency, ImRole role, String regulator, BigDecimal netGrossRate) {
+    // get all of the crif which are in the SCHEDULE model and have the applied regulator
+    List<Crif> filteredForScheduleAndRegulator = crifs.stream().filter(isSchedule).filter(c -> containsRegulator(role, c, regulator)).collect(Collectors.toList());
+    // convert the CRIF objects to the schedule module's types
+    List<ScheduleNotional> notionals = filteredForScheduleAndRegulator.stream().filter(isScheduleNotional).map(c -> SimmpleConversions.convertToScheduleNotional(c, fx)).collect(Collectors.toList());
+    return new ImTreeResult(ConversionImTree.convert(role, Schedule.calculateWithoutPvs(notionals, netGrossRate), fx, FxRate.USD, resultCurrency), regulator, resultCurrency);
+  }
 }

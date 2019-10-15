@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,16 @@
  * SOFTWARE.
  */
 
-package com.acadiasoft.im.simm.model.param.fx;
+package com.acadiasoft.im.simm.model.param;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
-import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
+
 import java.math.BigDecimal;
 
-/**
- * As defined in Appendix 1 section I of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
- */
-public class FXRiskWeightV2_1 implements SimmRiskWeight {
+public interface SimmFxRiskWeight {
 
-  private static final BigDecimal ALL = new BigDecimal("8.1");
-  private static final BigDecimal VEGA = new BigDecimal("0.30");
+  public BigDecimal getDeltaRiskWeight(WeightingClass weightingClass, String calculationCurrency);
 
-  @Override
-  public BigDecimal getDeltaRiskWeight(WeightingClass s) {
-    // only one bucket for all currencies in FX org.acadiasoft.simm.model.risk class
-    return ALL;
-  }
-
-  @Override
-  public BigDecimal getVegaRiskWeight(WeightingClass s) {
-    return VEGA;
-  }
+  public BigDecimal getVegaRiskWeight(WeightingClass weightingClass, String calculationCurrency);
 
 }

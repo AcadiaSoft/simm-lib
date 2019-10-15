@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,39 +20,28 @@
  * SOFTWARE.
  */
 
-package com.acadiasoft.im.simm.model.param.cnq;
+package com.acadiasoft.im.simm.model.param.cq;
 
-import com.acadiasoft.im.simm.model.imtree.identifiers.BucketType;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
-import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
+import com.acadiasoft.im.simm.model.param.SimmRiskWeightBaseCorr;
+import com.acadiasoft.im.simm.model.param.SimmSensitivityCorrelationBaseCorr;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
-/**
- * As defined in Appendix 1 of ISDA_SIMM_2.0_(PUBLIC).pdf
- */
-public class CreditNonQualifyingRiskWeightV2_1 implements SimmRiskWeight {
-
-  private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
-
-  static {
-    WEIGHTS.put(BucketType.CRNQ1, new BigDecimal("150"));
-    WEIGHTS.put(BucketType.CRNQ2, new BigDecimal("1200"));
-    WEIGHTS.put(BucketType.CRNQRESIDUAL, new BigDecimal("1200"));
-  }
-
-  private static final BigDecimal VEGA = new BigDecimal("0.27");
+public class BaseCorrRisk implements SimmRiskWeightBaseCorr, SimmSensitivityCorrelationBaseCorr {
 
   @Override
-  public BigDecimal getDeltaRiskWeight(WeightingClass s) {
-    return WEIGHTS.get(s.getBucketIdentifier().getBucketType());
+  public BigDecimal getRiskWeight(WeightingClass w) {
+    // currently only one org.acadiasoft.simm.model.risk weight for base corr but the method is here
+    // to handle a more complex weighting system if necessary
+    return new BigDecimal("7");
   }
 
   @Override
-  public BigDecimal getVegaRiskWeight(WeightingClass s) {
-    return VEGA;
+  public BigDecimal getSensitivityCorrelation(WeightingClass r, WeightingClass s) {
+    // currently only one value for correlation but method is here if
+    // base corr gets updated to org.acadiasoft.simm.model.sensitivity dependent correlations
+    return new BigDecimal("0.14");
   }
 
 }

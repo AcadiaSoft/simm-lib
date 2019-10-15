@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,6 @@
 package com.acadiasoft.im.base.fx;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 /**
  *
@@ -33,18 +31,7 @@ import java.time.ZonedDateTime;
 public class NoConversionFxRate implements FxRate {
 
   @Override
-  public BigDecimal getRate(String from, String to) {
-    return BigDecimal.ONE;
+  public BigDecimal convert(BigDecimal amount, String from, String to) {
+    return amount;
   }
-
-  @Override
-  public BigDecimal getRate(String from, String to, LocalDate valuationDate) {
-    return BigDecimal.ONE;
-  }
-
-  @Override
-  public BigDecimal getRate(String from, String to, ZonedDateTime timestamp) {
-    return BigDecimal.ONE;
-  }
-
 }

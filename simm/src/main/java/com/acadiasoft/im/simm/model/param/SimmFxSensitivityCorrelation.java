@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,14 @@
  * SOFTWARE.
  */
 
-package com.acadiasoft.im.simm.model.param.cq;
+package com.acadiasoft.im.simm.model.param;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
-import com.acadiasoft.im.simm.model.param.SimmRiskWeightBaseCorr;
-import com.acadiasoft.im.simm.model.param.SimmSensitivityCorrelationBaseCorr;
 
 import java.math.BigDecimal;
 
-public class BaseCorrRiskV2_1 implements SimmRiskWeightBaseCorr, SimmSensitivityCorrelationBaseCorr {
+public interface SimmFxSensitivityCorrelation {
 
-  @Override
-  public BigDecimal getRiskWeight(WeightingClass w) {
-    // currently only one org.acadiasoft.simm.model.risk weight for base corr but the method is here
-    // to handle a more complex weighting system if necessary
-    return new BigDecimal("19");
-  }
-
-  @Override
-  public BigDecimal getSensitivityCorrelation(WeightingClass r, WeightingClass s) {
-    // currently only one value for correlation but method is here if
-    // base corr gets updated to org.acadiasoft.simm.model.sensitivity dependent correlations
-    return new BigDecimal("0.05");
-  }
+  public BigDecimal getSensitivityCorrelation(WeightingClass r, WeightingClass s, String calculationCurrency);
 
 }

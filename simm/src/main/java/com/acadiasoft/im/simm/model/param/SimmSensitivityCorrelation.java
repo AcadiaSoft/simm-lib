@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,31 +23,37 @@
 package com.acadiasoft.im.simm.model.param;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
+import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
-import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingCorrelationV2_1;
-import com.acadiasoft.im.simm.model.param.commodity.CommodityCorrelationV2_1;
-import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingCorrelationV2_1;
-import com.acadiasoft.im.simm.model.param.equity.EquityCorrelationV2_1;
-import com.acadiasoft.im.simm.model.param.fx.FXCorrelationV2_1;
-import com.acadiasoft.im.simm.model.param.interestrate.InterestRateCorrelationV2_1;
+import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingCorrelation;
+import com.acadiasoft.im.simm.model.param.commodity.CommodityCorrelation;
+import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingCorrelation;
+import com.acadiasoft.im.simm.model.param.equity.EquityCorrelation;
+import com.acadiasoft.im.simm.model.param.fx.FXCorrelation;
+import com.acadiasoft.im.simm.model.param.interestrate.InterestRateCorrelation;
 
 import java.math.BigDecimal;
 
 public interface SimmSensitivityCorrelation {
 
-  public static BigDecimal get(RiskClass riskClass, WeightingClass r, WeightingClass s) {
+  public static BigDecimal get(RiskClass riskClass, SensitivityClass sensitivityClass,
+                               WeightingClass r, WeightingClass s, String calculationCurrency) {
     if (riskClass.equals(RiskClass.INTEREST_RATE)) {
-      return new InterestRateCorrelationV2_1().getSensitivityCorrelation(r, s);
+      return new InterestRateCorrelation().getSensitivityCorrelation(r, s);
     } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
-      return new CreditQualifyingCorrelationV2_1().getSensitivityCorrelation(r, s);
+      return new CreditQualifyingCorrelation().getSensitivityCorrelation(r, s);
     } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
-      return new CreditNonQualifyingCorrelationV2_1().getSensitivityCorrelation(r, s);
+      return new CreditNonQualifyingCorrelation().getSensitivityCorrelation(r, s);
     } else if (riskClass.equals(RiskClass.EQUITY)) {
-      return new EquityCorrelationV2_1().getSensitivityCorrelation(r, s);
+      return new EquityCorrelation().getSensitivityCorrelation(r, s);
     } else if (riskClass.equals(RiskClass.COMMODITY)) {
-      return new CommodityCorrelationV2_1().getSensitivityCorrelation(r, s);
+      return new CommodityCorrelation().getSensitivityCorrelation(r, s);
     } else if (riskClass.equals(RiskClass.FX)) {
-      return new FXCorrelationV2_1().getSensitivityCorrelation(r, s);
+      if (sensitivityClass.equals(SensitivityClass.DELTA)) {
+        return new FXCorrelation().getSensitivityCorrelation(r, s, calculationCurrency);
+      } else {
+        return FXCorrelation.CORRELATION;
+      }
     } else {
       throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
     }

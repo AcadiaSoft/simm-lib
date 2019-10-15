@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +20,46 @@
  * SOFTWARE.
  */
 
-package com.acadiasoft.im.simm.model.param.fx;
+package com.acadiasoft.im.simm.model.param.cnq;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketClass;
+import com.acadiasoft.im.simm.model.imtree.identifiers.BucketType;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
+import com.acadiasoft.im.simm.model.Sensitivity;
 import com.acadiasoft.im.simm.model.param.SimmBucketCorrelation;
 import com.acadiasoft.im.simm.model.param.SimmSensitivityCorrelation;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 
 /**
- * As defined in Appendix 1 section I of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * As defined in Appendix 1 of ISDA_SIMM_2.0_(PUBLIC).pdf
  */
-public class FXCorrelationV2_1 implements SimmBucketCorrelation, SimmSensitivityCorrelation {
+public class CreditNonQualifyingCorrelation implements SimmBucketCorrelation, SimmSensitivityCorrelation {
 
-  public static final BigDecimal CORRELATION = new BigDecimal("0.5");
-
+  public static final BigDecimal AGGREGATE_SAME = new BigDecimal("0.43");
+  public static final BigDecimal AGGREGATE_DIFF = new BigDecimal("0.15");
+  public static final BigDecimal RESIDUAL = new BigDecimal("0.50");
+  public static final BigDecimal NON_RESIDUAL_TO_NON_RESIDUAL = new BigDecimal("0.17");
 
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass si, WeightingClass sk) {
-    return CORRELATION;
+    if (StringUtils.equalsIgnoreCase(Sensitivity.RESIDUAL, si.getBucket())
+      || StringUtils.equalsIgnoreCase(Sensitivity.RESIDUAL, sk.getBucket())) {
+      return RESIDUAL;
+    } else if (StringUtils.equalsIgnoreCase(si.getLabel2(), sk.getLabel2())) {
+      return AGGREGATE_SAME;
+    } else {
+      return AGGREGATE_DIFF;
+    }
   }
 
   @Override
   public BigDecimal getBucketCorrelation(BucketClass bi, BucketClass bk) {
-    // all FX in the same bucket, so we should actually never call this method
-    return BigDecimal.ONE;
+    if (BucketType.isResidualBucket(bi.getBucketType()) || BucketType.isResidualBucket(bk.getBucketType())) {
+      throw new RuntimeException("called bucket correlation for a residual bucket: " + bi + ", " + bk);
+    } else {
+      return NON_RESIDUAL_TO_NON_RESIDUAL;
+    }
   }
-
 }

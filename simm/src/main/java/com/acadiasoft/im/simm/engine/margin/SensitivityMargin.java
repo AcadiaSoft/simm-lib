@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -67,11 +67,12 @@ public class SensitivityMargin implements ImTree {
     this.children.addAll(marginByBucket);
   }
 
-  public static SensitivityMargin calculate(RiskClass riskClass, SensitivityClass sensitivityClass, List<Sensitivity> sensitivities) {
+  public static SensitivityMargin calculate(RiskClass riskClass, SensitivityClass sensitivityClass,
+                                            List<Sensitivity> sensitivities, String calculationCurrency) {
     if (sensitivityClass.equals(SensitivityClass.BASECORR)) {
-      return calculateForBaseCorr(sensitivities);
+      return calculateForBaseCorr(sensitivities, calculationCurrency);
     } else if (sensitivityClass.equals(SensitivityClass.CURVATURE)) {
-      return calculateForCurvature(riskClass, sensitivities);
+      return calculateForCurvature(riskClass, sensitivities, calculationCurrency);
     } else {
       Map<BucketClass, List<Sensitivity>> mapByBucket = SensitivityUtils.mapByIdentifier(s -> s.getBucketIdentifier(), sensitivities);
       Map<BucketClass, Map<String, ConcentrationRiskGroup>> classes = mapByBucket.entrySet().stream()
@@ -94,7 +95,7 @@ public class SensitivityMargin implements ImTree {
           ));
 
       List<BucketMargin> marginByBucket = SensitivityUtils.listByMargin(
-          e -> BucketMargin.calculate(riskClass, sensitivityClass, e.getKey(), e.getValue(), classes.get(e.getKey())),
+          e -> BucketMargin.calculate(riskClass, sensitivityClass, e.getKey(), e.getValue(), classes.get(e.getKey()), calculationCurrency),
           mapByBucket
       );
 
@@ -118,7 +119,8 @@ public class SensitivityMargin implements ImTree {
             BigDecimal concentrationCorrelation = ConcentrationRiskGroup.correlateClasses(r.getBucketConcentrationClass(), s.getBucketConcentrationClass());
             BigDecimal correlation = SimmBucketCorrelation.get(riskClass, r.getBucketClass(), s.getBucketClass());
             return concentrationCorrelation.multiply(correlation);
-          }
+          },
+          calculationCurrency
       );
 
       BigDecimal total = BigDecimalUtils.sqrt(nonResCrossSumSquared.add(nonResCrossCorrelation)).add(BigDecimalUtils.sqrt(resCrossSumSquared));
@@ -126,10 +128,11 @@ public class SensitivityMargin implements ImTree {
     }
   }
 
-  private static SensitivityMargin calculateForBaseCorr(List<Sensitivity> sensitivities) {
+  private static SensitivityMargin calculateForBaseCorr(List<Sensitivity> sensitivities, String calculationCurrency) {
     List<WeightingMargin> weighted = BucketMargin.getWeightingMargin(
         sensitivities,
-        s -> ConcentrationRiskGroup.buildWithConcentrationOfOne(RiskClass.CREDIT_QUALIFYING, SensitivityClass.BASECORR, SensitivityClass.BASECORR.getLabel())
+        s -> ConcentrationRiskGroup.buildWithConcentrationOfOne(RiskClass.CREDIT_QUALIFYING, SensitivityClass.BASECORR, SensitivityClass.BASECORR.getLabel()),
+        calculationCurrency
     );
 
     BigDecimal sumSquared = BigDecimalUtils.sumSquared(weighted, (m) -> m.getMargin());
@@ -139,13 +142,14 @@ public class SensitivityMargin implements ImTree {
     return new SensitivityMargin(SensitivityClass.BASECORR, total, new ArrayList<>());
   }
 
-  private static SensitivityMargin calculateForCurvature(RiskClass riskClass, List<Sensitivity> sensitivities) {
+  private static SensitivityMargin calculateForCurvature(RiskClass riskClass, List<Sensitivity> sensitivities, String calculationCurrency) {
     // there is no concentration risk for curvatire margin so we use the concentration risk
     ConcentrationRiskGroup one = ConcentrationRiskGroup.buildWithConcentrationOfOne(riskClass, SensitivityClass.CURVATURE, SensitivityClass.CURVATURE.getLabel());
     Map<BucketClass, List<Sensitivity>> mapByBucketClass = SensitivityUtils.mapByIdentifier(s -> s.getBucketIdentifier(), sensitivities);
-    List<BucketMargin> margins = SensitivityUtils.listByMargin(e -> BucketMargin.calculate(riskClass, SensitivityClass.CURVATURE, e.getKey(), e.getValue(), one), mapByBucketClass);
-    BigDecimal nonResMargin = calculateCurvatureMarginPart(riskClass, margins, mapByBucketClass, one,true);
-    BigDecimal resMargin = calculateCurvatureMarginPart(riskClass, margins, mapByBucketClass, one, false);
+    List<BucketMargin> margins = SensitivityUtils.listByMargin(e ->
+      BucketMargin.calculate(riskClass, SensitivityClass.CURVATURE, e.getKey(), e.getValue(), one, calculationCurrency), mapByBucketClass);
+    BigDecimal nonResMargin = calculateCurvatureMarginPart(riskClass, margins, mapByBucketClass, one, calculationCurrency,true);
+    BigDecimal resMargin = calculateCurvatureMarginPart(riskClass, margins, mapByBucketClass, one, calculationCurrency, false);
 
     if (riskClass.equals(RiskClass.INTEREST_RATE)) {
       // the interest rate curvature class is multiplied by a factor of HVR_{IR}^{-2}
@@ -157,7 +161,8 @@ public class SensitivityMargin implements ImTree {
     }
   }
 
-  private static BigDecimal calculateCurvatureMarginPart(RiskClass riskClass, List<BucketMargin> margins, Map<BucketClass, List<Sensitivity>> mapByBucketClass, ConcentrationRiskGroup one, boolean removeResidual) {
+  private static BigDecimal calculateCurvatureMarginPart(RiskClass riskClass, List<BucketMargin> margins, Map<BucketClass,
+    List<Sensitivity>> mapByBucketClass, ConcentrationRiskGroup one, String calculationCurrency, boolean removeResidual) {
     List<BucketMargin> filtered = filterForResiduals(margins, removeResidual);
     BigDecimal crossBucketSumSquared = BigDecimalUtils.sumSquared(filtered, m -> m.getMargin());
 
@@ -167,11 +172,12 @@ public class SensitivityMargin implements ImTree {
         filtered,
         filterForResiduals(mapByBucketClass, removeResidual),
         (s) -> one,
-        (r, s) -> BigDecimalUtils.square(SimmBucketCorrelation.get(riskClass, r.getBucketClass(), s.getBucketClass()))
+        (r, s) -> BigDecimalUtils.square(SimmBucketCorrelation.get(riskClass, r.getBucketClass(), s.getBucketClass())),
+        calculationCurrency
     );
 
     List<Sensitivity> allSensitivities = filterForResiduals(mapByBucketClass, removeResidual).values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-    List<WeightingMargin> weighted = BucketMargin.getWeightingMargin(allSensitivities, s -> one);
+    List<WeightingMargin> weighted = BucketMargin.getWeightingMargin(allSensitivities, s -> one, calculationCurrency);
     BigDecimal lambda = calculateLambda(weighted);
     BigDecimal rhs = lambda.multiply(BigDecimalUtils.sqrt(crossBucketSumSquared.add(crossBucketCorrelation)));
     BigDecimal lhs = BigDecimalUtils.sum(weighted, m -> m.getMargin());
@@ -206,12 +212,14 @@ public class SensitivityMargin implements ImTree {
 
   // UTIL FUNCTIONS
 
-  private static BigDecimal sumCorrelatedForBucket(List<BucketMargin> margins, Map<BucketClass, List<Sensitivity>> sensitivitiesByBucket, Function<Sensitivity, ConcentrationRiskGroup> convert, BiFunction<BucketMargin, BucketMargin, BigDecimal> correlate) {
+  private static BigDecimal sumCorrelatedForBucket(List<BucketMargin> margins, Map<BucketClass,
+      List<Sensitivity>> sensitivitiesByBucket, Function<Sensitivity, ConcentrationRiskGroup> convert,
+      BiFunction<BucketMargin, BucketMargin, BigDecimal> correlate, String calculationCurrency) {
     Map<BucketClass, BucketMargin> marginByBucket = margins.stream().collect(Collectors.toMap(b -> b.getBucketClass(), b -> b));
     Map<BucketClass, BigDecimal> sValue = sensitivitiesByBucket.entrySet().stream().collect(Collectors.toMap(
         e -> e.getKey(),
         e -> {
-          BigDecimal sum = BigDecimalUtils.sum(BucketMargin.getWeightingMargin(e.getValue(), convert), m -> m.getMargin());
+          BigDecimal sum = BigDecimalUtils.sum(BucketMargin.getWeightingMargin(e.getValue(), convert, calculationCurrency), m -> m.getMargin());
           BigDecimal bucketMargin = marginByBucket.get(e.getKey()).getMargin();
           return sum.min(bucketMargin).max(bucketMargin.negate());
         }));

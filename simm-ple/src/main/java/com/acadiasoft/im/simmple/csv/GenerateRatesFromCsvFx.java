@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -83,7 +83,6 @@ public class GenerateRatesFromCsvFx implements FxRate {
     }
   }
 
-  @Override
   public BigDecimal getRate(String from, String to) {
     if (rates.containsKey(from)) {
       if (rates.get(from).containsKey(to)) {
@@ -100,15 +99,9 @@ public class GenerateRatesFromCsvFx implements FxRate {
   }
 
   @Override
-  public BigDecimal getRate(String from, String to, LocalDate date) {
-    return this.getRate(from, to);
+  public BigDecimal convert(BigDecimal amount, String from, String to) {
+    return amount.multiply(getRate(from, to));
   }
-
-  @Override
-  public BigDecimal getRate(String from, String to, ZonedDateTime timestamp) {
-    return this.getRate(from, to);
-  }
-
 
   private class BridgeRate {
 

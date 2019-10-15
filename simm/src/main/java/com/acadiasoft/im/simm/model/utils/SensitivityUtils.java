@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -111,7 +111,7 @@ public class SensitivityUtils {
    * @param sensitivities input sensitivities
    * @return list of sensitivities which contains vol weighted and scaled curvature sensitivities as well as vol weighted vega sensitivities
    */
-  public static List<Sensitivity> handleInputSensitivities(List<Sensitivity> sensitivities) {
+  public static List<Sensitivity> handleInputSensitivities(List<Sensitivity> sensitivities, String calculationCurrency) {
     Map<SensitivityClass, List<Sensitivity>> map = mapByIdentifier(s -> s.getSensitivityIdentifier(), sensitivities);
     // First, we make the curvature sensitivities from the vega sensitivities and then scale them by SF(t)
     // we get all the sensitivities on the same "level"
@@ -121,8 +121,8 @@ public class SensitivityUtils {
     List<Sensitivity> volWeightedCurvatures;
     if (map.containsKey(SensitivityClass.VEGA)) {
       List<Sensitivity> scaledCurvatures = SensitivityUtils.makeAndScaleCurvatureSensitivities(map.get(SensitivityClass.VEGA));
-      volWeightedVegas = SensitivityUtils.volWeightSensitivities(map.get(SensitivityClass.VEGA));
-      volWeightedCurvatures = SensitivityUtils.volWeightSensitivities(scaledCurvatures);
+      volWeightedVegas = SensitivityUtils.volWeightSensitivities(map.get(SensitivityClass.VEGA), calculationCurrency);
+      volWeightedCurvatures = SensitivityUtils.volWeightSensitivities(scaledCurvatures, calculationCurrency);
     } else {
       volWeightedVegas = new ArrayList<>();
       volWeightedCurvatures = new ArrayList<>();
@@ -140,10 +140,11 @@ public class SensitivityUtils {
     return allSensitivities;
   }
 
-  private static List<Sensitivity> volWeightSensitivities(List<Sensitivity> sensitivities) {
+  private static List<Sensitivity> volWeightSensitivities(List<Sensitivity> sensitivities, String calculationCurrency) {
     // method is only called on vega and curvature sensitivites
     return sensitivities.stream()
-        .map(s -> Sensitivity.fromRiskFactorKey(s.getRiskFactorKey(), s.getAmountUsd().multiply(getVolatilityWeight(s))))
+        .map(s -> Sensitivity.fromRiskFactorKey(s.getRiskFactorKey(),
+          s.getAmountUsd().multiply(getVolatilityWeight(s, calculationCurrency))))
         .collect(Collectors.toList());
   }
 
@@ -152,7 +153,7 @@ public class SensitivityUtils {
    * @param s the sensitivity that we are vol-weighting
    * @return the volatility weight which the input sensitivity amount needs to be multiplied by to get the vega x vol amount
    */
-  private static BigDecimal getVolatilityWeight(Sensitivity s) {
+  private static BigDecimal getVolatilityWeight(Sensitivity s, String calculationCurrency) {
     RiskClass riskClass = s.getRiskIdentifier();
     if (riskClass.equals(RiskClass.COMMODITY) || riskClass.equals(RiskClass.EQUITY) || riskClass.equals(RiskClass.FX)) {
       // we need to multiply by RW, HVR, and volFactor to get weighting
@@ -161,7 +162,8 @@ public class SensitivityUtils {
       BigDecimal hvr = BigDecimal.ONE;
       if (s.getSensitivityIdentifier().equals(SensitivityClass.VEGA)) hvr = SimmHvr.get(riskClass);
       // need to get delta risk weight
-      BigDecimal riskWeight = SimmRiskWeight.get(SensitivityClass.DELTA, WeightingClass.determineWeightingClass(s.getWeightingClassIdentifier()));
+      BigDecimal riskWeight = SimmRiskWeight.getForVolWeight(
+        WeightingClass.determineWeightingClass(s.getWeightingClassIdentifier()), calculationCurrency);
       return hvr.multiply(volFactor).multiply(riskWeight);
     } else {
       // Credit, IR should already be vol-weighted so weighting is one
@@ -175,6 +177,8 @@ public class SensitivityUtils {
 
   private static List<Sensitivity> makeAndScaleCurvatureSensitivities(List<Sensitivity> sensitivities) {
     return sensitivities.stream()
+        // the curvature margin of EQV bucket 12 is take to be zero so filter out any EQV-12 sensitivities
+        .filter(s -> !(s.getRiskIdentifier().equals(RiskClass.EQUITY) && s.getBucket().equals("12")))
         .map(s -> Sensitivity.fromVegaToCurvature(s))
         .map(s -> Sensitivity.fromRiskFactorKey(s.getRiskFactorKey(), getScalingFunction(s.getLabel1()).multiply(s.getAmountUsd())))
         .collect(Collectors.toList());

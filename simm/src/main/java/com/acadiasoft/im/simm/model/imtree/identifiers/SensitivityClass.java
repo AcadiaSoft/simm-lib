@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ public enum SensitivityClass implements MarginIdentifier {
   DELTA("Delta"),
   VEGA("Vega"),
   CURVATURE("Curvature"),
-  BASECORR("Base Correlation");
+  BASECORR("BaseCorr"); // Base Correlation
 
   private final String label;
   public static final String VEGA_SUFFIX = "Vol";

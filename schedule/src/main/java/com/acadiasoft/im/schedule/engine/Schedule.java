@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,14 +29,11 @@ import com.acadiasoft.im.schedule.engine.margin.ScheduleMargin;
 import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
-import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationType;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -52,7 +49,7 @@ public class Schedule {
    * @return Schedule IM exposure amount
    */
   public static BigDecimal calculate(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
-    return calculate(notionals, new ArrayList<>(), ScheduleCalculationType.WITHOUT_PVS, Optional.ofNullable(netGrossRate)).getMargin();
+    return calculateWithoutPvs(notionals, netGrossRate).getMargin();
   }
 
   /**
@@ -62,33 +59,43 @@ public class Schedule {
    * @return Schedule IM exposure amount
    */
   public static BigDecimal calculate(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
-    return calculate(notionals, pvs, ScheduleCalculationType.WITH_PVS, Optional.empty()).getMargin();
+    return calculateWithPvs(notionals, pvs).getMargin();
   }
 
   public static ImTree calculateTree(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
-    return TotalMargin.build(calculate(notionals, new ArrayList<>(), ScheduleCalculationType.WITHOUT_PVS, Optional.ofNullable(netGrossRate)));
+    return TotalMargin.build(calculateWithoutPvs(notionals, netGrossRate));
   }
 
   public static ImTree calculateTree(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
-    return TotalMargin.build(calculate(notionals, pvs, ScheduleCalculationType.WITH_PVS, Optional.empty()));
+    return TotalMargin.build(calculateWithPvs(notionals, pvs));
   }
 
-  public static ImTree calculate(List<ScheduleNotional> notionals, List<SchedulePv> pvs, ScheduleCalculationType type, Optional<BigDecimal> netGrossRate) {
+  public static ImTree calculateWithPvs(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
     // map an net by trade id, etc. for the notionals
     Map<ScheduleIdentifier, List<ScheduleNotional>> mappedNotionals = notionals.stream()
-        .collect(Collectors.groupingBy(n -> n.getIdentifier(), Collectors.toList()));
+        .collect(Collectors.groupingBy(ScheduleNotional::getIdentifier, Collectors.toList()));
     // NOTE: we only care about the absolute notional after netting, so we take the absolute value of the sum
     List<ScheduleNotional> nettedNotionals = mappedNotionals.entrySet().stream()
-        .map(e -> ScheduleNotional.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), n -> n.getAmountUSD()).abs()))
+        .map(e -> ScheduleNotional.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), ScheduleNotional::getAmountUSD).abs()))
         .collect(Collectors.toList());
-    if (type.equals(ScheduleCalculationType.WITHOUT_PVS)) return ScheduleMargin.calculate(nettedNotionals, netGrossRate.orElse(BigDecimal.ONE));
     // this is a WITH call so map pvs too
     Map<ScheduleIdentifier, List<SchedulePv>> mappedPvs = pvs.stream()
-        .collect(Collectors.groupingBy(p -> p.getIdentifier(), Collectors.toList()));
+        .collect(Collectors.groupingBy(SchedulePv::getIdentifier, Collectors.toList()));
     List<SchedulePv> nettedPvs = mappedPvs.entrySet().stream()
-        .map(e -> SchedulePv.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), p -> p.getAmountUSD())))
+        .map(e -> SchedulePv.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), SchedulePv::getAmountUSD)))
         .collect(Collectors.toList());
     return ScheduleMargin.calculate(nettedNotionals, nettedPvs);
+  }
+
+  public static ImTree calculateWithoutPvs(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
+    // map an net by trade id, etc. for the notionals
+    Map<ScheduleIdentifier, List<ScheduleNotional>> mappedNotionals = notionals.stream()
+        .collect(Collectors.groupingBy(ScheduleNotional::getIdentifier, Collectors.toList()));
+    // NOTE: we only care about the absolute notional after netting, so we take the absolute value of the sum
+    List<ScheduleNotional> nettedNotionals = mappedNotionals.entrySet().stream()
+        .map(e -> ScheduleNotional.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), ScheduleNotional::getAmountUSD).abs()))
+        .collect(Collectors.toList());
+    return ScheduleMargin.calculate(nettedNotionals, Optional.ofNullable(netGrossRate).orElse(BigDecimal.ONE));
   }
 
 }

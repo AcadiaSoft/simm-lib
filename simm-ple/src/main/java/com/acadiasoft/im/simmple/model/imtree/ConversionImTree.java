@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 package com.acadiasoft.im.simmple.model.imtree;
 
 
-import com.acadiasoft.im.base.fx.FxConverter;
+import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.imtree.ImTree;
 import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 import com.acadiasoft.im.simmple.model.ImRole;
@@ -54,7 +54,7 @@ public class ConversionImTree implements ImTree {
     this.margin = margin;
   }
 
-  public static ImTree convert(ImRole role, ImTree old, FxConverter fx, String from, String to) {
+  public static ImTree convert(ImRole role, ImTree old, FxRate fx, String from, String to) {
     List<ImTree> newChildren = old.getChildren().stream().map(c -> convert(role, c, fx, from, to)).collect(Collectors.toList());
     BigDecimal convertedMargin = fx.convert(old.getMargin(), from, to).abs();
     if (role.equals(ImRole.PLEDGOR)) convertedMargin = convertedMargin.negate(); // we want to display pledgor im as negative

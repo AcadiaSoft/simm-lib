@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Created by alec.stewart on 8/8/17.
  */
-public class InterestRateConcentrationRiskV2_1 implements SimmConcentrationThreshold {
+public class InterestRateConcentrationRisk implements SimmConcentrationThreshold {
 
   private static final Map<List<String>, BigDecimal> DELTA_THRESHOLD = new HashMap<>();
   private static final Map<List<String>, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
@@ -44,14 +44,14 @@ public class InterestRateConcentrationRiskV2_1 implements SimmConcentrationThres
   private static final List<String> LOW_VOL = Arrays.asList("JPY");
 
   static {
-    DELTA_THRESHOLD.put(HIGH_VOL, new BigDecimal("12").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(REGULAR_VOL_LESS_TRADED, new BigDecimal("27").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("210").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(LOW_VOL, new BigDecimal("170").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(HIGH_VOL, new BigDecimal("6.9").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(REGULAR_VOL_LESS_TRADED, new BigDecimal("30").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("230").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(LOW_VOL, new BigDecimal("150").multiply(ConcentrationRiskGroup.MM));
 
-    VEGA_THRESHOLD.put(HIGH_VOL, new BigDecimal("120").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(HIGH_VOL, new BigDecimal("170").multiply(ConcentrationRiskGroup.MM));
     VEGA_THRESHOLD.put(REGULAR_VOL_LESS_TRADED, new BigDecimal("190").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("2200").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("2300").multiply(ConcentrationRiskGroup.MM));
     VEGA_THRESHOLD.put(LOW_VOL, new BigDecimal("770").multiply(ConcentrationRiskGroup.MM));
   }
 

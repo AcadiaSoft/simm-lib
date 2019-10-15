@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 
 public enum AddOnClass implements MarginIdentifier {
 
-  ADDON("Add On");
+  ADDON("AddOn");
 
   private final String label;
 

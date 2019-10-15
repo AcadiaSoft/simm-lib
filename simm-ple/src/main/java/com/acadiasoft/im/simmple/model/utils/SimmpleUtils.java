@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,15 @@
 
 package com.acadiasoft.im.simmple.model.utils;
 
-import com.acadiasoft.im.base.fx.FxConverter;
-import com.acadiasoft.im.base.imtree.ImTree;
 import com.acadiasoft.im.base.imtree.identifiers.ImModelClass;
 import com.acadiasoft.im.schedule.models.utils.ScheduleRiskType;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
-import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
+import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simmple.model.Crif;
 import com.acadiasoft.im.simmple.model.ImRole;
-import com.acadiasoft.im.simmple.model.result.ImTreeResult;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -55,23 +51,9 @@ public class SimmpleUtils {
   public static final String ALL_REGULATORS_STRING = "SIMMPLE_ALL_REGS_WILDCARD";
   public static final String BLANK_REGULATOR_STRING = StringUtils.EMPTY;
 
-  private static final List<String> ADD_ON_TYPES = new ArrayList<>();
-
-  static {
-    ADD_ON_TYPES.add(AddOnSubType.ADD_ON_NOTIONAL);
-    ADD_ON_TYPES.add(AddOnSubType.ADD_ON_NOTIONAL_FACTOR);
-    ADD_ON_TYPES.add(AddOnSubType.ADD_ON_FIXED_AMOUNT);
-    ADD_ON_TYPES.add(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER);
-  }
-
   // add on type predicates
-  public static final Predicate<Crif> isAddOnType = crif -> {
-    for (String type: ADD_ON_TYPES) {
-      if (type.equalsIgnoreCase(crif.getRiskType())) return true;
-    }
-    return false;
-  };
-  public static final Predicate<Crif> isSensitivityType = crif -> !isAddOnType.test(crif);
+  public static final Predicate<Crif> isAddOnType = crif -> AddOnSubType.isAddOnSubType(crif.getRiskType());
+  public static final Predicate<Crif> isSensitivityType = crif -> RiskClass.isSimmRiskType(crif.getRiskType());
 
   // im model class predicates
   public static final Predicate<Crif> isSimm = c -> determineModelClass(c.getImModel(), c.getRiskType()).equals(ImModelClass.SIMM);
@@ -88,15 +70,18 @@ public class SimmpleUtils {
    */
   private static ImModelClass determineModelClass(String model, String riskType) {
     if (model.equals(StringUtils.EMPTY)) {
-      try {
-        AddOnSubType type = AddOnSubType.determineAddOnType(riskType);
-        if (type.equals(AddOnSubType.FIXED_AMOUNT) || type.equals(AddOnSubType.NOTIONAL_FACTOR) || type.equals(AddOnSubType.PRODUCT_MULTIPLIER)) {
-          return ImModelClass.SIMM;
-        } else {
-          throw new IllegalStateException("Found empty model with AddOnNotional Risk Type");
-        }
-      } catch (IllegalStateException ise) {
-        throw new IllegalStateException("Found empty model string but risk type was not param: " + ise.getMessage());
+      // TODO: if the notional string is ever change to differentiate between schedule and simm then we need to update this
+      if (riskType.equalsIgnoreCase("Notional")) {
+        throw new RuntimeException("Tried to determine model from risk type since the model field was omitted" +
+            "but the risk type was notional which could be either SIMM or SCHEDULE");
+      } else if (AddOnSubType.isAddOnSubType(riskType)) {
+        return ImModelClass.SIMM;
+      } else if (RiskClass.isSimmRiskType(riskType)) {
+        return ImModelClass.SIMM;
+      } else if (ScheduleRiskType.isScheduleRiskType(riskType)) {
+        return ImModelClass.SCHEDULE;
+      } else {
+        throw new RuntimeException("Unknown risk type found while trying to identify omitted model: [" + riskType + "]!");
       }
     } else {
       return ImModelClass.determineModelClass(model);
@@ -116,30 +101,22 @@ public class SimmpleUtils {
   public static boolean containsRegulator(ImRole role, Crif crif, String regulator) {
     if (regulator.equalsIgnoreCase(INCLUDED)) {
       return getRegulatorByRole(ImRole.PLEDGOR, crif).equalsIgnoreCase(regulator) || getRegulatorByRole(ImRole.SECURED, crif).equalsIgnoreCase(regulator);
-    } else if (regulator.equalsIgnoreCase(ALL_REGULATORS_STRING)) {
+    } else if (getRegulatorByRole(role, crif).equalsIgnoreCase(ALL_REGULATORS_STRING)) {
       return true;
     } else {
-      return getRegulatorByRole(role, crif).toLowerCase().contains(regulator.toLowerCase());
+      return StringUtils.containsIgnoreCase(getRegulatorByRole(role, crif), regulator);
     }
   }
 
   // predicates for specific add on types
-  public static final Predicate<Crif> isProductMultiplier = crif -> matchesAddOnType(AddOnSubType.PRODUCT_MULTIPLIER, crif);
-  public static final Predicate<Crif> isSimmNotional = crif -> matchesAddOnType(AddOnSubType.NOTIONAL, crif);
-  public static final Predicate<Crif> isNotionalFactor = crif -> matchesAddOnType(AddOnSubType.NOTIONAL_FACTOR, crif);
-  public static final Predicate<Crif> isFixedAmount = crif -> matchesAddOnType(AddOnSubType.FIXED_AMOUNT, crif);
-
-  private static boolean matchesAddOnType(AddOnSubType type, Crif crif) {
-    return AddOnSubType.determineAddOnType(crif.getRiskType()).equals(type);
-  }
+  public static final Predicate<Crif> isProductMultiplier = crif -> crif.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER);
+  public static final Predicate<Crif> isSimmNotional = crif -> crif.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL);
+  public static final Predicate<Crif> isNotionalFactor = crif -> crif.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR);
+  public static final Predicate<Crif> isFixedAmount = crif -> crif.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_FIXED_AMOUNT);
 
   // predicates for schedule types
-  public static final Predicate<Crif> isScheduleNotional = crif -> matchesScheduleType(ScheduleRiskType.NOTIONAL, crif);
-  public static final Predicate<Crif> isSchedulePv = crif -> matchesScheduleType(ScheduleRiskType.PV, crif);
-
-  private static boolean matchesScheduleType(ScheduleRiskType type, Crif crif) {
-    return ScheduleRiskType.determineByRiskType(crif.getRiskType()).equals(type);
-  }
+  public static final Predicate<Crif> isScheduleNotional = crif -> crif.getRiskType().equalsIgnoreCase(ScheduleRiskType.SCHEDULE_NOTIONAL);
+  public static final Predicate<Crif> isSchedulePv = crif -> crif.getRiskType().equalsIgnoreCase(ScheduleRiskType.SCHEDULE_PV);
 
   /**
    *
@@ -159,7 +136,7 @@ public class SimmpleUtils {
           return list;
         })
         .flatMap(Collection::stream)
-        .collect(Collectors.collectingAndThen(Collectors.toSet(), set -> convertAllBlankRegulators(set)));
+        .collect(Collectors.collectingAndThen(Collectors.toSet(), SimmpleUtils::convertAllBlankRegulators));
 
     // remove all regs string if it is there
     check.remove(ALL_REGULATORS_STRING);
@@ -175,7 +152,7 @@ public class SimmpleUtils {
       Set<String> regulators = crifs.stream()
           .map(c -> parseRegulatorString(SimmpleUtils.getRegulatorByRole(role, c)))
           .flatMap(Collection::stream)
-          .collect(Collectors.collectingAndThen(Collectors.toSet(), set -> convertAllBlankRegulators(set)));
+          .collect(Collectors.collectingAndThen(Collectors.toSet(), SimmpleUtils::convertAllBlankRegulators));
 
       regulators.remove(ALL_REGULATORS_STRING);
       regulators.remove(BLANK_REGULATOR_STRING);

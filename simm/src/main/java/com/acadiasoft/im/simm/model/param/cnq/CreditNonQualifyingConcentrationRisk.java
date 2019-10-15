@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Created by alec.stewart on 8/9/17.
  */
-public class CreditNonQualifyingConcentrationRiskV2_1 implements SimmConcentrationThreshold {
+public class CreditNonQualifyingConcentrationRisk implements SimmConcentrationThreshold {
 
   private static final String IG = "1";
   private static final String HY = "2";
@@ -57,7 +57,7 @@ public class CreditNonQualifyingConcentrationRiskV2_1 implements SimmConcentrati
 
   @Override
   public BigDecimal getVegaThreshold(String bucket) {
-    return new BigDecimal("54").multiply(ConcentrationRiskGroup.MM);
+    return new BigDecimal("59").multiply(ConcentrationRiskGroup.MM);
   }
 
   private String determineGroup(String bucket) {

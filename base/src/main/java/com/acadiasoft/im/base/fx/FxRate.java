@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,41 +23,11 @@
 package com.acadiasoft.im.base.fx;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
-/**
- *
- * @author alec.stewart
- */
 public interface FxRate {
 
   String USD = "USD";
 
-  /**
-   *
-   * @param from currency of amount
-   * @param to currency to be change to
-   * @return amount in to currency
-   */
-  BigDecimal getRate(String from, String to);
-
-  /**
-   *
-   * @param from currency of amount
-   * @param to currency to be change to
-   * @param date the date that we are pulling fx rates from (yyyy-mm-dd)
-   * @return amount in to currency
-   */
-  BigDecimal getRate(String from, String to, LocalDate date);
-
-  /**
-   *
-   * @param from currency of amount
-   * @param to currency to be change to
-   * @param timestamp the time and date of the fx rate we are pulling (yyyy-MM-dd T hh:mm:ss)
-   * @return amount in to currency
-   */
-  BigDecimal getRate(String from, String to, ZonedDateTime timestamp);
+  BigDecimal convert(BigDecimal amount, String from, String to);
 
 }

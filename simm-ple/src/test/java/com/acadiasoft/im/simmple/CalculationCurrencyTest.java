@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
 
 package com.acadiasoft.im.simmple;
 
-import com.acadiasoft.im.base.fx.FxConverter;
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.fx.NoConversionFxRate;
 import com.acadiasoft.im.simm.engine.Simm;
@@ -44,7 +43,7 @@ import java.util.Arrays;
  */
 public class CalculationCurrencyTest {
 
-  private final FxConverter fx = new FxConverter(new NoConversionFxRate());
+  private final FxRate fx = new NoConversionFxRate();
 
   @Test
   public void testCalculationCurrencyBasic() {

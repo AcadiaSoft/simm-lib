@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,9 +34,9 @@ import java.util.List;
  */
 public enum RiskClass implements MarginIdentifier {
 
-  INTEREST_RATE("Interest Rate"), //
-  CREDIT_QUALIFYING("Credit Qualifying"), //
-  CREDIT_NON_QUALIFYING("Credit Non-qualifying"), //
+  INTEREST_RATE("IR"), //
+  CREDIT_QUALIFYING("CreditQ"), //
+  CREDIT_NON_QUALIFYING("CreditNonQ"), //
   EQUITY("Equity"), //
   COMMODITY("Commodity"), //
   FX("FX");
@@ -56,6 +57,12 @@ public enum RiskClass implements MarginIdentifier {
   public static final String RISK_TYPE_IR_CURVE = "Risk_IRCurve";
   public static final String RISK_TYPE_INFLATION_VOL = "Risk_InflationVol";
   public static final String RISK_TYPE_XCCY_BASIS = "Risk_XCcyBasis";
+  public static final List<String> RISK_TYPE_LIST = Collections.unmodifiableList(
+      Arrays.asList(RISK_TYPE_COMMODITY_VOL, RISK_TYPE_COMMODITY, RISK_TYPE_FX_VOL, RISK_TYPE_FX,
+          RISK_TYPE_EQUITY_VOL, RISK_TYPE_EQUITY, RISK_TYPE_CREDIT_VOL_NON_Q, RISK_TYPE_CREDIT_NON_Q,
+          RISK_TYPE_CREDIT_VOL, RISK_TYPE_CREDIT_Q, RISK_TYPE_BASE_CORR, RISK_TYPE_IR_VOL, RISK_TYPE_INFLATION,
+          RISK_TYPE_IR_CURVE, RISK_TYPE_INFLATION_VOL, RISK_TYPE_XCCY_BASIS)
+  );
 
   private static final List<RiskClass> ALL = Arrays.asList(values());
 
@@ -72,6 +79,10 @@ public enum RiskClass implements MarginIdentifier {
 
   public static int indexOf(RiskClass r) {
     return ALL.indexOf(r);
+  }
+
+  public static boolean isSimmRiskType(String type) {
+    return RISK_TYPE_LIST.stream().anyMatch(type::equalsIgnoreCase);
   }
 
   /**

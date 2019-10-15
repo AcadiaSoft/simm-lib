@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * Created by alec.stewart on 8/9/17.
  */
-public class CreditQualifyingConcentrationRiskV2_1 implements SimmConcentrationThreshold {
+public class CreditQualifyingConcentrationRisk implements SimmConcentrationThreshold {
 
   private static final List<String> SOVERIGN = Arrays.asList("1", "7");
   private static final List<String> CORPORATE = Arrays.asList("2", "3", "4", "5", "6", "8", "9", "10", "11", "12");
@@ -45,9 +45,9 @@ public class CreditQualifyingConcentrationRiskV2_1 implements SimmConcentrationT
 //    private static final Map<List<String>, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
 
   static {
-    DELTA_THRESHOLD.put(SOVERIGN, new BigDecimal("1").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(CORPORATE, new BigDecimal("0.24").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("0.24").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(SOVERIGN, new BigDecimal("0.94").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(CORPORATE, new BigDecimal("0.18").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("0.18").multiply(ConcentrationRiskGroup.MM));
 
     // NOTE: there is only one concentration threshold for all Credit Qualifying Vol
   }
@@ -59,7 +59,7 @@ public class CreditQualifyingConcentrationRiskV2_1 implements SimmConcentrationT
 
   @Override
   public BigDecimal getVegaThreshold(String bucket) {
-    return new BigDecimal("250").multiply(ConcentrationRiskGroup.MM);
+    return new BigDecimal("280").multiply(ConcentrationRiskGroup.MM);
   }
 
   private List<String> determineGroup(String bucket) {

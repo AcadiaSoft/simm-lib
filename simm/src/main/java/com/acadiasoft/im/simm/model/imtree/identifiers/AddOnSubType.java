@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,13 @@
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
 import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public enum AddOnSubType implements MarginIdentifier {
 
@@ -37,6 +43,9 @@ public enum AddOnSubType implements MarginIdentifier {
   public static final String ADD_ON_NOTIONAL = "Notional";
   public static final String ADD_ON_NOTIONAL_FACTOR = "Param_AddOnNotionalFactor";
   public static final String ADD_ON_PRODUCT_MULTIPLIER = "Param_ProductClassMultiplier";
+  public static final List<String> ADD_ON_TYPES_LIST = Collections.unmodifiableList(
+      Arrays.asList(ADD_ON_FIXED_AMOUNT, ADD_ON_NOTIONAL, ADD_ON_NOTIONAL_FACTOR, ADD_ON_PRODUCT_MULTIPLIER)
+  );
 
   private String label;
 
@@ -47,6 +56,10 @@ public enum AddOnSubType implements MarginIdentifier {
   @Override
   public String getLabel() {
     return label;
+  }
+
+  public static boolean isAddOnSubType(String riskType) {
+    return ADD_ON_TYPES_LIST.stream().anyMatch(riskType::equalsIgnoreCase);
   }
 
   public static AddOnSubType determineAddOnType(String riskType) {

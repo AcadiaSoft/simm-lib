@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,9 @@ public class WeightingMargin implements ImTree {
     this.concentrationRiskClass = concentrationRiskClass;
   }
 
-  public static WeightingMargin calculate(Sensitivity sensitivity, ConcentrationRiskGroup concentrationRiskClass) {
+  public static WeightingMargin calculate(Sensitivity sensitivity, ConcentrationRiskGroup concentrationRiskClass, String calculationCurrency) {
     WeightingClass weightingClass = WeightingClass.determineWeightingClass(sensitivity.getWeightingClassIdentifier());
-    BigDecimal riskWeight = SimmRiskWeight.get(sensitivity.getSensitivityIdentifier(), weightingClass);
+    BigDecimal riskWeight = SimmRiskWeight.get(sensitivity.getSensitivityIdentifier(), weightingClass, calculationCurrency);
     BigDecimal amountUsd = sensitivity.getAmountUsd();
     BigDecimal concentrationRisk = concentrationRiskClass.getConcentrationRisk();
     return new WeightingMargin(weightingClass, riskWeight.multiply(amountUsd).multiply(concentrationRisk), concentrationRiskClass);

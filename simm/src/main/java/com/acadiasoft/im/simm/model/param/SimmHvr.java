@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,10 @@ import java.math.BigDecimal;
 
 public interface SimmHvr {
 
-  BigDecimal CM_HVR = new BigDecimal("0.74");
-  BigDecimal EQ_HVR = new BigDecimal("0.59");
-  BigDecimal FX_HVR = new BigDecimal("0.63");
-  BigDecimal IR_HVR = new BigDecimal("0.62");
+  BigDecimal CM_HVR = new BigDecimal("0.78");
+  BigDecimal EQ_HVR = new BigDecimal("0.61");
+  BigDecimal FX_HVR = new BigDecimal("0.65");
+  BigDecimal IR_HVR = new BigDecimal("0.53");
 
   public static BigDecimal get(RiskClass riskClass) {
     if (riskClass.equals(RiskClass.COMMODITY)) {

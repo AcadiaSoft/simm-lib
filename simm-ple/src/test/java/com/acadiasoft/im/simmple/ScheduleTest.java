@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
 
 package com.acadiasoft.im.simmple;
 
-import com.acadiasoft.im.base.fx.FxConverter;
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.fx.NoConversionFxRate;
 import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationType;
@@ -37,7 +36,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
  *
@@ -45,7 +43,7 @@ import java.util.Optional;
  */
 public class ScheduleTest {
   
-  public final FxConverter fx = new FxConverter(new NoConversionFxRate());
+  public final FxRate fx = new NoConversionFxRate();
 
   @Test
   public void testScheduleWithPV1() {
@@ -62,8 +60,8 @@ public class ScheduleTest {
         new Crif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "PV", "", "", "", "", "20.00", "USD", "20.00", "CFTC,SEC", "CFTC,SEC")
     );
 
-    ImTreeResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR, ScheduleCalculationType.WITH_PVS, Optional.empty());
-    ImTreeResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED, ScheduleCalculationType.WITH_PVS, Optional.empty());
+    ImTreeResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR);
+    ImTreeResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED);
 
     Assert.assertEquals(new BigDecimal("10269"), securedScheduleIM.getImTree().getMargin().setScale(0, RoundingMode.HALF_UP));
     Assert.assertEquals(new BigDecimal("-4800"), pledgorScheduleIM.getImTree().getMargin().setScale(0, RoundingMode.HALF_UP));
@@ -89,8 +87,8 @@ public class ScheduleTest {
     );
 
 
-    ImTreeResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR, ScheduleCalculationType.WITH_PVS, Optional.empty());
-    ImTreeResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED, ScheduleCalculationType.WITH_PVS, Optional.empty());
+    ImTreeResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR);
+    ImTreeResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED);
 
 //    System.out.println(pledgorScheduleIM.getAmount() + ", " + securedScheduleIM.getAmount());
 
@@ -115,8 +113,8 @@ public class ScheduleTest {
         new Crif("trade6", "2018-02-01", "2030-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "-40000.00", "USD", "-40000.00", "CFTC,SEC", "CFTC,SEC")
     );
 
-    ImTreeResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR, ScheduleCalculationType.WITH_PVS, Optional.empty());
-    ImTreeResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED, ScheduleCalculationType.WITH_PVS, Optional.empty());
+    ImTreeResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR);
+    ImTreeResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED);
 
 //    System.out.println(pledgorScheduleIM.getAmount() + ", " + securedScheduleIM.getAmount());
 

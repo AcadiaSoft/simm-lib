@@ -1,7 +1,7 @@
 # Simm-Lib
 
-Simm-Lib is an implementation of version 2.1 of the value at risk Standard Initial
-Margin Model ([SIMM™ 2.1](https://www2.isda.org/functional-areas/wgmr-implementation/))
+Simm-Lib is an implementation of version 2.2 of the value at risk Standard Initial
+Margin Model ([SIMM™ 2.2](https://www2.isda.org/functional-areas/wgmr-implementation/))
 developed by ISDA, see [here](https://www.isda.org/category/margin/isda-simm/) for methodology specifications.
 It has been built to be compatible with the Common
 Risk Interchange Format (CRIF) and it's correlation parameters and risk
@@ -18,18 +18,9 @@ calculate initial margin for their or their clients’ non-cleared
 derivatives transactions. Please contact isdalegal@isda.org for more
 information on licensing the ISDA SIMM™.
 
-### Updates
-The library has been expanded to now include both a Schedule IM calculation model, and
-a SIMM calculation model. Post and Collect regulation handling has been added, taking a
-'Worst-Of' approach, and along with this IM can now be calculated by role (either Pledgor
-or Secured) for both the SIMM and Schedule models.
-
-The Schedule IM model is (unsurprisingly) contained in the schedule model. Following the
-same format as the SIMM model, the main methods of the module can be found in the `Schedule`
-class. See below for more specifici information on the module.
-
-The 'Worst-Of' handling and role calculation is handled by the simm-ple module. The main calculation
-methods can again be found in the `Simmple` class. Again, see below for more specific details.
+### Updates: 2019-10-15
+The Library is now passing ISDA's unit tests for SIMM 2.2, as well as the optional test
+to test worst-of calculation functionality.
 
 ## Getting Started
 Simm-Lib is built with Apache Maven, so one must get Maven
@@ -174,6 +165,7 @@ self-explanatory: `calculateSimmWorstOf()` returns the winning regulator calcula
 calculating using only Schedule model `Crif`, and `calculateWorstOf()` returns the winning regulator calculating over the `Crif` in both models.
 
 ### Change Log
+
 #### 2018-09-14
 - `Schedule` class has been added to handle Schedule IM calculation. New CRIF formatted objects
 `ScheduleNotional` and `SchedulePv` are the inputs to the model. Methods for calculating Schedule IM
@@ -187,6 +179,7 @@ input `AddOnType`s, the calculation methods instead take in a `List`. This strea
 - A calculation currency input has been added to the SIMM model with v2.1, so now the model explicitly
 filters out FX Delta risk to the calculation currency from the input sensitivities.
 - Simm-Lib passes ISDA's Unit Test for SIMM™ 2.1.
+
 #### 2018-04-04
 - Simm-lib has been restructured to be more easily parsed, and also to more easily implement `ImTree` functionality.
 As a result, ImTree functionality has been expanded to include Additional-IM sensitivities, and the strict `Bucket` level
@@ -201,3 +194,14 @@ An `ImTree` data structure, which parses directly to the standard IM-Tree CSV fo
 currencies in the FX risk class as all currencies are in the same bucket per ISDA's documentation.
 - Simm-Lib has added the Base Correlation Sensitivity Type to the Credit Qualifying risk class.
 - Simm-Lib now passes ISDA's Unit Test for SIMM™ 2.0 confirming the accuracy of the calculated exposure.
+
+#### 2018-11-25
+-The library has been expanded to now include both a Schedule IM calculation model, and
+a SIMM calculation model. Post and Collect regulation handling has been added, taking a
+'Worst-Of' approach, and along with this IM can now be calculated by role (either Pledgor
+or Secured) for both the SIMM and Schedule models.
+-The Schedule IM model is (unsurprisingly) contained in the schedule model. Following the
+same format as the SIMM model, the main methods of the module can be found in the `Schedule`
+class. See below for more specifici information on the module.
+-The 'Worst-Of' handling and role calculation is handled by the simm-ple module. The main calculation
+methods can again be found in the `Simmple` class. Again, see below for more specific details.

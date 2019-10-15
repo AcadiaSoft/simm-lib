@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -75,9 +75,9 @@ public class RiskMargin implements ImTree {
     return riskClass;
   }
 
-  public static RiskMargin calculate(RiskClass riskClass, List<Sensitivity> sensitivities) {
+  public static RiskMargin calculate(RiskClass riskClass, List<Sensitivity> sensitivities, String calculationCurrency) {
     List<SensitivityMargin> marginBySensitivityClass = SensitivityUtils.listByMargin(
-        e -> SensitivityMargin.calculate(riskClass, e.getKey(), e.getValue()),
+        e -> SensitivityMargin.calculate(riskClass, e.getKey(), e.getValue(), calculationCurrency),
         SensitivityUtils.mapByIdentifier(s -> s.getSensitivityIdentifier(), sensitivities)
     );
     // we sum across the sensitivity margins in the Risk Class to get the total IM for that Risk Class

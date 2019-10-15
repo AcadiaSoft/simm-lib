@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,9 +69,9 @@ public class ProductMargin implements ImTree {
     return LEVEL;
   }
 
-  public static ProductMargin calculate(ProductClass product, List<Sensitivity> sensitivities) {
+  public static ProductMargin calculate(ProductClass product, List<Sensitivity> sensitivities, String calculationCurrency) {
     List<RiskMargin> marginByRiskClass = SensitivityUtils.listByMargin(
-        e -> RiskMargin.calculate(e.getKey(), e.getValue()),
+        e -> RiskMargin.calculate(e.getKey(), e.getValue(), calculationCurrency),
         SensitivityUtils.mapByIdentifier(s -> s.getRiskIdentifier(), sensitivities)
     );
     BigDecimal sumSquared = BigDecimalUtils.sumSquared(marginByRiskClass, m -> m.getMargin());

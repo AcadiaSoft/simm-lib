@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ package com.acadiasoft.im.schedule.engine.margin;
 import com.acadiasoft.im.base.imtree.identifiers.ImModelClass;
 import com.acadiasoft.im.base.imtree.ImTree;
 import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
 import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass;
@@ -54,7 +55,7 @@ public class ScheduleMargin implements ImTree {
 
   public static ScheduleMargin calculate(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
     Map<ScheduleProductClass, List<ScheduleNotional>> notionalMap = notionals.stream()
-        .collect(Collectors.groupingBy(n -> n.getProductClass(), Collectors.toList()));
+        .collect(Collectors.groupingBy(ScheduleIdentifier::getProductClass, Collectors.toList()));
     List<ScheduleProductMargin> productMargins = notionalMap.entrySet().stream()
         .map(e -> ScheduleProductMargin.calculate(e.getKey(), e.getValue(), netGrossRate))
         .collect(Collectors.toList());
@@ -64,9 +65,9 @@ public class ScheduleMargin implements ImTree {
 
   public static ScheduleMargin calculate(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
     Map<ScheduleProductClass, List<ScheduleNotional>> notionalMap = notionals.stream()
-        .collect(Collectors.groupingBy(n -> n.getProductClass(), Collectors.toList()));
+        .collect(Collectors.groupingBy(ScheduleIdentifier::getProductClass, Collectors.toList()));
     Map<ScheduleProductClass, List<SchedulePv>> pvMap = pvs.stream()
-        .collect(Collectors.groupingBy(p -> p.getProductClass(), Collectors.toList()));
+        .collect(Collectors.groupingBy(ScheduleIdentifier::getProductClass, Collectors.toList()));
     List<ScheduleProductMargin> productMargins = notionalMap.entrySet().stream()
         .map(e -> {
           List<SchedulePv> list = new ArrayList<>();
@@ -95,9 +96,7 @@ public class ScheduleMargin implements ImTree {
 
   @Override
   public List<ImTree> getChildren() {
-    List<ImTree> list = new ArrayList<>();
-    list.addAll(children);
-    return list;
+    return new ArrayList<>(children);
   }
 
 }

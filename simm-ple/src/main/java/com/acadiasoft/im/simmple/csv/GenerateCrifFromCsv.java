@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,8 @@ public class GenerateCrifFromCsv {
   }
 
   private String get(CSVRecord record, String string) {
-    return defaultString(record.get(string));
+    if (record.isMapped(string)) return defaultString(record.get(string));
+    return "";
   }
 
   public List<Crif> getCrifs() {

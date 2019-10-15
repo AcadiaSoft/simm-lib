@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -66,14 +66,14 @@ public class Simm {
 
   public static ImTree calculate(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, SimmCalculationType type) {
     List<Sensitivity> filtered = SensitivityUtils.filterDeltaFxRiskInCalcCurrency(inputSensitivities, calculationCurrency);
-    if (type.equals(SimmCalculationType.STANDARD)) return SimmMargin.calculateStandard(filtered);
+    if (type.equals(SimmCalculationType.STANDARD)) return SimmMargin.calculateStandard(filtered, calculationCurrency);
     Map<ProductClass, ProductMultiplier> multiplierMap = SensitivityUtils.groupByThenTakeFirst(multipliers, ProductMultiplier::getProductClass);
     Map<String, AddOnNotionalFactor> factorMap = SensitivityUtils.groupByThenTakeFirst(factors, AddOnNotionalFactor::getProduct);
     Map<String, List<AddOnNotional>> notionalMap = SensitivityUtils.groupBy(notionals, AddOnNotional::getProduct);
     if (type.equals(SimmCalculationType.ADDITIONAL)) {
-      return SimmMargin.calculateAdditional(filtered, multiplierMap, factorMap, notionalMap, fixed);
+      return SimmMargin.calculateAdditional(filtered, multiplierMap, factorMap, notionalMap, fixed, calculationCurrency);
     } else if (type.equals(SimmCalculationType.TOTAL)) {
-      return SimmMargin.calculateTotal(filtered, multiplierMap, factorMap, notionalMap, fixed);
+      return SimmMargin.calculateTotal(filtered, multiplierMap, factorMap, notionalMap, fixed, calculationCurrency);
     } else {
       throw new RuntimeException("Called a SIMM calculation with unknown type: [" + type + "]");
     }

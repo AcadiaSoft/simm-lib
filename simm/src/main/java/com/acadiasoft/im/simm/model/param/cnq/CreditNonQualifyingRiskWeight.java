@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.acadiasoft.im.simm.model.param.commodity;
+package com.acadiasoft.im.simm.model.param.cnq;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketType;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
@@ -33,31 +33,17 @@ import java.util.Map;
 /**
  * As defined in Appendix 1 of ISDA_SIMM_2.0_(PUBLIC).pdf
  */
-public class CommodityRiskWeightV2_1 implements SimmRiskWeight {
+public class CreditNonQualifyingRiskWeight implements SimmRiskWeight {
 
   private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.CM1, new BigDecimal("19"));
-    WEIGHTS.put(BucketType.CM2, new BigDecimal("20"));
-    WEIGHTS.put(BucketType.CM3, new BigDecimal("17"));
-    WEIGHTS.put(BucketType.CM4, new BigDecimal("19"));
-    WEIGHTS.put(BucketType.CM5, new BigDecimal("24"));
-    WEIGHTS.put(BucketType.CM6, new BigDecimal("22"));
-    WEIGHTS.put(BucketType.CM7, new BigDecimal("26"));
-    WEIGHTS.put(BucketType.CM8, new BigDecimal("50"));
-    WEIGHTS.put(BucketType.CM9, new BigDecimal("27"));
-    WEIGHTS.put(BucketType.CM10, new BigDecimal("54"));
-    WEIGHTS.put(BucketType.CM11, new BigDecimal("20"));
-    WEIGHTS.put(BucketType.CM12, new BigDecimal("20"));
-    WEIGHTS.put(BucketType.CM13, new BigDecimal("17"));
-    WEIGHTS.put(BucketType.CM14, new BigDecimal("14"));
-    WEIGHTS.put(BucketType.CM15, new BigDecimal("10"));
-    WEIGHTS.put(BucketType.CM16, new BigDecimal("54"));
-    WEIGHTS.put(BucketType.CM17, new BigDecimal("16"));
+    WEIGHTS.put(BucketType.CRNQ1, new BigDecimal("100"));
+    WEIGHTS.put(BucketType.CRNQ2, new BigDecimal("1600"));
+    WEIGHTS.put(BucketType.CRNQRESIDUAL, new BigDecimal("1600"));
   }
 
-  private static final BigDecimal VEGA = new BigDecimal("0.27");
+  private static final BigDecimal VEGA = new BigDecimal("0.39");
 
   @Override
   public BigDecimal getDeltaRiskWeight(WeightingClass s) {
@@ -68,4 +54,5 @@ public class CommodityRiskWeightV2_1 implements SimmRiskWeight {
   public BigDecimal getVegaRiskWeight(WeightingClass s) {
     return VEGA;
   }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ import com.acadiasoft.im.base.util.BigDecimalUtils;
 import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,35 +58,39 @@ public class SimmMargin implements ImTree {
     this.children.addAll(marginByBucket);
   }
 
-  public static SimmMargin calculateStandard(List<Sensitivity> inputSensitivities) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities);
-    BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, m -> m.getMargin());
+  public static SimmMargin calculateStandard(List<Sensitivity> inputSensitivities, String calculationCurrency) {
+    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, calculationCurrency);
+    BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, ProductMargin::getMargin);
     return new SimmMargin(productSum, marginByProductClass);
   }
 
-  public static SimmMargin calculateAdditional(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities);
+  public static SimmMargin calculateAdditional(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers,
+      Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
+    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, calculationCurrency);
     AddOnMargin addOn = AddOnMargin.calculate(marginByProductClass, multipliers, factors, notionals, fixed);
     return new SimmMargin(addOn.getMargin(), addOn);
   }
 
-  public static SimmMargin calculateTotal(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities);
+  public static SimmMargin calculateTotal(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers,
+      Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
+    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, calculationCurrency);
     AddOnMargin addOn = AddOnMargin.calculate(marginByProductClass, multipliers, factors, notionals, fixed);
-    BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, m -> m.getMargin());
-    return new SimmMargin(productSum.add(addOn.getMargin()), marginByProductClass, addOn);
+    BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, ProductMargin::getMargin);
+    if (addOn.getMargin().setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO)) return new SimmMargin(productSum, marginByProductClass);
+    else if (productSum.setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO)) return new SimmMargin(addOn.getMargin(), addOn);
+    else return new SimmMargin(productSum.add(addOn.getMargin()), marginByProductClass, addOn);
   }
 
-  private static List<ProductMargin> getMarginByProductClass(List<Sensitivity> inputSensitivities) {
+  private static List<ProductMargin> getMarginByProductClass(List<Sensitivity> inputSensitivities, String calculationCurrency) {
     // get all input sensitivities on the same "level"
-    List<Sensitivity> allSensitivities = SensitivityUtils.handleInputSensitivities(inputSensitivities);
+    List<Sensitivity> allSensitivities = SensitivityUtils.handleInputSensitivities(inputSensitivities, calculationCurrency);
 
     // Now that we have gotten all of the input sensitivities on he same level and generate curvature sensitivities, we net
     List<Sensitivity> nettedSensitivities = SensitivityUtils.netSensitivitiesByRiskFactor(allSensitivities);
 
     // map sensitivities by product class, build the exposure of each product class
     return SensitivityUtils.listByMargin(
-        e -> ProductMargin.calculate(e.getKey(), e.getValue()),
+        e -> ProductMargin.calculate(e.getKey(), e.getValue(), calculationCurrency),
         SensitivityUtils.mapByIdentifier(s -> s.getProductIdentifier(), nettedSensitivities)
     );
   }
@@ -102,9 +107,7 @@ public class SimmMargin implements ImTree {
 
   @Override
   public List<ImTree> getChildren() {
-    List<ImTree> list = new ArrayList<>();
-    list.addAll(children);
-    return list;
+    return new ArrayList<>(children);
   }
 
   @Override

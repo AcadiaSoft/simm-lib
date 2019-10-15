@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 AcadiaSoft, Inc.
+ * Copyright (c) 2019 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@ package com.acadiasoft.im.schedule.models.utils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -35,6 +37,9 @@ public enum ScheduleRiskType implements Serializable {
   NOTIONAL("Notional"),
   PV("PV");
 
+  public static final String SCHEDULE_NOTIONAL = "Notional";
+  public static final String SCHEDULE_PV = "PV";
+
   private final String riskType;
 
   private ScheduleRiskType(String riskType) {
@@ -43,6 +48,10 @@ public enum ScheduleRiskType implements Serializable {
 
   public String getRiskType() {
     return riskType;
+  }
+
+  public static boolean isScheduleRiskType(String type) {
+    return Arrays.stream(values()).anyMatch(v -> type.equalsIgnoreCase(v.riskType));
   }
 
   public static ScheduleRiskType determineByRiskType(String type) {
