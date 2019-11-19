@@ -22,7 +22,7 @@
 
 package com.acadiasoft.im.simm.model.param.equity;
 
-import com.acadiasoft.im.simm.model.utils.ConcentrationRiskGroup;
+import com.acadiasoft.im.simm.model.ConcentrationRiskGroup;
 import com.acadiasoft.im.simm.model.param.SimmConcentrationThreshold;
 import org.apache.commons.lang3.StringUtils;
 

@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -39,6 +38,7 @@ public enum ScheduleRiskType implements Serializable {
 
   public static final String SCHEDULE_NOTIONAL = "Notional";
   public static final String SCHEDULE_PV = "PV";
+  private static final String BAD_RISK_TYPE = "Unknown Schedule Risk Type: [%s]!";
 
   private final String riskType;
 
@@ -59,9 +59,9 @@ public enum ScheduleRiskType implements Serializable {
       return NOTIONAL;
     } else if (StringUtils.equalsIgnoreCase(type, PV.getRiskType())) {
       return PV;
+    } else {
+      throw new RuntimeException(String.format(BAD_RISK_TYPE, type));
     }
-
-    throw new RuntimeException("Unknown Schedule Risk Type: [" + type + "]!");
   }
 
 }

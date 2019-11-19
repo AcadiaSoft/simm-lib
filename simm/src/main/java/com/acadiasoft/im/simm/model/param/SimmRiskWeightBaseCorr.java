@@ -22,15 +22,21 @@
 
 package com.acadiasoft.im.simm.model.param;
 
+import com.acadiasoft.im.simm.config.HoldingPeriod;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.cq.BaseCorrRisk;
+import com.acadiasoft.im.simm.model.param.cq.BaseCorrRisk1d;
 
 import java.math.BigDecimal;
 
 public interface SimmRiskWeightBaseCorr {
 
-  public static BigDecimal get(WeightingClass weightingClass) {
-    return new BaseCorrRisk().getRiskWeight(weightingClass);
+  public static BigDecimal get(WeightingClass weightingClass, HoldingPeriod period) {
+    if (period.equals(HoldingPeriod.TEN_DAY)) {
+      return new BaseCorrRisk().getRiskWeight(weightingClass);
+    } else {
+      return new BaseCorrRisk1d().getRiskWeight(weightingClass);
+    }
   }
 
   public BigDecimal getRiskWeight(WeightingClass w);

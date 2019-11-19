@@ -22,7 +22,7 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifier;
 
-import com.acadiasoft.im.base.imtree.identifiers.ImModelClass;
+import com.acadiasoft.im.base.model.imtree.identifiers.ImModelClass;
 import org.junit.Assert;
 import org.junit.Test;
 

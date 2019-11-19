@@ -24,18 +24,18 @@ package com.acadiasoft.im.simmple;
 
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.fx.NoConversionFxRate;
+import com.acadiasoft.im.simm.config.SimmCalculationType;
 import com.acadiasoft.im.simm.engine.Simm;
-import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
+import com.acadiasoft.im.simmple.config.ImRole;
 import com.acadiasoft.im.simmple.engine.Simmple;
-import com.acadiasoft.im.simmple.model.Crif;
-import com.acadiasoft.im.simmple.model.ImRole;
-import com.acadiasoft.im.simmple.model.result.ImTreeResult;
-import com.acadiasoft.im.simmple.model.utils.SimmpleConversions;
+import com.acadiasoft.im.simmple.model.DefaultCrif;
+import com.acadiasoft.im.simmple.model.utils.SimmpleResult;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  *
@@ -47,10 +47,10 @@ public class CalculationCurrencyTest {
 
   @Test
   public void testCalculationCurrencyBasic() {
-    Crif one = new Crif("1a","2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "USD", "", "", "","1000.00","USD","1000.00", "CFTC", "CFTC");
-    Crif two = new Crif("1b","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "","5000.00","USD","5000.00", "CFTC", "CFTC");
-    BigDecimal simmLibAmount = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR)), "GBP").negate();
-    ImTreeResult simmpleAmount = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "EUR", fx, FxRate.USD, ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    DefaultCrif one = new DefaultCrif("1a","2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "USD", "", "", "","1000.00","USD","1000.00", "CFTC", "CFTC");
+    DefaultCrif two = new DefaultCrif("1b","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "","5000.00","USD","5000.00", "CFTC", "CFTC");
+    BigDecimal simmLibAmount = Simm.calculateStandard(Collections.singletonList(one), "GBP").negate();
+    SimmpleResult simmpleAmount = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "EUR", fx, FxRate.USD, ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(simmLibAmount, simmpleAmount.getImTree().getMargin());
   }
 

@@ -22,51 +22,29 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.simm.model.AddOnFixedAmount;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.margin.GroupMargin;
+import com.acadiasoft.im.base.util.BigDecimalUtils;
+import com.acadiasoft.im.simm.config.SimmConfig;
+import com.acadiasoft.im.simm.model.FixedAmount;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
-import com.acadiasoft.im.base.util.BigDecimalUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class AddOnFixedMargin implements ImTree {
+public class AddOnFixedMargin extends GroupMargin {
 
   private static final String LEVEL = "4.AddOnFixed";
-  private final AddOnSubClass addOnSubClass;
-  private final BigDecimal margin;
 
   private AddOnFixedMargin(AddOnSubClass addOnSubClass, BigDecimal margin) {
-    this.addOnSubClass = addOnSubClass;
-    this.margin = margin;
+    super(LEVEL, addOnSubClass, margin, Collections.emptyList());
   }
 
-  public static AddOnFixedMargin calculate(List<AddOnFixedAmount> fixed) {
-    AddOnSubClass subClass = AddOnSubClass.determineAddOnSubClass(AddOnSubType.FIXED_AMOUNT, AddOnSubType.FIXED_AMOUNT.getLabel());
-    return new AddOnFixedMargin(subClass, BigDecimalUtils.sum(fixed, f -> f.getAmountUsd()));
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return addOnSubClass;
-  }
-
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
+  public static AddOnFixedMargin calculate(List<FixedAmount> fixed, SimmConfig config) {
+    AddOnSubClass subClass = AddOnSubClass.determineAddOnSubClass(AddOnSubType.FIXED_AMOUNT, AddOnSubType.FIXED_AMOUNT.getMarginIdentifier());
+    BigDecimal fixedAmount = BigDecimalUtils.sum(fixed, f -> f.getAmountUsd(config.fxRate()));
+    return new AddOnFixedMargin(subClass, fixedAmount);
   }
 
 }

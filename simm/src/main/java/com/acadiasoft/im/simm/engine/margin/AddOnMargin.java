@@ -22,78 +22,61 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
-import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnClass;
-import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
-import com.acadiasoft.im.simm.model.AddOnFixedAmount;
-import com.acadiasoft.im.simm.model.AddOnNotional;
-import com.acadiasoft.im.simm.model.AddOnNotionalFactor;
-import com.acadiasoft.im.simm.model.ProductMultiplier;
+import com.acadiasoft.im.base.margin.GroupMargin;
+import com.acadiasoft.im.base.margin.SiloMargin;
+import com.acadiasoft.im.base.model.imtree.ImTree;
+import com.acadiasoft.im.base.model.imtree.MarginIdentifier;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
-import org.apache.commons.collections4.CollectionUtils;
+import com.acadiasoft.im.simm.config.SimmConfig;
+import com.acadiasoft.im.simm.model.FixedAmount;
+import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnClass;
+import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
+import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class AddOnMargin implements ImTree {
+public class AddOnMargin extends SiloMargin {
 
   private final static String LEVEL = "3.AddOn";
-  private final BigDecimal margin;
-  private final List<ImTree> children = new ArrayList<>();
 
-  private AddOnMargin(BigDecimal margin, List<ImTree> children) {
-    this.margin = margin;
-    this.children.addAll(children);
+  private AddOnMargin(BigDecimal margin, List<GroupMargin> children) {
+    super(LEVEL, AddOnClass.ADDON, margin, children);
   }
 
-  public static AddOnMargin calculate(List<ProductMargin> marginByProduct, Map<ProductClass, ProductMultiplier> multipliers, Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed) {
-    List<ImTree> subAddOn = new ArrayList<>();
-    if (!CollectionUtils.isEmpty(multipliers.entrySet())) {
-      List<ProductMultiplierMargin> multiplierMargins = marginByProduct.stream()
-          .filter(m -> multipliers.containsKey(m.getProductClass()))
-          .map(m -> ProductMultiplierMargin.calculate(m, multipliers.get(m.getProductClass()).getMultiplier().subtract(BigDecimal.ONE)))
-          .collect(Collectors.toList());
-      subAddOn.addAll(multiplierMargins);
+  public static AddOnMargin calculate(List<Sensitivity> addOns, List<ProductMargin> marginByProduct, SimmConfig config) {
+    List<GroupMargin> subAddOn = new ArrayList<>();
+
+    Map<MarginIdentifier, ProductMargin> mappedMargins = marginByProduct.stream()
+      .collect(Collectors.toMap(ProductMargin::getMarginIdentifier, Function.identity()));
+    addOns.stream().filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER))
+      .forEach(multiplier -> {
+        ProductClass productClass = config.useSingleProductClass() ? ProductClass.SINGLE : multiplier.getMultiplierProduct();
+        ProductMargin productMargin = mappedMargins.get(productClass);
+        subAddOn.add(ProductMultiplierMargin.calculate(multiplier, productMargin));
+      });
+
+    List<Sensitivity> notionalAddOns = addOns.stream()
+      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL)
+        || sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR))
+      .collect(Collectors.toList());
+    if (!notionalAddOns.isEmpty()) {
+      subAddOn.add(AddOnNotionalMargin.calculate(notionalAddOns, config));
     }
 
-    if (!CollectionUtils.isEmpty(factors.entrySet())) {
-      AddOnNotionalMargin notionalMargin = AddOnNotionalMargin.calculate(factors, notionals);
-      subAddOn.add(notionalMargin);
+    List<FixedAmount> fixed = addOns.stream()
+      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_FIXED_AMOUNT))
+      .collect(Collectors.toList());
+    if (!fixed.isEmpty()) {
+      subAddOn.add(AddOnFixedMargin.calculate(fixed, config));
     }
 
-    if (!CollectionUtils.isEmpty(fixed)) {
-      AddOnFixedMargin fixedMargin = AddOnFixedMargin.calculate(fixed);
-      subAddOn.add(fixedMargin);
-    }
-
-    BigDecimal total = BigDecimalUtils.sum(subAddOn, m -> m.getMargin());
-    return new AddOnMargin(total, subAddOn);
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return AddOnClass.ADDON;
-  }
-
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    List<ImTree> list = new ArrayList<>();
-    list.addAll(children);
-    return list;
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
+    return new AddOnMargin(BigDecimalUtils.sum(subAddOn, ImTree::getMargin), subAddOn);
   }
 
 }

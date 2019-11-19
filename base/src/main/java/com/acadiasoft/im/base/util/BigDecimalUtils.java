@@ -26,31 +26,19 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class BigDecimalUtils {
 
   private static final int DIVISION_SCALE = 64;
+  private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
   public static BigDecimal divideWithPrecision(BigDecimal dividend, BigDecimal divisor) {
     return dividend.divide(divisor, DIVISION_SCALE, RoundingMode.HALF_UP);
   }
 
-  public static <T> BigDecimal sumCorrelated(List<T> list, Function<T, BigDecimal> convert, BiFunction<T, T, BigDecimal> correlate, BiFunction<T, T, Boolean> check) {
-    BigDecimal sum = BigDecimal.ZERO;
-    for (T r: list) {
-      for (T s: list) {
-        if (check.apply(r, s)) {
-          BigDecimal rWeight = convert.apply(r);
-          BigDecimal sWeight = convert.apply(s);
-          BigDecimal correlation = correlate.apply(r, s);
-          sum = sum.add(rWeight.multiply(sWeight.multiply(correlation)));
-        }
-      }
-    }
-
-    return sum;
+  public static BigDecimal divideByOneHundred(BigDecimal dividend) {
+    return divideWithPrecision(dividend, ONE_HUNDRED).stripTrailingZeros();
   }
 
   public static <T> BigDecimal sumSquared(List<T> o, Function<T, BigDecimal> f) {
@@ -67,10 +55,6 @@ public class BigDecimalUtils {
 
   public static BigDecimal square(BigDecimal b1) {
     return b1.pow(2);
-  }
-
-  public static BigDecimal abs(BigDecimal b1) {
-    return b1.abs();
   }
 
 }

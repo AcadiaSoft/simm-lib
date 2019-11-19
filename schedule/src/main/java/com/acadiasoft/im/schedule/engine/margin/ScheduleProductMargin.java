@@ -22,54 +22,45 @@
 
 package com.acadiasoft.im.schedule.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.margin.SiloMargin;
+import com.acadiasoft.im.base.util.ListUtils;
+import com.acadiasoft.im.schedule.config.ScheduleConfig;
+import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
+import com.acadiasoft.im.schedule.models.ScheduleSensitivity;
 import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass;
-import com.acadiasoft.im.schedule.engine.ScheduleCalculationUtils;
+import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleTradeClass;
+import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class ScheduleProductMargin implements ImTree {
+public class ScheduleProductMargin extends SiloMargin {
 
   private static final String LEVEL = "3.Silo";
-  private final MarginIdentifier identifier;
-  private final BigDecimal margin;
-  private final List<ImTree> children = new ArrayList<>();
+  private final List<ScheduleTradeMargin> nettedTrades;
 
-  public ScheduleProductMargin(ScheduleProductClass identifier, BigDecimal margin) {
-    this.margin = margin;
-    this.identifier = identifier;
+  private ScheduleProductMargin(ScheduleProductClass identifier, BigDecimal margin, List<ScheduleTradeMargin> nettedTrades) {
+    super(LEVEL, identifier, margin, Collections.emptyList());
+    this.nettedTrades = nettedTrades;
   }
 
-  public static ScheduleProductMargin calculate(ScheduleProductClass product, List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
-    return new ScheduleProductMargin(product, ScheduleCalculationUtils.calculate(notionals, pvs));
+  public static ScheduleProductMargin calculate(ScheduleProductClass productClass, List<ScheduleSensitivity> sensitivities, ScheduleConfig config) {
+    List<ScheduleTradeMargin> trades = ListUtils.groupBy(sensitivities, ScheduleIdentifier::getScheduleTradeIdentifier).entrySet().stream()
+      .map(entry -> ScheduleTradeMargin.calculate(ScheduleTradeClass.determineWeightingClass(entry.getKey()), entry.getValue(), config))
+      .collect(Collectors.toList());
+    List<ScheduleNotional> notionals = trades.stream().map(ScheduleTradeMargin::getNettedNotional).collect(Collectors.toList());
+    BigDecimal grossIm = ScheduleCalculationUtils.calculateGrossIm(notionals, config.fxRate());
+    List<SchedulePv> pvs = trades.stream().map(ScheduleTradeMargin::getNettedPv).collect(Collectors.toList());
+    BigDecimal ngr = (config.useConfiguredNgr()) ? config.netGrossRate() : ScheduleCalculationUtils.calculateNgr(pvs, config.fxRate());
+    return new ScheduleProductMargin(productClass, ScheduleCalculationUtils.calculateMargin(grossIm, ngr), trades);
   }
 
-  public static ScheduleProductMargin calculate(ScheduleProductClass product, List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
-    return new ScheduleProductMargin(product, ScheduleCalculationUtils.calculate(notionals, netGrossRate));
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return identifier;
-  }
-
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    return children;
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
+  public List<ScheduleTradeMargin> getNettedTrades() {
+    return new ArrayList<>(nettedTrades);
   }
 }

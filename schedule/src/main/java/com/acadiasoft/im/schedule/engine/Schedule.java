@@ -22,18 +22,18 @@
 
 package com.acadiasoft.im.schedule.engine;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.TotalMargin;
-import com.acadiasoft.im.base.util.BigDecimalUtils;
+import com.acadiasoft.im.base.margin.ModelMargin;
+import com.acadiasoft.im.base.margin.TotalMargin;
+import com.acadiasoft.im.base.model.imtree.ImTree;
+import com.acadiasoft.im.schedule.config.ScheduleCalculationType;
+import com.acadiasoft.im.schedule.config.ScheduleConfig;
 import com.acadiasoft.im.schedule.engine.margin.ScheduleMargin;
-import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
+import com.acadiasoft.im.schedule.models.ScheduleSensitivity;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -42,22 +42,18 @@ import java.util.stream.Collectors;
  */
 public class Schedule {
 
-  /**
-   *
-   * @param notionals notional values of the trades
-   * @param netGrossRate the net replacement cost divided by the gross replacement cost
-   * @return Schedule IM exposure amount
-   */
+  // --------------------------- calculation functions -----------------------------
+
+  public static ModelMargin calculate(List<ScheduleSensitivity> sensitivities, ScheduleConfig config) {
+    return ScheduleMargin.calculate(sensitivities, config);
+  }
+
+  // --------------------------- legacy functions -----------------------------
+
   public static BigDecimal calculate(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
     return calculateWithoutPvs(notionals, netGrossRate).getMargin();
   }
 
-  /**
-   *  NGR can be calculated from the PVs
-   *
-   * @param notionals the notional amounts
-   * @return Schedule IM exposure amount
-   */
   public static BigDecimal calculate(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
     return calculateWithPvs(notionals, pvs).getMargin();
   }
@@ -70,32 +66,20 @@ public class Schedule {
     return TotalMargin.build(calculateWithPvs(notionals, pvs));
   }
 
-  public static ImTree calculateWithPvs(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
-    // map an net by trade id, etc. for the notionals
-    Map<ScheduleIdentifier, List<ScheduleNotional>> mappedNotionals = notionals.stream()
-        .collect(Collectors.groupingBy(ScheduleNotional::getIdentifier, Collectors.toList()));
-    // NOTE: we only care about the absolute notional after netting, so we take the absolute value of the sum
-    List<ScheduleNotional> nettedNotionals = mappedNotionals.entrySet().stream()
-        .map(e -> ScheduleNotional.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), ScheduleNotional::getAmountUSD).abs()))
-        .collect(Collectors.toList());
-    // this is a WITH call so map pvs too
-    Map<ScheduleIdentifier, List<SchedulePv>> mappedPvs = pvs.stream()
-        .collect(Collectors.groupingBy(SchedulePv::getIdentifier, Collectors.toList()));
-    List<SchedulePv> nettedPvs = mappedPvs.entrySet().stream()
-        .map(e -> SchedulePv.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), SchedulePv::getAmountUSD)))
-        .collect(Collectors.toList());
-    return ScheduleMargin.calculate(nettedNotionals, nettedPvs);
+  public static ModelMargin calculateWithPvs(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
+    ScheduleConfig config = ScheduleConfig.Builder().build();
+    List<ScheduleSensitivity> sensitivities = notionals.stream().map(ScheduleNotional::of).collect(Collectors.toList());
+    sensitivities.addAll(pvs.stream().map(SchedulePv::of).collect(Collectors.toList()));
+    return ScheduleMargin.calculate(sensitivities, config);
   }
 
-  public static ImTree calculateWithoutPvs(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
-    // map an net by trade id, etc. for the notionals
-    Map<ScheduleIdentifier, List<ScheduleNotional>> mappedNotionals = notionals.stream()
-        .collect(Collectors.groupingBy(ScheduleNotional::getIdentifier, Collectors.toList()));
-    // NOTE: we only care about the absolute notional after netting, so we take the absolute value of the sum
-    List<ScheduleNotional> nettedNotionals = mappedNotionals.entrySet().stream()
-        .map(e -> ScheduleNotional.make(e.getKey(), BigDecimalUtils.sum(e.getValue(), ScheduleNotional::getAmountUSD).abs()))
-        .collect(Collectors.toList());
-    return ScheduleMargin.calculate(nettedNotionals, Optional.ofNullable(netGrossRate).orElse(BigDecimal.ONE));
+  public static ModelMargin calculateWithoutPvs(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
+    ScheduleConfig config = ScheduleConfig.Builder()
+      .netGrossRate(netGrossRate)
+      .scheduleCalculationType(ScheduleCalculationType.WITHOUT_PVS)
+      .build();
+    List<ScheduleSensitivity> sensitivities = notionals.stream().map(ScheduleNotional::of).collect(Collectors.toList());
+    return ScheduleMargin.calculate(sensitivities, config);
   }
 
 }

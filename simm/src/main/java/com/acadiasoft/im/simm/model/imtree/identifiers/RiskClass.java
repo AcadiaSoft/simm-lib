@@ -22,24 +22,23 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.model.imtree.identifiers.GroupClass;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * As defined in Appendix 1 section K of ISDA_SIMM_2.0_(PUBLIC).pdf
  */
-public enum RiskClass implements MarginIdentifier {
+public class RiskClass extends GroupClass {
 
-  INTEREST_RATE("IR"), //
-  CREDIT_QUALIFYING("CreditQ"), //
-  CREDIT_NON_QUALIFYING("CreditNonQ"), //
-  EQUITY("Equity"), //
-  COMMODITY("Commodity"), //
-  FX("FX");
+  public static final RiskClass INTEREST_RATE = new RiskClass("IR");
+  public static final RiskClass CREDIT_QUALIFYING = new RiskClass("CreditQ");
+  public static final RiskClass CREDIT_NON_QUALIFYING = new RiskClass("CreditNonQ");
+  public static final RiskClass EQUITY = new RiskClass("Equity");
+  public static final RiskClass COMMODITY = new RiskClass("Commodity");
+  public static final RiskClass FX = new RiskClass("FX");
 
   public static final String RISK_TYPE_COMMODITY_VOL = "Risk_CommodityVol";
   public static final String RISK_TYPE_COMMODITY = "Risk_Commodity";
@@ -57,40 +56,24 @@ public enum RiskClass implements MarginIdentifier {
   public static final String RISK_TYPE_IR_CURVE = "Risk_IRCurve";
   public static final String RISK_TYPE_INFLATION_VOL = "Risk_InflationVol";
   public static final String RISK_TYPE_XCCY_BASIS = "Risk_XCcyBasis";
-  public static final List<String> RISK_TYPE_LIST = Collections.unmodifiableList(
-      Arrays.asList(RISK_TYPE_COMMODITY_VOL, RISK_TYPE_COMMODITY, RISK_TYPE_FX_VOL, RISK_TYPE_FX,
-          RISK_TYPE_EQUITY_VOL, RISK_TYPE_EQUITY, RISK_TYPE_CREDIT_VOL_NON_Q, RISK_TYPE_CREDIT_NON_Q,
-          RISK_TYPE_CREDIT_VOL, RISK_TYPE_CREDIT_Q, RISK_TYPE_BASE_CORR, RISK_TYPE_IR_VOL, RISK_TYPE_INFLATION,
-          RISK_TYPE_IR_CURVE, RISK_TYPE_INFLATION_VOL, RISK_TYPE_XCCY_BASIS)
+  public static final Supplier<Stream<String>> RISK_TYPE_LIST = () -> Stream.of(
+      RISK_TYPE_COMMODITY_VOL, RISK_TYPE_COMMODITY, RISK_TYPE_FX_VOL, RISK_TYPE_FX,
+      RISK_TYPE_EQUITY_VOL, RISK_TYPE_EQUITY, RISK_TYPE_CREDIT_VOL_NON_Q, RISK_TYPE_CREDIT_NON_Q,
+      RISK_TYPE_CREDIT_VOL, RISK_TYPE_CREDIT_Q, RISK_TYPE_BASE_CORR, RISK_TYPE_IR_VOL, RISK_TYPE_INFLATION,
+      RISK_TYPE_IR_CURVE, RISK_TYPE_INFLATION_VOL, RISK_TYPE_XCCY_BASIS
   );
 
-  private static final List<RiskClass> ALL = Arrays.asList(values());
-
-  private final String label;
+  private static final String BAD_RISK_TYPE = "Unknown risk type specified: [%s]";
 
   private RiskClass(String label) {
-    this.label = label;
-  }
-
-  @Override
-  public String getLabel() {
-    return label;
-  }
-
-  public static int indexOf(RiskClass r) {
-    return ALL.indexOf(r);
+    super(label);
   }
 
   public static boolean isSimmRiskType(String type) {
-    return RISK_TYPE_LIST.stream().anyMatch(type::equalsIgnoreCase);
+    if (type == null) { return false; }
+    return RISK_TYPE_LIST.get().anyMatch(type::equalsIgnoreCase);
   }
 
-  /**
-   * Risk_Data_Standards_v1.25_(PUBLIC).pdf
-   *
-   * @param riskType
-   * @return
-   */
   public static RiskClass determineByRiskType(String riskType) {
     if (StringUtils.equalsIgnoreCase(RISK_TYPE_IR_CURVE, riskType) ||
       StringUtils.equalsIgnoreCase(RISK_TYPE_INFLATION, riskType) ||
@@ -114,19 +97,11 @@ public enum RiskClass implements MarginIdentifier {
     } else if (StringUtils.equalsIgnoreCase(RISK_TYPE_COMMODITY, riskType) ||
       StringUtils.equalsIgnoreCase(RISK_TYPE_COMMODITY_VOL, riskType)) {
       return COMMODITY;
+    } else if (AddOnSubType.isAddOnSubType(riskType)) {
+      return null; // this is to handle building the initial add on sensitivities which should never need
     } else {
       // Schedule IM: Notional, PV (present value of the trade, including all cashflows strictly after the ValuationDate)
-      throw new IllegalStateException("Unknown risk type specified:[" + riskType + "]!");
+      throw new IllegalStateException(String.format(BAD_RISK_TYPE, riskType));
     }
-  }
-
-  public static RiskClass getByLabel(String label) {
-    for (RiskClass r: ALL) {
-      if (label.equalsIgnoreCase(r.getLabel())) {
-        return r;
-      }
-    }
-
-    throw new IllegalStateException("tried to get risk class label that doesn't exist: [" + label + "]!");
   }
 }

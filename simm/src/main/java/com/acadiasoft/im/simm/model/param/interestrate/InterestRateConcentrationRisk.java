@@ -22,7 +22,7 @@
 
 package com.acadiasoft.im.simm.model.param.interestrate;
 
-import com.acadiasoft.im.simm.model.utils.ConcentrationRiskGroup;
+import com.acadiasoft.im.simm.model.ConcentrationRiskGroup;
 import com.acadiasoft.im.simm.model.param.SimmConcentrationThreshold;
 
 import java.math.BigDecimal;
@@ -38,7 +38,7 @@ public class InterestRateConcentrationRisk implements SimmConcentrationThreshold
 
   private static final Map<List<String>, BigDecimal> DELTA_THRESHOLD = new HashMap<>();
   private static final Map<List<String>, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
-  private static final List<String> HIGH_VOL = null; // high volatlity currencies are all currencies not in other catagories
+  private static final List<String> HIGH_VOL = null; // high volatility currencies are all currencies not in other categories
   private static final List<String> REGULAR_VOL_WELL_TRADED = Arrays.asList("USD", "EUR", "GBP");
   private static final List<String> REGULAR_VOL_LESS_TRADED = Arrays.asList("AUD", "CAD", "CHF", "DKK", "HKD", "KRW", "NOK", "NZD", "SEK", "SGD", "TWD");
   private static final List<String> LOW_VOL = Arrays.asList("JPY");

@@ -23,56 +23,65 @@
 package com.acadiasoft.im.schedule.models;
 
 import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass;
+import com.acadiasoft.im.schedule.models.utils.ScheduleRiskType;
 
 import java.time.LocalDate;
 
-public class ScheduleIdentifier {
+public interface ScheduleIdentifier {
 
-  private final String tradeId;
-  private final ScheduleProductClass productClass;
-  private final LocalDate valuationDate;
-  private final LocalDate endDate;
+  // -------------------- interface methods -----------------------
 
-  public ScheduleIdentifier(String tradeId, ScheduleProductClass productClass, LocalDate valuationDate, LocalDate endDate) {
-    this.tradeId = tradeId;
-    this.productClass = productClass;
-    this.valuationDate = valuationDate;
-    this.endDate = endDate;
+  String getTradeId();
+
+  String getProductClass();
+
+  String getRiskType();
+
+  String getValuationDateAsString();
+
+  String getEndDateAsString();
+
+  // -------------------- default util methods --------------------
+
+  default LocalDate getValuationDate() {
+    return LocalDate.parse(getValuationDateAsString());
   }
 
-  public ScheduleIdentifier(String tradeId, String productClass, String valuationDate, String endDate) {
-    this.tradeId = tradeId;
-    this.productClass = ScheduleProductClass.determineProductClass(productClass);
-    this.valuationDate = LocalDate.parse(valuationDate);
-    this.endDate = LocalDate.parse(endDate);
+  default LocalDate getEndDate() {
+    return LocalDate.parse(getEndDateAsString());
   }
 
-  public String getTradeId() {
-    return tradeId;
+  default ScheduleProductClass getScheduleProductClass() {
+    return ScheduleProductClass.determineProductClass(getProductClass());
   }
 
-  public ScheduleProductClass getProductClass(){
-    return productClass;
+  default ScheduleRiskType getScheduleRiskIdentifier() {
+    return ScheduleRiskType.determineByRiskType(getRiskType());
   }
 
-  public LocalDate getEndDate() {
-    return endDate;
+  default ScheduleIdentifier getScheduleTradeIdentifier() {
+    return new DefaultScheduleIdentifier(this.getTradeId(), this.getProductClass(), this.getRiskType(),
+      this.getValuationDateAsString(), this.getEndDateAsString());
   }
 
-  public LocalDate getValuationDate() {
-    return valuationDate;
-  }
+  // --------------------- default check methods -------------------
 
-  @Override
-  public boolean equals(Object other) {
-    if (!(other instanceof ScheduleIdentifier)) return false;
-    ScheduleIdentifier otherId = (ScheduleIdentifier) other;
-    return tradeId.equalsIgnoreCase(otherId.tradeId);
-  }
+  String MISSING_FORMAT = "The %s for this schedule sensitivity was missing (i.e. null or empty)";
+  String TRADE_ID_MISSING = String.format(MISSING_FORMAT, "tradeId");
+  String PRODUCT_MISSING = String.format(MISSING_FORMAT, "productClass");
+  String VAL_DATE_MISSING = String.format(MISSING_FORMAT, "valuationDate");
+  String END_DATE_MISSING = String.format(MISSING_FORMAT, "endDate");
 
-  @Override
-  public int hashCode() {
-    return tradeId.hashCode() * 11;
+  default void checkScheduleIdentifier(String tradeId, String productClass, String riskType, String valuationDate, String endDate) {
+    if (tradeId == null || tradeId.isEmpty()) {
+      throw new IllegalStateException(TRADE_ID_MISSING);
+    } else if (productClass == null || productClass.isEmpty()) {
+      throw new IllegalStateException(PRODUCT_MISSING);
+    } else if (valuationDate == null || valuationDate.isEmpty()) {
+      throw new IllegalStateException(VAL_DATE_MISSING);
+    } else if (endDate == null || endDate.isEmpty()) {
+      throw new IllegalStateException(END_DATE_MISSING);
+    }
   }
 
 }

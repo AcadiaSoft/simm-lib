@@ -22,102 +22,18 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.model.imtree.MarginIdentifier;
+import com.acadiasoft.im.simm.model.DefaultSensitivityIdentifier;
 import com.acadiasoft.im.simm.model.SensitivityIdentifier;
-import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
 
-public class WeightingClass implements MarginIdentifier, SensitivityIdentifier {
+public class WeightingClass extends DefaultSensitivityIdentifier implements MarginIdentifier {
 
-  private final String productClass;
-  private final String riskType;
-  private final String qualifier;
-  private final String bucket;
-  private final String label1;
-  private final String label2;
-
-  private WeightingClass(String riskFactorKey) {
-    String[] values = riskFactorKey.split(SensitivityUtils.DELIMITER, 6);
-    this.productClass = values[0];
-    this.riskType = values[1];
-    this.qualifier = values[2];
-    this.bucket = values[3];
-    this.label1 = values[4];
-    this.label2 = values[5];
+  private WeightingClass(SensitivityIdentifier identifier) {
+    super(identifier);
   }
 
-  public static WeightingClass determineWeightingClass(String key) {
-    return new WeightingClass(key);
-  }
-
-  @Override
-  public String getLabel() {
-    return qualifier;
-  }
-
-  @Override
-  public String getProductClass() {
-    return productClass;
-  }
-
-  @Override
-  public String getRiskType() {
-    return riskType;
-  }
-
-  @Override
-  public String getQualifier() {
-    return qualifier;
-  }
-
-  @Override
-  public String getBucket() {
-    return bucket;
-  }
-
-  @Override
-  public String getLabel1() {
-    return label1;
-  }
-
-  @Override
-  public String getLabel2() {
-    return label2;
-  }
-
-  public BucketClass getBucketIdentifier() {
-    return SensitivityIdentifier.getBucketIdentifier(this);
-  }
-
-  public RiskClass getRiskClass() {
-    return SensitivityIdentifier.getRiskIdentifier(this);
-  }
-
-  public String getConcentrationRiskIdentifier() {
-    return SensitivityIdentifier.getConcentrationRiskIdentifier(this);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof WeightingClass)) return false;
-    WeightingClass other = (WeightingClass) obj;
-    if (productClass.equalsIgnoreCase(other.getProductClass()) &&
-        riskType.equalsIgnoreCase(other.getRiskType()) &&
-        qualifier.equalsIgnoreCase(other.getQualifier()) &&
-        bucket.equalsIgnoreCase(other.getBucket()) &&
-        label1.equalsIgnoreCase(other.getLabel1()) &&
-        label2.equalsIgnoreCase(other.getLabel2())) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    int prime = 7;
-    int result = productClass.hashCode() + riskType.hashCode() + qualifier.hashCode();
-    result = prime * result + bucket.hashCode() + label1.hashCode() + label2.hashCode();
-    return prime * result;
+  public static WeightingClass determineWeightingClass(SensitivityIdentifier identifier) {
+    return new WeightingClass(identifier);
   }
 
 }

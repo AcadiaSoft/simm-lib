@@ -22,34 +22,60 @@
 
 package com.acadiasoft.im.simm.model.param;
 
+import com.acadiasoft.im.simm.config.HoldingPeriod;
+import com.acadiasoft.im.simm.config.SimmConfig;
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingCorrelation;
+import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingCorrelation1d;
 import com.acadiasoft.im.simm.model.param.commodity.CommodityCorrelation;
+import com.acadiasoft.im.simm.model.param.commodity.CommodityCorrelation1d;
 import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingCorrelation;
+import com.acadiasoft.im.simm.model.param.cq.CreditQualifyingCorrelation1d;
 import com.acadiasoft.im.simm.model.param.equity.EquityCorrelation;
+import com.acadiasoft.im.simm.model.param.equity.EquityCorrelation1d;
 import com.acadiasoft.im.simm.model.param.fx.FXCorrelation;
+import com.acadiasoft.im.simm.model.param.fx.FXCorrelation1d;
 import com.acadiasoft.im.simm.model.param.interestrate.InterestRateCorrelation;
+import com.acadiasoft.im.simm.model.param.interestrate.InterestRateCorrelation1d;
 
 import java.math.BigDecimal;
 
 public interface SimmBucketCorrelation {
 
-  public static BigDecimal get(RiskClass riskClass, BucketClass r, BucketClass s) {
-    if (riskClass.equals(RiskClass.INTEREST_RATE)) {
-      return new InterestRateCorrelation().getBucketCorrelation(r, s);
-    } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
-      return new CreditQualifyingCorrelation().getBucketCorrelation(r, s);
-    } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
-      return new CreditNonQualifyingCorrelation().getBucketCorrelation(r, s);
-    } else if (riskClass.equals(RiskClass.EQUITY)) {
-      return new EquityCorrelation().getBucketCorrelation(r, s);
-    } else if (riskClass.equals(RiskClass.COMMODITY)) {
-      return new CommodityCorrelation().getBucketCorrelation(r, s);
-    } else if (riskClass.equals(RiskClass.FX)) {
-      return new FXCorrelation().getBucketCorrelation(r, s);
+  public static BigDecimal get(RiskClass riskClass, BucketClass r, BucketClass s, SimmConfig config) {
+    if (config.holdingPeriod().equals(HoldingPeriod.TEN_DAY)) {
+      if (riskClass.equals(RiskClass.INTEREST_RATE)) {
+        return new InterestRateCorrelation().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
+        return new CreditQualifyingCorrelation().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
+        return new CreditNonQualifyingCorrelation().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.EQUITY)) {
+        return new EquityCorrelation().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.COMMODITY)) {
+        return new CommodityCorrelation().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.FX)) {
+        return new FXCorrelation().getBucketCorrelation(r, s);
+      } else {
+        throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
+      }
     } else {
-      throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
+      if (riskClass.equals(RiskClass.INTEREST_RATE)) {
+        return new InterestRateCorrelation1d().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
+        return new CreditQualifyingCorrelation1d().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
+        return new CreditNonQualifyingCorrelation1d().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.EQUITY)) {
+        return new EquityCorrelation1d().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.COMMODITY)) {
+        return new CommodityCorrelation1d().getBucketCorrelation(r, s);
+      } else if (riskClass.equals(RiskClass.FX)) {
+        return new FXCorrelation1d().getBucketCorrelation(r, s);
+      } else {
+        throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
+      }
     }
   }
 

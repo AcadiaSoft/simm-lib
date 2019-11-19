@@ -32,12 +32,11 @@
   <parent>
     <groupId>com.acadiasoft.im</groupId>
     <artifactId>im-parent</artifactId>
-    <version>2.2.0</version>
+    <version>2.2.1</version>
   </parent>
 
 
   <dependencies>
-
     <dependency>
       <groupId>com.acadiasoft.im</groupId>
       <artifactId>base</artifactId>
@@ -49,13 +48,6 @@
       <artifactId>commons-math3</artifactId>
       <version>3.6.1</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-collections4</artifactId>
-      <version>4.2</version>
-    </dependency>
-
   </dependencies>
 
 </project>

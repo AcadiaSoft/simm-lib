@@ -22,162 +22,146 @@
 
 package com.acadiasoft.im.simmple.model;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
+import com.acadiasoft.im.base.model.imtree.identifiers.ImModelClass;
+import com.acadiasoft.im.schedule.models.DefaultScheduleSensitivity;
+import com.acadiasoft.im.schedule.models.ScheduleSensitivity;
+import com.acadiasoft.im.schedule.models.utils.ScheduleRiskType;
+import com.acadiasoft.im.simm.model.DefaultSensitivity;
+import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
+import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
+import com.acadiasoft.im.simmple.config.ImRole;
+import com.acadiasoft.im.simmple.config.SimmpleConfig;
+import org.apache.commons.lang3.StringUtils;
 
-/**
- *
- * @author alec.stewart
- */
-public class Crif implements Serializable {
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-  private final String tradeId;
-  private final String imModel;
-  private final String productClass;
-  private final String riskType;
-  private final String qualifier;
-  private final String bucket;
-  private final String label1;
-  private final String label2;
-  private final String amount;
-  private final String amountCurrency;
-  private final String amountUSD;
-  private final String postRegulation;
-  private final String collectRegulation;
-  private final String valuationDate;
-  private final String endDate;
-  private final String notional;
-  private final String notionalCurrency;
+public interface Crif extends Sensitivity, ScheduleSensitivity {
 
-  /**
-   *  Builds a line of CRIF data with all fields
-   *
-   * @param tradeId the id of the trade that the CRIF line belongs to
-   * @param valuationDate the valuation date of the trade
-   * @param endDate the end date of the trade
-   * @param notional the notional amount of the trade
-   * @param notionalCurrency the currency of the trade notional
-   * @param imModel the model that im will be calculated with for the trade
-   * @param productClass the product class of the trade
-   *                     (either SIMM: [RatesFX, Credit, Commdity, Equity] or Schedule: [Rates, FX, Credit, Commodity, Equity]
-   * @param riskType the risk type of the CRIF line as defined by the Common Risk Interchange Format
-   * @param qualifier the qualifier " . . . "
-   * @param bucket the bucket " . . . "
-   * @param label1 the label1 " . . . "
-   * @param label2 the label2 " . . . "
-   * @param amount the amount " . . . "
-   * @param amountCurrency the currency of the amount
-   * @param amountUSD the amount in USD
-   * @param postRegulation the regulator of the posting party (usually this is yourself)
-   * @param collectRegulation the regulator of the collecting party (usually this is a counter-party)
-   */
-  public Crif(String tradeId, String valuationDate, String endDate, String notional, String notionalCurrency, String imModel,
-              String productClass, String riskType, String qualifier, String bucket, String label1, String label2, String amount,
-              String amountCurrency, String amountUSD, String postRegulation, String collectRegulation) {
-    this.valuationDate = valuationDate;
-    this.endDate = endDate;
-    this.tradeId = tradeId;
-    this.imModel = imModel;
-    this.productClass = productClass;
-    this.riskType = riskType;
-    this.qualifier = qualifier;
-    this.bucket = bucket;
-    this.label1 = label1;
-    this.label2 = label2;
-    this.amount = amount;
-    this.amountCurrency = amountCurrency;
-    this.amountUSD = amountUSD;
-    this.postRegulation = postRegulation;
-    this.collectRegulation = collectRegulation;
-    this.notional = notional;
-    this.notionalCurrency = notionalCurrency;
+  String SPACE_REGEX = "\\s+";
+  String BRACKET_REGEX = "\\[(.*)]";
+  String QUOTE_REGEX = "\"([^,]*)\"";
+  String FIRST_CAPTURE_GROUP = "$1";
+  String REGULATOR_DELIMITER = ",";
+  String INCLUDED = "included";
+  String BLANK_REGULATOR_STRING = "";
+  String ALL_REGULATORS_STRING = "SIMMPLE_ALL_REGS_WILDCARD";
+
+  public String getImModel();
+
+  public String getPostRegulation();
+
+  public String getCollectRegulation();
+
+  // ---------------------- amount mapping methods -------------------------
+
+  default Sensitivity convertSensitivityAmountForRole(SimmpleConfig config) {
+    if (ImRole.PLEDGOR.equals(config.imRole()) && this.isSimmStandard()) {
+      return new DefaultSensitivity(this, getAmountUsd(config.fxRate()).negate());
+    } else {
+      return this;
+    }
   }
 
-  public String getValuationDate() {
-    return valuationDate;
+  default ScheduleSensitivity convertScheduleAmountForRole(SimmpleConfig config) {
+    if (ImRole.SECURED.equals(config.imRole()) && this.isSchedulePv()) {
+      return new DefaultScheduleSensitivity(this, this.getTradeNotionalAsString(), this.getTradeCurrency(),
+        getAmountUsd(config.fxRate()).negate());
+    } else {
+      return this;
+    }
   }
 
-  public String getEndDate() {
-    return endDate;
+  // -------------------- im model class predicates ------------------------
+
+  Predicate<Crif> isSimm = crif -> crif.getImModelIdentifier().equals(ImModelClass.SIMM);
+  Predicate<Crif> isSchedule = crif -> crif.getImModelIdentifier().equals(ImModelClass.SCHEDULE);
+
+  // -------------------- im model class methods ---------------------------
+
+  String MODEL_OMMITTED_FOR_NOTIONAL = "Tried to determine model from risk type since the model field was omitted" +
+    "but the risk type was notional which could be either SIMM or SCHEDULE";
+  String UNKNOWN_RISK_TYPE = "Unknown risk type found while trying to identify omitted model: [%s]!";
+
+  default ImModelClass getImModelIdentifier() {
+    String model = getImModel();
+    String riskType = getRiskType();
+    if (model == null || model.equals(StringUtils.EMPTY)) {
+      // TODO: if the notional string is ever change to differentiate between schedule and simm then we need to update this
+      if (riskType.equalsIgnoreCase(ScheduleRiskType.SCHEDULE_NOTIONAL)) {
+        throw new IllegalStateException(MODEL_OMMITTED_FOR_NOTIONAL);
+      } else if (AddOnSubType.isAddOnSubType(riskType)) {
+        return ImModelClass.SIMM;
+      } else if (RiskClass.isSimmRiskType(riskType)) {
+        return ImModelClass.SIMM;
+      } else if (ScheduleRiskType.isScheduleRiskType(riskType)) {
+        return ImModelClass.SCHEDULE;
+      } else {
+        throw new IllegalStateException(String.format(UNKNOWN_RISK_TYPE, riskType));
+      }
+    } else {
+      return ImModelClass.determineModelClass(model);
+    }
   }
 
-  public String getTradeId() {
-    return tradeId;
+  // ------------------ methods for regulation --------------------------
+
+  default String getRegulation(ImRole role) {
+    String regulation = (ImRole.SECURED.equals(role)) ?
+      this.getCollectRegulation() : this.getPostRegulation();
+    regulation = regulation.replaceAll(BRACKET_REGEX, FIRST_CAPTURE_GROUP);
+    regulation = regulation.replaceAll(QUOTE_REGEX, FIRST_CAPTURE_GROUP);
+    return regulation.replaceAll(SPACE_REGEX, "");
   }
 
-  public String getImModel() {
-    return imModel;
+  default String[] getRegulatorArray(ImRole role) {
+    return getRegulation(role).split(REGULATOR_DELIMITER);
   }
 
-  public String getProductClass() {
-    return productClass;
+  default boolean containsRegulator(ImRole role, String toCheck) {
+    String regulation = getRegulation(role);
+    return (getRegulation(role).equalsIgnoreCase(ALL_REGULATORS_STRING))
+      || (toCheck.equalsIgnoreCase(INCLUDED) && (getPostRegulation().equalsIgnoreCase(INCLUDED) || getCollectRegulation().equalsIgnoreCase(INCLUDED)))
+      || (StringUtils.containsIgnoreCase(regulation, toCheck));
   }
 
-  public String getRiskType() {
-    return riskType;
-  }
+  static Set<String> getRegulators(List<Crif> crifs, ImRole role) {
+    // check which mode of calc we are in: all blank, 'included', or standard regs
+    Set<String> regulators = crifs.stream()
+      .map(crif -> crif.getRegulatorArray(role))
+      .flatMap(Stream::of)
+      .collect(Collectors.toSet());
 
-  public String getQualifier() {
-    return qualifier;
-  }
+    // we also need to check the  other roles regs because having all post regs blank but all collect regs filled
+    // would not fall under the 'all blank' mode of calculation -- so add other role to the set we will check
+    Set<String> modeCheck = new HashSet<>(regulators);
+    crifs.stream()
+      .map(crif -> crif.getRegulatorArray(role.swapRole()))
+      .flatMap(Stream::of)
+      .forEach(modeCheck::add);
 
-  public String getBucket() {
-    return bucket;
-  }
+    // remove the all regulators flag if it is present as it has no bearing on our mode check
+    modeCheck.remove(ALL_REGULATORS_STRING);
 
-  public String getLabel1() {
-    return label1;
-  }
-
-  public String getLabel2() {
-    return label2;
-  }
-
-  public String getAmountString() {
-    return amount;
-  }
-
-  public BigDecimal getAmount() {
-    return new BigDecimal(amount);
-  }
-
-  public String getAmountCurrency() {
-    return amountCurrency;
-  }
-
-  public String getAmountUSDString() {
-    return amountUSD;
-  }
-
-  public BigDecimal getAmountUSD() {
-    return new BigDecimal(amountUSD);
-  }
-
-  public String getPostRegulation() {
-    return postRegulation;
-  }
-
-  public String getCollectRegulation() {
-    return collectRegulation;
-  }
-
-  public String getNotionalString() {
-    return notional;
-  }
-
-  public BigDecimal getNotional() {
-    return new BigDecimal(notional);
-  }
-
-  public String getNotionalCurrency() {
-    return notionalCurrency;
-  }
-
-  public String toTestString() {
-    return "\"" + valuationDate + "\", \"" + endDate + "\", \"" + tradeId + "\", \"" + imModel + "\", \"" + productClass + "\", \""
-        + riskType + "\", \"" + qualifier + "\", \"" + bucket + "\", \"" + label1 + "\", \"" + label2 + "\", \"" + amount + "\", \""
-        + amountCurrency + "\", \"" + amountUSD + "\", \"" + postRegulation + "\", \"" + collectRegulation + "\", \""
-        + notional + "\", \"" + notionalCurrency + "\"";
+    // now use the mode check to determine what the set of regulators is
+    if (modeCheck.size() == 1 && modeCheck.contains(BLANK_REGULATOR_STRING)) {
+      return Collections.singleton(""); // all blank mode, return ""
+    } else if (modeCheck.size() == 2 && modeCheck.contains(INCLUDED)) {
+      // note that in usual execution, there is validation to ensure the input only contains "" and "included"
+      //  this validation isn't included in the library but users should stick to this manually.
+      return Collections.singleton(INCLUDED); // include mode, returned "included"
+    } else {
+      // we are in the standard regulation mode
+      regulators.remove(ALL_REGULATORS_STRING);
+      regulators.remove(BLANK_REGULATOR_STRING);
+      return regulators; // regular regulators mode
+    }
   }
 
 }

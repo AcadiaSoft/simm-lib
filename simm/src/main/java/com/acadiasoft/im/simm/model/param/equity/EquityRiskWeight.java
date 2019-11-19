@@ -22,8 +22,8 @@
 
 package com.acadiasoft.im.simm.model.param.equity;
 
+import com.acadiasoft.im.simm.model.SensitivityIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketType;
-import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
 
 import java.math.BigDecimal;
@@ -57,12 +57,12 @@ public class EquityRiskWeight implements SimmRiskWeight {
   private static final BigDecimal VEGA12 = new BigDecimal("0.62");
 
   @Override
-  public BigDecimal getDeltaRiskWeight(WeightingClass s) {
+  public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {
     return WEIGHTS.get(s.getBucketIdentifier().getBucketType());
   }
 
   @Override
-  public BigDecimal getVegaRiskWeight(WeightingClass s) {
+  public BigDecimal getVegaRiskWeight(SensitivityIdentifier s) {
     if (s.getBucket().equals("12")) {
       // bucket 12 has its own VRW as per doc/ISDA-SIMM-v1.3.38 paragraph 57
       return VEGA12;

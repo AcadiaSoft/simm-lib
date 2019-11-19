@@ -22,69 +22,40 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
-import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
-import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.base.margin.BatchMargin;
+import com.acadiasoft.im.base.margin.GroupMargin;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
-import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
+import com.acadiasoft.im.base.util.ListUtils;
+import com.acadiasoft.im.simm.config.SimmConfig;
+import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.SensitivityIdentifier;
+import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author alec.stewart
  */
-public class RiskMargin implements ImTree {
+public class RiskMargin extends GroupMargin {
 
-  private static final String LEVEL = "4.Risk Class";
-  private final RiskClass riskClass;
-  private final BigDecimal margin;
-  private final List<SensitivityMargin> children = new ArrayList<>();
+  private static final String LEVEL = "4.RiskClass";
 
-  private RiskMargin(RiskClass riskClass, BigDecimal margin, List<SensitivityMargin> marginBySensitivityClass) {
-    this.riskClass = riskClass;
-    this.margin = margin;
-    this.children.addAll(marginBySensitivityClass);
+  private RiskMargin(RiskClass riskClass, BigDecimal margin, List<BatchMargin> marginBySensitivityClass) {
+    super(LEVEL, riskClass, margin, marginBySensitivityClass);
   }
 
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    List<ImTree> list = new ArrayList<>();
-    list.addAll(children);
-    return list;
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return riskClass;
-  }
-
-  public RiskClass getRiskClass() {
-    return riskClass;
-  }
-
-  public static RiskMargin calculate(RiskClass riskClass, List<Sensitivity> sensitivities, String calculationCurrency) {
-    List<SensitivityMargin> marginBySensitivityClass = SensitivityUtils.listByMargin(
-        e -> SensitivityMargin.calculate(riskClass, e.getKey(), e.getValue(), calculationCurrency),
-        SensitivityUtils.mapByIdentifier(s -> s.getSensitivityIdentifier(), sensitivities)
-    );
+  public static RiskMargin calculate(RiskClass riskClass, List<Sensitivity> sensitivities, SimmConfig config) {
+    List<SensitivityMargin> marginBySensitivityClass = ListUtils.groupBy(sensitivities, SensitivityIdentifier::getSensitivityClass).entrySet().stream()
+      .map(entry -> SensitivityMargin.calculate(riskClass, entry.getKey(), entry.getValue(), config))
+      .collect(Collectors.toList());
     // we sum across the sensitivity margins in the Risk Class to get the total IM for that Risk Class
     // NOTE: since each Risk Class Margin only has the sensitivities associated with its own risk class, we can do a straight
     //    sum because all of the base corr sensitivities are in only the Credit Qualifying Risk Class by definition
-    BigDecimal sum = BigDecimalUtils.sum(marginBySensitivityClass, m -> m.getMargin());
-    return new RiskMargin(riskClass, sum, marginBySensitivityClass);
+    BigDecimal sum = BigDecimalUtils.sum(marginBySensitivityClass, SensitivityMargin::getMargin);
+    return new RiskMargin(riskClass, sum, new ArrayList<>(marginBySensitivityClass));
   }
 
 }

@@ -22,39 +22,33 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.model.imtree.identifiers.SiloClass;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * As defined in Appendix 1 section K of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
  */
-public enum ProductClass implements MarginIdentifier {
+public class ProductClass extends SiloClass {
 
-  RATES_FX("RatesFX", "Interest Rates and Foreign Exchange"), //
-  CREDIT("Credit", "Credit"), //
-  EQUITY("Equity", "Equity"), //
-  COMMODITY("Commodity", "Commodity");
+  public static final ProductClass RATES_FX = new ProductClass("RatesFX", "Interest Rates and Foreign Exchange");
+  public static final ProductClass CREDIT = new ProductClass("Credit", "Credit");
+  public static final ProductClass EQUITY = new ProductClass("Equity", "Equity");
+  public static final ProductClass COMMODITY = new ProductClass("Commodity", "Commodity");
+  public static final ProductClass SINGLE = new ProductClass("Single", "The single product class that can contain all types");
 
-  private static final List<ProductClass> ALL = Arrays.asList(values());
+  private static final String BAD_LABEL = "Unknown product class specified: [%s]";
+  private static final Supplier<Stream<ProductClass>> ALL = () -> Stream.of(
+    RATES_FX, CREDIT, EQUITY, COMMODITY
+  );
 
-  private final String label;
   private final String description;
 
   private ProductClass(String label, String description) {
-    this.label = label;
+    super(label);
     this.description = description;
-  }
-
-  @Override
-  public String getLabel() {
-    return label;
-  }
-
-  public static int indexOf(String productClass) {
-    return ALL.indexOf(determineProductClass(productClass));
   }
 
   public String getDescription() {
@@ -62,11 +56,7 @@ public enum ProductClass implements MarginIdentifier {
   }
 
   public static ProductClass determineProductClass(String label) {
-    for (ProductClass productClass : values()) {
-      if (StringUtils.equalsIgnoreCase(label, productClass.getLabel())) {
-        return productClass;
-      }
-    }
-    throw new RuntimeException("Unknown product class specified:[" + label + "]!");
+    return ALL.get().filter(product -> StringUtils.equalsIgnoreCase(label, product.label)).findAny()
+      .orElseThrow(() -> new IllegalStateException(String.format(BAD_LABEL, label)));
   }
 }

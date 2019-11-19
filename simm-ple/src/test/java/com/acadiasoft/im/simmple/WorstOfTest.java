@@ -24,16 +24,13 @@ package com.acadiasoft.im.simmple;
 
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.fx.NoConversionFxRate;
-import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationType;
+import com.acadiasoft.im.simm.config.SimmCalculationType;
 import com.acadiasoft.im.simm.engine.Simm;
-import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
+import com.acadiasoft.im.simmple.config.ImRole;
 import com.acadiasoft.im.simmple.engine.Simmple;
 import com.acadiasoft.im.simmple.model.Crif;
-import com.acadiasoft.im.simmple.model.ImRole;
-import com.acadiasoft.im.simmple.model.result.ImResult;
-import com.acadiasoft.im.simmple.model.result.ImTreeResult;
-import com.acadiasoft.im.simmple.model.utils.SimmpleConversions;
-import com.acadiasoft.im.simmple.model.utils.SimmpleUtils;
+import com.acadiasoft.im.simmple.model.DefaultCrif;
+import com.acadiasoft.im.simmple.model.utils.SimmpleResult;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,11 +48,11 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfInclude() {
-    Crif one = new Crif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "included", "");
-    Crif two = new Crif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "", "included");
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "included", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "", "included");
 
-    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR), SimmpleConversions.convertToSensitivity(two, fx, ImRole.PLEDGOR)), "USD");
-    ImTreeResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("included", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
@@ -63,16 +60,16 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfAllSame() {
-    Crif one = new Crif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC,SEC", "");
-    Crif two = new Crif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "CFTC,SEC", "");
+    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC,SEC", "");
+    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "CFTC,SEC", "");
 
-    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR), SimmpleConversions.convertToSensitivity(two, fx, ImRole.PLEDGOR)), "USD");
-    ImTreeResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
 
-    ImTreeResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
+    SimmpleResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
     Assert.assertEquals(BigDecimal.ZERO, collect.getImTree().getMargin());
     Assert.assertEquals("", collect.getRegulator());
     Assert.assertEquals("USD", collect.getCurrency());
@@ -80,16 +77,16 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfAllSameReverse() {
-    Crif one = new Crif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "SEC,CFTC", "");
-    Crif two = new Crif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "SEC,CFTC", "");
+    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
 
-    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR), SimmpleConversions.convertToSensitivity(two, fx, ImRole.PLEDGOR)), "USD");
-    ImTreeResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
 
-    ImTreeResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
+    SimmpleResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
     Assert.assertEquals(BigDecimal.ZERO, collect.getImTree().getMargin());
     Assert.assertEquals("", collect.getRegulator());
     Assert.assertEquals("USD", collect.getCurrency());
@@ -97,11 +94,11 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfCompound() {
-    Crif one = new Crif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
-    Crif two = new Crif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
+    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
 
-    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR), SimmpleConversions.convertToSensitivity(two, fx, ImRole.PLEDGOR)), "USD");
-    ImTreeResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
@@ -109,52 +106,43 @@ public class WorstOfTest {
 
   @Test
   public void testAlwaysIncludedFunctionality() {
-    Crif one = new Crif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
-    Crif two = new Crif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
-    Crif three = new Crif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00",  SimmpleUtils.ALL_REGULATORS_STRING, "" );
+    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
+    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif three = new DefaultCrif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00",  Crif.ALL_REGULATORS_STRING, "" );
 
 
-    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR), SimmpleConversions.convertToSensitivity(two, fx, ImRole.PLEDGOR),
-        SimmpleConversions.convertToSensitivity(three, fx, ImRole.PLEDGOR)), "USD");
-    ImTreeResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two, three), "USD");
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
     Assert.assertEquals(2, post.getImTree().getChildren().get(0).getChildren().size());
-    Assert.assertEquals("Credit", post.getImTree().getChildren().get(0).getChildren().get(0).getMarginIdentifier().getLabel());
-    Assert.assertEquals("RatesFX", post.getImTree().getChildren().get(0).getChildren().get(1).getMarginIdentifier().getLabel());
   }
 
   @Test
   public void testWorstOfOnlyAddsNonZeroMarginClassesWhenPossible() {
-    Crif one = new Crif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
-    Crif two = new Crif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
-    Crif three = new Crif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00",  SimmpleUtils.ALL_REGULATORS_STRING, "" );
+    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
+    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif three = new DefaultCrif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00",  Crif.ALL_REGULATORS_STRING, "" );
 
-
-    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR), SimmpleConversions.convertToSensitivity(two, fx, ImRole.PLEDGOR),
-        SimmpleConversions.convertToSensitivity(three, fx, ImRole.PLEDGOR)), "USD");
-    ImTreeResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two, three), "USD");
+    SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
     Assert.assertEquals(1, post.getImTree().getChildren().size());
-    Assert.assertEquals("SIMM-P", post.getImTree().getChildren().get(0).getMarginIdentifier().getLabel());
+    Assert.assertEquals("SIMM-P", post.getImTree().getChildren().get(0).getMarginIdentifier().getMarginIdentifier());
     Assert.assertEquals(2, post.getImTree().getChildren().get(0).getChildren().size());
-    Assert.assertEquals("Credit", post.getImTree().getChildren().get(0).getChildren().get(0).getMarginIdentifier().getLabel());
-    Assert.assertEquals("RatesFX", post.getImTree().getChildren().get(0).getChildren().get(1).getMarginIdentifier().getLabel());
   }
 
   @Test
   public void testWorstOfReturnsBlankTreeWhenZero() {
-    Crif one = new Crif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0", "CFTC", "" );
-    Crif two = new Crif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "0", "SEC,CFTC", "");
-    Crif three = new Crif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0",  SimmpleUtils.ALL_REGULATORS_STRING, "" );
+    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0", "CFTC", "" );
+    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "0", "SEC,CFTC", "");
+    DefaultCrif three = new DefaultCrif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0",  Crif.ALL_REGULATORS_STRING, "" );
 
-
-    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(SimmpleConversions.convertToSensitivity(one, fx, ImRole.PLEDGOR), SimmpleConversions.convertToSensitivity(two, fx, ImRole.PLEDGOR),
-        SimmpleConversions.convertToSensitivity(three, fx, ImRole.PLEDGOR)), "USD");
-    ImTreeResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two, three), "USD");
+    SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate().setScale(0, RoundingMode.HALF_UP), post.getImTree().getMargin().setScale(0, BigDecimal.ROUND_HALF_UP));
     Assert.assertTrue(post.getImTree().getChildren().isEmpty());
   }

@@ -22,43 +22,32 @@
 
 package com.acadiasoft.im.schedule.models.imtree.identifiers;
 
+import com.acadiasoft.im.base.model.imtree.identifiers.SiloClass;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-public enum ScheduleProductClass implements MarginIdentifier {
+public class ScheduleProductClass extends SiloClass {
 
-  FX("FX"),
-  RATES("Rates"),
-  CREDIT("Credit"),
-  COMMODITY("Commodity"),
-  EQUITY("Equity"),
-  OTHER("Other");
+  public static final ScheduleProductClass FX = new ScheduleProductClass("FX");
+  public static final ScheduleProductClass RATES = new ScheduleProductClass("Rates");
+  public static final ScheduleProductClass CREDIT = new ScheduleProductClass("Credit");
+  public static final ScheduleProductClass COMMODITY = new ScheduleProductClass("Commodity");
+  public static final ScheduleProductClass EQUITY = new ScheduleProductClass("Equity");
+  public static final ScheduleProductClass OTHER = new ScheduleProductClass("Other");
 
-  private final String productClass;
+  private static final String UNKNOWN = "Tried to get a product for an unknown label: [%s]";
+  private static final Supplier<Stream<ScheduleProductClass>> ALL = () -> Stream.of(
+    FX, RATES, CREDIT, COMMODITY, EQUITY, OTHER
+  );
 
-  ScheduleProductClass(String productClass) {
-    this.productClass = productClass;
+  private ScheduleProductClass(String label) {
+    super(label);
   }
 
   public static ScheduleProductClass determineProductClass(String productClass) {
-    if (productClass.equalsIgnoreCase(FX.productClass)) {
-      return FX;
-    } else if (productClass.equalsIgnoreCase(RATES.productClass)) {
-      return RATES;
-    } else if (productClass.equalsIgnoreCase(COMMODITY.productClass)) {
-      return COMMODITY;
-    } else if (productClass.equalsIgnoreCase(CREDIT.productClass)) {
-      return CREDIT;
-    } else if (productClass.equalsIgnoreCase(EQUITY.productClass)) {
-      return EQUITY;
-    } else {
-      return OTHER;
-    }
-  }
-
-  @Override
-  public String getLabel() {
-    return productClass;
+    return ALL.get().filter(product -> product.label.equalsIgnoreCase(productClass)).findAny()
+      .orElseThrow(() -> new IllegalStateException(String.format(UNKNOWN, productClass)));
   }
 
 }

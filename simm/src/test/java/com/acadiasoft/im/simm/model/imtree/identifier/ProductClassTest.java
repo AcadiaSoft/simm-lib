@@ -23,34 +23,9 @@
 package com.acadiasoft.im.simm.model.imtree.identifier;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class ProductClassTest {
-
-  @Test
-  public void assertIndexes() {
-    Assert.assertEquals(ProductClass.RATES_FX, ProductClass.values()[0]);
-    Assert.assertEquals(ProductClass.CREDIT, ProductClass.values()[1]);
-    Assert.assertEquals(ProductClass.EQUITY, ProductClass.values()[2]);
-    Assert.assertEquals(ProductClass.COMMODITY, ProductClass.values()[3]);
-  }
-
-  @Test
-  public void testIndexOf() {
-    Assert.assertEquals(0, ProductClass.indexOf(ProductClass.RATES_FX.getLabel()));
-    Assert.assertEquals(1, ProductClass.indexOf(ProductClass.CREDIT.getLabel()));
-    Assert.assertEquals(2, ProductClass.indexOf(ProductClass.EQUITY.getLabel()));
-    Assert.assertEquals(3, ProductClass.indexOf(ProductClass.COMMODITY.getLabel()));
-  }
-
-  @Test
-  public void testGetByLabel() {
-    Assert.assertEquals(ProductClass.RATES_FX, ProductClass.determineProductClass(ProductClass.RATES_FX.getLabel().toLowerCase()));
-    Assert.assertEquals(ProductClass.CREDIT, ProductClass.determineProductClass(ProductClass.CREDIT.getLabel().toLowerCase()));
-    Assert.assertEquals(ProductClass.EQUITY, ProductClass.determineProductClass(ProductClass.EQUITY.getLabel().toLowerCase()));
-    Assert.assertEquals(ProductClass.COMMODITY, ProductClass.determineProductClass(ProductClass.COMMODITY.getLabel().toLowerCase()));
-  }
 
   @Test(expected = RuntimeException.class)
   public void testGetByLabelUnknown() {

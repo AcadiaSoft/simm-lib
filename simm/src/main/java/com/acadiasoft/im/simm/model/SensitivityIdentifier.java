@@ -22,61 +22,120 @@
 
 package com.acadiasoft.im.simm.model;
 
-import com.acadiasoft.im.simm.model.imtree.identifiers.BucketClass;
-import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
-import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
-import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
+import com.acadiasoft.im.simm.model.imtree.identifiers.*;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.stream.Stream;
 
 
-public interface SensitivityIdentifier {
+public interface SensitivityIdentifier extends Serializable {
 
-  public static ProductClass getProductIdentifier(SensitivityIdentifier s) {
-    return ProductClass.determineProductClass(s.getProductClass());
-  }
+  String getTradeId();
 
-  public static RiskClass getRiskIdentifier(SensitivityIdentifier s) {
-    return RiskClass.determineByRiskType(s.getRiskType());
-  }
+  String getProductClass();
 
-  public static BucketClass getBucketIdentifier(SensitivityIdentifier s) {
-    return BucketClass.determineBucketClass(getRiskIdentifier(s), s.getQualifier(), s.getBucket());
-  }
+  String getRiskType();
 
-  public static String getWeightingClassIdentifier(SensitivityIdentifier s) {
-    return s.getProductClass() + SensitivityUtils.DELIMITER + s.getRiskType() + SensitivityUtils.DELIMITER + s.getQualifier() + SensitivityUtils.DELIMITER
-        + s.getBucket() + SensitivityUtils.DELIMITER + s.getLabel1() + SensitivityUtils.DELIMITER + s.getLabel2();
-  }
+  String getQualifier();
 
-  public static String getConcentrationRiskIdentifier(SensitivityIdentifier identifier) {
-    RiskClass r = getRiskIdentifier(identifier);
-    if (r.equals(RiskClass.CREDIT_NON_QUALIFYING) || r.equals(RiskClass.CREDIT_QUALIFYING)) {
-      // for credit risk, the concentration is summed over risk factors with the same issuer and seniority,
-      // irrespective of tenor or payment currency. Issuer and seniority should be identified by the qualifier
-      return identifier.getQualifier();
-    } else if (r.equals(RiskClass.INTEREST_RATE)) {
-      // concentration risk is summed over the currencies, which are exactly the buckets of IR and are indicated by
-      // the qualifier
-      return identifier.getQualifier();
-    } else if (r.equals(RiskClass.FX)) {
-      // fx is also over the currency (qualifier) but in this case there should be only one sensitivity per currency
-      return identifier.getQualifier();
-    } else {
-      // CM or EQ are over the individual sensitivities, so our string should be exact
-      return identifier.getProductClass() + SensitivityUtils.DELIMITER + identifier.getRiskType()
-          + SensitivityUtils.DELIMITER + identifier.getQualifier() + SensitivityUtils.DELIMITER + identifier.getBucket();
+  String getBucket();
+
+  String getLabel1();
+
+  String getLabel2();
+
+  SensitivityClass getSensitivityClass();
+
+  RiskClass getRiskIdentifier();
+
+  // ------------------- default methods ---------------------------------
+
+  String BAD_RISK_TYPE = "The risk type was null or empty when it was required";
+  String BAD_QUALIFIER = "The qualifier was null or empty when it was required";
+  String BAD_PRODUCT = "The product class was null or empty when it was required";
+
+
+  default void checkSensitivityIdentifier(String productClass, String riskType, String qualifier,
+                                          String bucket, String label1, String label2) {
+    if (riskType == null || riskType.isEmpty()) {
+      throw new IllegalStateException(BAD_RISK_TYPE);
+    } else if ((qualifier == null || qualifier.isEmpty()) && !riskType.equalsIgnoreCase(AddOnSubType.ADD_ON_FIXED_AMOUNT)) {
+      throw new IllegalStateException(BAD_QUALIFIER);
+    } else if (isSimmStandard() && (productClass == null || productClass.isEmpty())) {
+      throw new IllegalStateException(BAD_PRODUCT);
     }
   }
 
-  public String getProductClass();
+  default boolean isAddOn() {
+    return AddOnSubType.isAddOnSubType(this.getRiskType());
+  }
 
-  public String getRiskType();
+  default boolean isSimmStandard() {
+    return RiskClass.isSimmRiskType(this.getRiskType());
+  }
 
-  public String getQualifier();
+  default String normalizeFxVegaQualifier(String qualifier) {
+    String ccy1 = StringUtils.substring(qualifier, 0, 3);
+    String ccy2 = StringUtils.substring(qualifier, 3, 6);
+    return Stream.of(ccy1, ccy2).sorted().reduce("", String::concat);
+  }
 
-  public String getBucket();
+  default ProductClass getProductIdentifier() {
+    return ProductClass.determineProductClass(this.getProductClass());
+  }
 
-  public String getLabel1();
+  default BucketClass getBucketIdentifier() {
+    return BucketClass.determineBucketClass(this.getRiskIdentifier(), this.getQualifier(), this.getBucket());
+  }
 
-  public String getLabel2();
+  default SensitivityIdentifier getConcentrationRiskIdentifier() {
+    RiskClass risk = this.getRiskIdentifier();
+    if (risk.equals(RiskClass.CREDIT_NON_QUALIFYING) || risk.equals(RiskClass.CREDIT_QUALIFYING)) {
+      // for credit risk, the concentration is summed over risk factors with the same issuer and seniority,
+      // irrespective of tenor or payment currency. Issuer and seniority should be identified by the qualifier
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(),
+        null, null, null, this.getSensitivityClass(), risk);
+    } else if (risk.equals(RiskClass.INTEREST_RATE)) {
+      // concentration risk is summed over the currencies, which are exactly the buckets of IR and are indicated by
+      // the qualifier
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(),
+        null, null, null, this.getSensitivityClass(), risk);
+    } else if (risk.equals(RiskClass.FX)) {
+      // fx is also over the currency (qualifier) but in this case there should be only one sensitivity per currency
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(),
+        null, null, null, this.getSensitivityClass(), risk);
+    } else {
+      // CM or EQ are over the individual sensitivities, so our string should be exact
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), this.getRiskType(), this.getQualifier(),
+        this.getBucket(), null, null, this.getSensitivityClass(), risk);
+    }
+  }
+
+  default SensitivityIdentifier determineRiskFactor() {
+    String label1 = this.getLabel1();
+    String qualifier = this.getQualifier();
+    RiskClass riskClass = this.getRiskIdentifier();
+
+    if (this.getSensitivityClass().equals(SensitivityClass.VEGA) || this.getSensitivityClass().equals(SensitivityClass.CURVATURE)) {
+      // we need to sum over all of the vol-tenors for certain risk types, thus we specify label1 which holds vega vol-tenor values
+      if (RiskClass.EQUITY.equals(riskClass) ||
+        RiskClass.FX.equals(riskClass) ||
+        RiskClass.COMMODITY.equals(riskClass) ||
+        (RiskClass.INTEREST_RATE.equals(riskClass) && this.getRiskType().equals(RiskClass.RISK_TYPE_INFLATION_VOL))) {
+        label1 = null;
+      }
+
+      // for FX Vega risk, the order of the currency pair is irrelevant, so we order alphabetically
+      if (RiskClass.FX.equals(riskClass)) {
+        String ccy1 = StringUtils.substring(qualifier, 0, 3);
+        String ccy2 = StringUtils.substring(qualifier, 3, 6);
+        qualifier = Stream.of(ccy1, ccy2).sorted().reduce("", (s1, s2) -> s1 + s2);
+      }
+    }
+
+    return new DefaultSensitivityIdentifier(null, this.getProductClass(), this.getRiskType(), qualifier,
+      this.getBucket(), label1, this.getLabel2(), this.getSensitivityClass(), riskClass);
+  }
 
 }

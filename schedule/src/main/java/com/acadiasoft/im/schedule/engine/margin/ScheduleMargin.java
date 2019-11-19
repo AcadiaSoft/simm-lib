@@ -22,81 +22,50 @@
 
 package com.acadiasoft.im.schedule.engine.margin;
 
-import com.acadiasoft.im.base.imtree.identifiers.ImModelClass;
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.margin.ModelMargin;
+import com.acadiasoft.im.base.margin.SiloMargin;
+import com.acadiasoft.im.base.model.imtree.identifiers.ImModelClass;
+import com.acadiasoft.im.base.util.ListUtils;
+import com.acadiasoft.im.schedule.config.ScheduleConfig;
 import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
-import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass;
-import com.acadiasoft.im.schedule.engine.ScheduleCalculationUtils;
+import com.acadiasoft.im.schedule.models.ScheduleSensitivity;
+import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  *
  * @author alec.stewart
  */
-public class ScheduleMargin implements ImTree {
+public class ScheduleMargin extends ModelMargin {
 
-  private final static String LEVEL = "2.ImModel";
-  private final static MarginIdentifier IDENTIFIER = ImModelClass.SCHEDULE;
-  private final BigDecimal margin;
-  private final List<ScheduleProductMargin> children = new ArrayList<>();
-
-  private ScheduleMargin(BigDecimal margin, List<ScheduleProductMargin> children) {
-    this.margin = margin;
-    this.children.addAll(children);
+  private ScheduleMargin(BigDecimal margin, List<SiloMargin> children) {
+    super(ImModelClass.SCHEDULE, margin, children);
   }
 
-  public static ScheduleMargin calculate(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
-    Map<ScheduleProductClass, List<ScheduleNotional>> notionalMap = notionals.stream()
-        .collect(Collectors.groupingBy(ScheduleIdentifier::getProductClass, Collectors.toList()));
-    List<ScheduleProductMargin> productMargins = notionalMap.entrySet().stream()
-        .map(e -> ScheduleProductMargin.calculate(e.getKey(), e.getValue(), netGrossRate))
-        .collect(Collectors.toList());
-    BigDecimal margin = ScheduleCalculationUtils.calculate(notionals, netGrossRate);
-    return new ScheduleMargin(margin, productMargins);
-  }
-
-  public static ScheduleMargin calculate(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
-    Map<ScheduleProductClass, List<ScheduleNotional>> notionalMap = notionals.stream()
-        .collect(Collectors.groupingBy(ScheduleIdentifier::getProductClass, Collectors.toList()));
-    Map<ScheduleProductClass, List<SchedulePv>> pvMap = pvs.stream()
-        .collect(Collectors.groupingBy(ScheduleIdentifier::getProductClass, Collectors.toList()));
-    List<ScheduleProductMargin> productMargins = notionalMap.entrySet().stream()
-        .map(e -> {
-          List<SchedulePv> list = new ArrayList<>();
-          if (pvMap.containsKey(e.getKey())) list = pvMap.get(e.getKey());
-          return ScheduleProductMargin.calculate(e.getKey(), e.getValue(), list);
-        })
-        .collect(Collectors.toList());
-    BigDecimal margin = ScheduleCalculationUtils.calculate(notionals, pvs);
-    return new ScheduleMargin(margin, productMargins);
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
-  }
-
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return IDENTIFIER;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    return new ArrayList<>(children);
+  public static ScheduleMargin calculate(List<ScheduleSensitivity> sensitivities, ScheduleConfig config) {
+    List<ScheduleProductMargin> products = ListUtils.groupBy(sensitivities, ScheduleIdentifier::getScheduleProductClass).entrySet().stream()
+      .map(entry -> ScheduleProductMargin.calculate(entry.getKey(), entry.getValue(), config))
+      .collect(Collectors.toList());
+    List<ScheduleNotional> notionals = products.stream()
+      .map(ScheduleProductMargin::getNettedTrades)
+      .flatMap(Collection::stream)
+      .map(ScheduleTradeMargin::getNettedNotional)
+      .collect(Collectors.toList());
+    BigDecimal grossIm = ScheduleCalculationUtils.calculateGrossIm(notionals, config.fxRate());
+    List<SchedulePv> pvs = products.stream()
+      .map(ScheduleProductMargin::getNettedTrades)
+      .flatMap(Collection::stream)
+      .map(ScheduleTradeMargin::getNettedPv)
+      .collect(Collectors.toList());
+    BigDecimal ngr = (config.useConfiguredNgr()) ? config.netGrossRate() : ScheduleCalculationUtils.calculateNgr(pvs, config.fxRate());
+    return new ScheduleMargin(ScheduleCalculationUtils.calculateMargin(grossIm, ngr), new ArrayList<>(products));
   }
 
 }

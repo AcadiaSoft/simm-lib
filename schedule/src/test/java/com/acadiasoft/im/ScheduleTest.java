@@ -22,9 +22,13 @@
 
 package com.acadiasoft.im;
 
+import com.acadiasoft.im.base.fx.FxRate;
+import com.acadiasoft.im.schedule.config.ScheduleConfig;
 import com.acadiasoft.im.schedule.engine.Schedule;
+import com.acadiasoft.im.schedule.models.DefaultScheduleSensitivity;
 import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
+import com.acadiasoft.im.schedule.models.ScheduleSensitivity;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,26 +44,33 @@ public class ScheduleTest {
 
   @Test
   public void testNettingWorksAsExpected() {
-    ScheduleNotional one = new ScheduleNotional("trade1", "Rates", "2018-09-12", "2018-11-23", "1000");
-    ScheduleNotional two = new ScheduleNotional("trade1", "Rates", "2018-09-12", "2018-11-23", "-1000");
+    ScheduleNotional one = new DefaultScheduleSensitivity("trade1", "Rates", "Notional", "2018-09-12", "2018-11-23", "1000", FxRate.USD, "1000");
+    ScheduleNotional two = new DefaultScheduleSensitivity("trade1", "Rates", "Notional", "2018-09-12", "2018-11-23", "-1000", FxRate.USD, "-1000");
     Assert.assertEquals(BigDecimal.ZERO, Schedule.calculate(Arrays.asList(one, two), BigDecimal.ONE).setScale(0, RoundingMode.HALF_UP));
   }
 
   @Test
   public void testNettingWorksAsExpectedPv() {
-    ScheduleNotional notional = new ScheduleNotional("trade1", "Rates", "2018-09-12", "2018-11-23", "1000");
-    SchedulePv one = new SchedulePv("trade1", "Rates", "2018-09-12", "2018-11-23", "1000");
-    SchedulePv two = new SchedulePv("trade1", "Rates", "2018-09-12", "2018-11-23", "-1000");
+    ScheduleNotional notional = new DefaultScheduleSensitivity("trade1", "Rates", "Notional", "2018-09-12", "2018-11-23", "1000", FxRate.USD, "1000");
+    SchedulePv one = new DefaultScheduleSensitivity("trade1", "Rates", "PV", "2018-09-12", "2018-11-23", "1000", FxRate.USD, "1000");
+    SchedulePv two = new DefaultScheduleSensitivity("trade1", "Rates", "PV", "2018-09-12", "2018-11-23", "-1000", FxRate.USD, "-1000");
     Assert.assertEquals(new BigDecimal("10"), Schedule.calculate(Arrays.asList(notional), Arrays.asList(one, two)).setScale(0, RoundingMode.HALF_UP));
   }
 
   @Test
+  public void testNotionalBeingGottenFromTradeFields() {
+    ScheduleSensitivity one = new DefaultScheduleSensitivity("trade1", "1000", FxRate.USD, "Rates", "PV", "2018-09-12", "2018-11-23", "1000", FxRate.USD, "1000");
+    ScheduleSensitivity two = new DefaultScheduleSensitivity("trade1", "1000", FxRate.USD, "Rates", "PV", "2018-09-12", "2018-11-23", "-1000", FxRate.USD, "-1000");
+    Assert.assertEquals(new BigDecimal("10"), Schedule.calculate(Arrays.asList(one, two), ScheduleConfig.Builder().build()).getMargin().setScale(0, RoundingMode.HALF_UP));
+  }
+
+  @Test
   public void testNettingAndAbsoluteNotional() {
-    ScheduleNotional notional1 = new ScheduleNotional("trade1", "Rates", "2018-09-12", "2018-11-23", "1000");
-    ScheduleNotional notional2 = new ScheduleNotional("trade2", "Rates", "2018-09-12", "2018-11-23", "-1000");
-    SchedulePv pv1a = new SchedulePv("trade1", "Rates", "2018-09-12", "2018-11-23", "2000");
-    SchedulePv pv1b = new SchedulePv("trade1", "Rates", "2018-09-12", "2018-11-23", "-1000");
-    SchedulePv pv2 = new SchedulePv("trade2", "Rates", "2018-09-12", "2018-11-23", "-1000");
+    ScheduleNotional notional1 = new DefaultScheduleSensitivity("trade1", "Rates", "Notional", "2018-09-12", "2018-11-23", "1000", FxRate.USD, "1000");
+    ScheduleNotional notional2 = new DefaultScheduleSensitivity("trade2", "Rates", "Notional", "2018-09-12", "2018-11-23", "-1000", FxRate.USD, "-1000");
+    SchedulePv pv1a = new DefaultScheduleSensitivity("trade1", "Rates", "PV", "2018-09-12", "2018-11-23", "2000", FxRate.USD, "2000");
+    SchedulePv pv1b = new DefaultScheduleSensitivity("trade1", "Rates", "PV", "2018-09-12", "2018-11-23", "-1000", FxRate.USD, "-1000");
+    SchedulePv pv2 = new DefaultScheduleSensitivity("trade2", "Rates", "PV", "2018-09-12", "2018-11-23", "-1000", FxRate.USD, "-1000");
     Assert.assertEquals(new BigDecimal("8"), Schedule.calculate(Arrays.asList(notional1, notional2), Arrays.asList(pv1a, pv1b, pv2)).setScale(0, RoundingMode.HALF_UP));
   }
 

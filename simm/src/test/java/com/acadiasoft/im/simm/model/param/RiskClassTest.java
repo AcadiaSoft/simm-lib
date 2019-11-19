@@ -29,16 +29,6 @@ import org.junit.Test;
 public class RiskClassTest {
 
   @Test
-  public void assertIndexes() {
-    Assert.assertEquals(RiskClass.INTEREST_RATE, RiskClass.values()[0]);
-    Assert.assertEquals(RiskClass.CREDIT_QUALIFYING, RiskClass.values()[1]);
-    Assert.assertEquals(RiskClass.CREDIT_NON_QUALIFYING, RiskClass.values()[2]);
-    Assert.assertEquals(RiskClass.EQUITY, RiskClass.values()[3]);
-    Assert.assertEquals(RiskClass.COMMODITY, RiskClass.values()[4]);
-    Assert.assertEquals(RiskClass.FX, RiskClass.values()[5]);
-  }
-
-  @Test
   public void testRiskType() {
     Assert.assertEquals(RiskClass.INTEREST_RATE, RiskClass.determineByRiskType("Risk_IRCurve"));
     Assert.assertEquals(RiskClass.INTEREST_RATE, RiskClass.determineByRiskType("Risk_Inflation"));

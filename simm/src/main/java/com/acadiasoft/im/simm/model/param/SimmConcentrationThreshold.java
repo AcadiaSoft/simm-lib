@@ -22,6 +22,7 @@
 
 package com.acadiasoft.im.simm.model.param;
 
+import com.acadiasoft.im.simm.model.SensitivityIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
 import com.acadiasoft.im.simm.model.param.cnq.CreditNonQualifyingConcentrationRisk;
@@ -35,18 +36,24 @@ import java.math.BigDecimal;
 
 public interface SimmConcentrationThreshold {
 
-  static BigDecimal getThreshold(RiskClass riskClass, SensitivityClass sensitivityClass, String identifier) {
+  String BAD_CALL = "Called getThreshold from a non-concentration risk using sensitivity type: [%s]!";
+
+  static BigDecimal getThreshold(SensitivityIdentifier identifier, String threshold) {
+    RiskClass riskClass = identifier.getRiskIdentifier();
+    SensitivityClass sensitivityClass = identifier.getSensitivityClass();
     if (sensitivityClass.equals(SensitivityClass.VEGA)) {
-      return fromRiskClass(riskClass).getVegaThreshold(identifier);
+      return fromRiskClass(riskClass).getVegaThreshold(threshold);
     } else if (sensitivityClass.equals(SensitivityClass.DELTA)) {
       // NOTE: for FX sensitivities, the thresholds are at the sensitivity level, and identifier
       //  must be the currency (qualifier) of the sensitivity
       //  all other thresholds are at bucket level or risk class level
-      return fromRiskClass(riskClass).getDeltaThreshold(identifier);
+      return fromRiskClass(riskClass).getDeltaThreshold(threshold);
     } else {
-      throw new IllegalStateException("Called getThreshold from a non-concentration risk using sensitivity type: [" + sensitivityClass + "]!");
+      throw new IllegalStateException(String.format(BAD_CALL, identifier.getSensitivityClass()));
     }
   }
+
+  String BAD_RISK_CLASS = "Tried to get a threshold for unknown risk class: [%s]!";
 
   static SimmConcentrationThreshold fromRiskClass(RiskClass riskClass) {
     if (riskClass.equals(RiskClass.INTEREST_RATE)) {
@@ -62,12 +69,12 @@ public interface SimmConcentrationThreshold {
     } else if (riskClass.equals(RiskClass.FX)) {
       return new FXConcentrationRisk();
     } else {
-      throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
+      throw new IllegalStateException(String.format(BAD_RISK_CLASS, riskClass));
     }
   }
 
-  public BigDecimal getDeltaThreshold(String bucketName);
+  public BigDecimal getDeltaThreshold(String threshold);
 
-  public BigDecimal getVegaThreshold(String bucketName);
+  public BigDecimal getVegaThreshold(String threshold);
 
 }

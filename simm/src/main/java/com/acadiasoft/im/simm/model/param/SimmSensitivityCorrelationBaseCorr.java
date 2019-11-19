@@ -22,16 +22,23 @@
 
 package com.acadiasoft.im.simm.model.param;
 
+import com.acadiasoft.im.simm.config.HoldingPeriod;
+import com.acadiasoft.im.simm.config.SimmConfig;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.cq.BaseCorrRisk;
+import com.acadiasoft.im.simm.model.param.cq.BaseCorrRisk1d;
 
 import java.math.BigDecimal;
 
 public interface SimmSensitivityCorrelationBaseCorr {
 
-  public static BigDecimal get(RiskClass riskClass, WeightingClass r, WeightingClass s) {
-    return new BaseCorrRisk().getSensitivityCorrelation(r, s);
+  public static BigDecimal get(RiskClass riskClass, WeightingClass r, WeightingClass s, SimmConfig config) {
+    if (config.holdingPeriod().equals(HoldingPeriod.TEN_DAY)) {
+      return new BaseCorrRisk().getSensitivityCorrelation(r, s);
+    } else {
+      return new BaseCorrRisk1d().getSensitivityCorrelation(r, s);
+    }
   }
 
   public BigDecimal getSensitivityCorrelation(WeightingClass r, WeightingClass s);

@@ -22,10 +22,14 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.DefaultSensitivity;
 import com.acadiasoft.im.simm.model.param.equity.EquityRegion;
 import com.acadiasoft.im.simm.model.param.equity.EquitySize;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.stream.Stream;
+
+import static com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass.*;
 
 public enum BucketType {
 
@@ -50,35 +54,35 @@ public enum BucketType {
   CM15(RiskClass.COMMODITY, 15, "Livestock"), //  
   CM16(RiskClass.COMMODITY, 16, "Other"), //
   CM17(RiskClass.COMMODITY, 17, "Indexes"),
-  CRNQ1(RiskClass.CREDIT_NON_QUALIFYING, 1, "Investment grade (IG) in RMBS/CMBS"), // 
-  CRNQ2(RiskClass.CREDIT_NON_QUALIFYING, 2, "High yield (HY) & non-rated (NR) in RMBS/CMBS"), //
-  CRNQRESIDUAL(RiskClass.CREDIT_NON_QUALIFYING, -1, "CRNQ Residual Bucket"),
-  CRQ1(RiskClass.CREDIT_QUALIFYING, 1, "Investment grade (IG) in Sovereigns including central banks"), //
-  CRQ2(RiskClass.CREDIT_QUALIFYING, 2, "Investment grade (IG) in Financials including government-backed financials"), //
-  CRQ3(RiskClass.CREDIT_QUALIFYING, 3, "Investment grade (IG) in Basic materials, energy, industrials"), //
-  CRQ4(RiskClass.CREDIT_QUALIFYING, 4, "Investment grade (IG) in Consumer"), //
-  CRQ5(RiskClass.CREDIT_QUALIFYING, 5, "Investment grade (IG) in Technology, telecommunications"), //
-  CRQ6(RiskClass.CREDIT_QUALIFYING, 6, "Investment grade (IG) in Health care, utilities, local government, government-backed corporates (non- financial)"), // 
-  CRQ7(RiskClass.CREDIT_QUALIFYING, 7, "High yield (HY) & non-rated (NR) in Sovereigns including central banks"), //
-  CRQ8(RiskClass.CREDIT_QUALIFYING, 8, "High yield (HY) & non-rated (NR) in Financials including government-backed financials"), //
-  CRQ9(RiskClass.CREDIT_QUALIFYING, 9, "High yield (HY) & non-rated (NR) in Basic materials, energy, industrials"), //
-  CRQ10(RiskClass.CREDIT_QUALIFYING, 10, "High yield (HY) & non-rated (NR) in Consumer"), //
-  CRQ11(RiskClass.CREDIT_QUALIFYING, 11, "High yield (HY) & non-rated (NR) in Technology, telecommunications"), //
-  CRQ12(RiskClass.CREDIT_QUALIFYING, 12, "High yield (HY) & non-rated (NR) in Health care, utilities, local government, government-backed corporates (non- financial)"), // 
-  CRQRESIDUAL(RiskClass.CREDIT_QUALIFYING, -1, "CRQ Residual Bucket"),
-  EQ1(RiskClass.EQUITY, 1, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities"), //
-  EQ2(RiskClass.EQUITY, 2, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Telecommunications, industrials"), //
-  EQ3(RiskClass.EQUITY, 3, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Basic materials, energy, agriculture, manufacturing, mining and quarrying "), //
-  EQ4(RiskClass.EQUITY, 4, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Financials including gov't-backed financials, real estate activities, technology"), //
-  EQ5(RiskClass.EQUITY, 5, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities "), //
-  EQ6(RiskClass.EQUITY, 6, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Telecommunications, industrials"), //
-  EQ7(RiskClass.EQUITY, 7, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Basic materials, energy, agriculture, manufacturing, mining and quarrying "), //
-  EQ8(RiskClass.EQUITY, 8, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Financials including gov't-backed financials, real estate activities, technology "), //
-  EQ9(RiskClass.EQUITY, 9, EquitySize.SMALL + " " + EquityRegion.EMERGING + " All sectors"), //
-  EQ10(RiskClass.EQUITY, 10, EquitySize.SMALL + " " + EquityRegion.DEVELOPED + " All sectors"), //
-  EQ11(RiskClass.EQUITY, 11, EquitySize.ALL + " " + EquityRegion.ALL + " Indexes, Funds, ETFs"),
-  EQ12(RiskClass.EQUITY, 12, EquitySize.ALL + " " + EquityRegion.ALL + " Volatility Indexes"),
-  EQRESIDUAL(RiskClass.EQUITY, -1, "EQ Residual Bucket");
+  CRNQ1(CREDIT_NON_QUALIFYING, 1, "Investment grade (IG) in RMBS/CMBS"), //
+  CRNQ2(CREDIT_NON_QUALIFYING, 2, "High yield (HY) & non-rated (NR) in RMBS/CMBS"), //
+  CRNQRESIDUAL(CREDIT_NON_QUALIFYING, -1, "CRNQ Residual Bucket"),
+  CRQ1(CREDIT_QUALIFYING, 1, "Investment grade (IG) in Sovereigns including central banks"), //
+  CRQ2(CREDIT_QUALIFYING, 2, "Investment grade (IG) in Financials including government-backed financials"), //
+  CRQ3(CREDIT_QUALIFYING, 3, "Investment grade (IG) in Basic materials, energy, industrials"), //
+  CRQ4(CREDIT_QUALIFYING, 4, "Investment grade (IG) in Consumer"), //
+  CRQ5(CREDIT_QUALIFYING, 5, "Investment grade (IG) in Technology, telecommunications"), //
+  CRQ6(CREDIT_QUALIFYING, 6, "Investment grade (IG) in Health care, utilities, local government, government-backed corporates (non- financial)"), //
+  CRQ7(CREDIT_QUALIFYING, 7, "High yield (HY) & non-rated (NR) in Sovereigns including central banks"), //
+  CRQ8(CREDIT_QUALIFYING, 8, "High yield (HY) & non-rated (NR) in Financials including government-backed financials"), //
+  CRQ9(CREDIT_QUALIFYING, 9, "High yield (HY) & non-rated (NR) in Basic materials, energy, industrials"), //
+  CRQ10(CREDIT_QUALIFYING, 10, "High yield (HY) & non-rated (NR) in Consumer"), //
+  CRQ11(CREDIT_QUALIFYING, 11, "High yield (HY) & non-rated (NR) in Technology, telecommunications"), //
+  CRQ12(CREDIT_QUALIFYING, 12, "High yield (HY) & non-rated (NR) in Health care, utilities, local government, government-backed corporates (non- financial)"), //
+  CRQRESIDUAL(CREDIT_QUALIFYING, -1, "CRQ Residual Bucket"),
+  EQ1(EQUITY, 1, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities"), //
+  EQ2(EQUITY, 2, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Telecommunications, industrials"), //
+  EQ3(EQUITY, 3, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Basic materials, energy, agriculture, manufacturing, mining and quarrying "), //
+  EQ4(EQUITY, 4, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Financials including gov't-backed financials, real estate activities, technology"), //
+  EQ5(EQUITY, 5, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities "), //
+  EQ6(EQUITY, 6, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Telecommunications, industrials"), //
+  EQ7(EQUITY, 7, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Basic materials, energy, agriculture, manufacturing, mining and quarrying "), //
+  EQ8(EQUITY, 8, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Financials including gov't-backed financials, real estate activities, technology "), //
+  EQ9(EQUITY, 9, EquitySize.SMALL + " " + EquityRegion.EMERGING + " All sectors"), //
+  EQ10(EQUITY, 10, EquitySize.SMALL + " " + EquityRegion.DEVELOPED + " All sectors"), //
+  EQ11(EQUITY, 11, EquitySize.ALL + " " + EquityRegion.ALL + " Indexes, Funds, ETFs"),
+  EQ12(EQUITY, 12, EquitySize.ALL + " " + EquityRegion.ALL + " Volatility Indexes"),
+  EQRESIDUAL(EQUITY, -1, "EQ Residual Bucket");
 
   private final RiskClass riskClass;
   private final int bucketNumber;
@@ -94,6 +98,10 @@ public enum BucketType {
     return bucketNumber;
   }
 
+  public String getBucketString() {
+    return Integer.toString(bucketNumber);
+  }
+
   public RiskClass getBucketRiskClass() {
     return riskClass;
   }
@@ -102,17 +110,16 @@ public enum BucketType {
     return description;
   }
 
+  private static final String COULD_NOT_FIND_BUCKET_TYPE = "Failed to determine bucket: [%s, %s]!";
+
   public static BucketType determineBucketType(RiskClass riskClass, String bucketNumber) {
-    if (StringUtils.equalsIgnoreCase(bucketNumber, Sensitivity.RESIDUAL)) {
+    if (StringUtils.equalsIgnoreCase(bucketNumber, DefaultSensitivity.RESIDUAL)) {
       return getResidualBucket(riskClass);
     } else {
-      for (BucketType b : values()) {
-        if (b.getBucketRiskClass().equals(riskClass) && (Integer.toString(b.getBucketNumber()).equals(bucketNumber))) {
-          return b;
-        }
-      }
-
-      throw new IllegalStateException("tried to determine bucket for non-legal risk class: [" + riskClass + "]!");
+      return Stream.of(values())
+        .filter(type -> type.getBucketRiskClass().equals(riskClass) && type.getBucketString().equals(bucketNumber))
+        .findAny()
+        .orElseThrow(() -> new IllegalStateException(String.format(COULD_NOT_FIND_BUCKET_TYPE, riskClass, bucketNumber)));
     }
   }
 
@@ -128,19 +135,18 @@ public enum BucketType {
   }
 
   private static BucketType getResidualBucket(RiskClass riskClass) {
-    switch (riskClass) {
-      case EQUITY:
-        return EQRESIDUAL;
-      case CREDIT_QUALIFYING:
-        return CRQRESIDUAL;
-      case CREDIT_NON_QUALIFYING:
-        return CRNQRESIDUAL;
-      case INTEREST_RATE:
-      case COMMODITY:
-      case FX:
-        throw new IllegalStateException("tried to get Residual bucket for risk class without one: [" + riskClass + "]!");
-      default:
-        throw new IllegalStateException("tried to determine bucket for non-legal risk class: [" + riskClass +"]!");
+    if (riskClass.equals(RiskClass.EQUITY)) {
+      return EQRESIDUAL;
+    } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {
+      return CRQRESIDUAL;
+    } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
+      return CRNQRESIDUAL;
+    } else if (riskClass.equals(RiskClass.INTEREST_RATE)
+      || riskClass.equals(RiskClass.COMMODITY)
+      || riskClass.equals(RiskClass.FX)) {
+      throw new IllegalStateException("tried to get Residual bucket for risk class without one: [" + riskClass + "]!");
+    } else {
+      throw new IllegalStateException("tried to determine bucket for non-legal risk class: [" + riskClass +"]!");
     }
   }
 

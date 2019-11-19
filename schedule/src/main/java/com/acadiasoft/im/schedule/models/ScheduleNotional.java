@@ -23,76 +23,46 @@
 package com.acadiasoft.im.schedule.models;
 
 import com.acadiasoft.im.base.fx.FxRate;
-import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass;
+import com.acadiasoft.im.base.model.amount.CurrencyAmount;
+import com.acadiasoft.im.schedule.models.utils.ScheduleRiskType;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-/**
- *
- * @author alec.stewart
- */
-public class ScheduleNotional extends ScheduleIdentifier implements Serializable {
+public interface ScheduleNotional extends ScheduleIdentifier, CurrencyAmount {
 
-  private final BigDecimal amount;
-  private final String amountCurrency;
-  private final BigDecimal amountUSD;
-
-  /**
-   *
-   * @param productClass product class: Rates, FX, Credit, Commodity, Equit, Other
-   * @param valuationDate date formatted by ISO8601: yyyy-mm-dd
-   * @param endDate date formatted by ISO8601: yyyy-mm-dd
-   * @param amount notional amount
-   * @param amountCurrency currency of the trade (uses ISO currency code)
-   */
-  public ScheduleNotional(String tradeId, String productClass, String valuationDate, String endDate, String amount, String amountCurrency, String amountUSD) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = new BigDecimal(amount);
-    this.amountCurrency = amountCurrency;
-    this.amountUSD = new BigDecimal(amountUSD);
+  static ScheduleSensitivity of(ScheduleNotional notional) {
+    return new DefaultScheduleSensitivity(notional.getTradeId(), notional.getProductClass(),
+      ScheduleRiskType.SCHEDULE_NOTIONAL, notional.getValuationDateAsString(), notional.getEndDateAsString(),
+      notional.getAmountAsString(), notional.getAmountCurrency(), notional.getAmountUsdAsString());
   }
 
-  public ScheduleNotional(String tradeId, String productClass, String valuationDate, String endDate, String amount) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = new BigDecimal(amount).stripTrailingZeros();
-    this.amountCurrency = FxRate.USD;
-    this.amountUSD = new BigDecimal(amount).stripTrailingZeros();
+  String BAD_CALL = "Risk type was not 'Notional' as it was expected to be: [%s]";
+
+  default boolean isScheduleNotional() {
+    return ScheduleRiskType.SCHEDULE_NOTIONAL.equalsIgnoreCase(getRiskType());
   }
 
-  public ScheduleNotional(String tradeId, ScheduleProductClass productClass, LocalDate valuationDate, LocalDate endDate, BigDecimal amount, String amountCurrency, BigDecimal amountUSD) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = amount;
-    this.amountCurrency = amountCurrency;
-    this.amountUSD = amountUSD;
+  default BigDecimal getNotional() {
+    if (getScheduleRiskIdentifier().equals(ScheduleRiskType.NOTIONAL)) {
+      return getAmount();
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, getRiskType()));
+    }
   }
 
-  public ScheduleNotional(String tradeId, ScheduleProductClass productClass, LocalDate valuationDate, LocalDate endDate, BigDecimal amount) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = amount;
-    this.amountCurrency = FxRate.USD;
-    this.amountUSD = amount;
+  default String getNotionalCurrency() {
+    if (getScheduleRiskIdentifier().equals(ScheduleRiskType.NOTIONAL)) {
+      return getAmountCurrency();
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, getRiskType()));
+    }
   }
 
-  public static ScheduleNotional make(ScheduleIdentifier id, BigDecimal amountUSD) {
-    return new ScheduleNotional(id.getTradeId(), id.getProductClass(), id.getValuationDate(), id.getEndDate(), amountUSD);
+  default BigDecimal getNotionalInUsd(FxRate fx) {
+    if (getScheduleRiskIdentifier().equals(ScheduleRiskType.NOTIONAL)) {
+      return getAmountUsd(fx);
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, getRiskType()));
+    }
   }
-
-  public BigDecimal getAmount() {
-    return amount;
-  }
-
-  public String getAmountCurrency() {
-    return amountCurrency;
-  }
-
-  public BigDecimal getAmountUSD() {
-    return amountUSD;
-  }
-
-  public ScheduleIdentifier getIdentifier() {
-    return new ScheduleIdentifier(getTradeId(), getProductClass(), getValuationDate(), getEndDate());
-  }
-
 }

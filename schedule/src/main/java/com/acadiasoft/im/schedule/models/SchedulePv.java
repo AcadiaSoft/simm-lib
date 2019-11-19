@@ -23,76 +23,46 @@
 package com.acadiasoft.im.schedule.models;
 
 import com.acadiasoft.im.base.fx.FxRate;
-import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass;
+import com.acadiasoft.im.base.model.amount.CurrencyAmount;
+import com.acadiasoft.im.schedule.models.utils.ScheduleRiskType;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-/**
- *
- * @author alec.stewart
- */
-public class SchedulePv extends ScheduleIdentifier implements Serializable {
+public interface SchedulePv extends ScheduleIdentifier, CurrencyAmount {
 
-  private final BigDecimal amount;
-  private final String amountCurrency;
-  private final BigDecimal amountUSD;
-
-  /**
-   *
-   * @param productClass product class: Rates, FX, Credit, Commodity, Equit, Other
-   * @param valuationDate date formatted by ISO8601: yyyy-mm-dd
-   * @param endDate date formatted by ISO8601: yyyy-mm-dd
-   * @param amount notional amount
-   * @param amountCurrency currency of the trade (uses ISO currency code)
-   */
-  public SchedulePv(String tradeId, String productClass, String valuationDate, String endDate, String amount, String amountCurrency, String amountUSD) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = new BigDecimal(amount).stripTrailingZeros();
-    this.amountCurrency = amountCurrency;
-    this.amountUSD = new BigDecimal(amountUSD).stripTrailingZeros();
+  static ScheduleSensitivity of(SchedulePv pv) {
+    return new DefaultScheduleSensitivity(pv.getTradeId(), pv.getProductClass(),
+      ScheduleRiskType.SCHEDULE_PV, pv.getValuationDateAsString(), pv.getEndDateAsString(),
+      pv.getAmountAsString(), pv.getAmountCurrency(), pv.getAmountUsdAsString());
   }
 
-  public SchedulePv(String tradeId, String productClass, String valuationDate, String endDate, String amount) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = new BigDecimal(amount).stripTrailingZeros();
-    this.amountCurrency = FxRate.USD;
-    this.amountUSD = new BigDecimal(amount).stripTrailingZeros();
+  String BAD_CALL = "Risk type was not 'PV' as it was expected to be: [%s]";
+
+  default boolean isSchedulePv() {
+    return ScheduleRiskType.SCHEDULE_PV.equalsIgnoreCase(getRiskType());
   }
 
-  public SchedulePv(String tradeId, ScheduleProductClass productClass, LocalDate valuationDate, LocalDate endDate, BigDecimal amount, String amountCurrency, BigDecimal amountUSD) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = amount.stripTrailingZeros();
-    this.amountCurrency = amountCurrency;
-    this.amountUSD = amountUSD.stripTrailingZeros();
+  default BigDecimal getPresentValue() {
+    if (getScheduleRiskIdentifier().equals(ScheduleRiskType.PV)) {
+      return getAmount();
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, getRiskType()));
+    }
   }
 
-  public SchedulePv(String tradeId, ScheduleProductClass productClass, LocalDate valuationDate, LocalDate endDate, BigDecimal amount) {
-    super(tradeId, productClass, valuationDate, endDate);
-    this.amount = amount.stripTrailingZeros();
-    this.amountCurrency = FxRate.USD;
-    this.amountUSD = amount.stripTrailingZeros();
+  default String getPresentValueCurrency() {
+    if (getScheduleRiskIdentifier().equals(ScheduleRiskType.PV)) {
+      return getAmountCurrency();
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, getRiskType()));
+    }
   }
 
-  public static SchedulePv make(ScheduleIdentifier id, BigDecimal amountUSD) {
-    return new SchedulePv(id.getTradeId(), id.getProductClass(), id.getValuationDate(), id.getEndDate(), amountUSD);
+  default BigDecimal getPresentValueInUsd(FxRate fx) {
+    if (getScheduleRiskIdentifier().equals(ScheduleRiskType.PV)) {
+      return getAmountUsd(fx);
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, getRiskType()));
+    }
   }
-
-  public BigDecimal getAmount() {
-    return amount;
-  }
-
-  public String getAmountCurrency() {
-    return amountCurrency;
-  }
-
-  public BigDecimal getAmountUSD() {
-    return amountUSD;
-  }
-
-  public ScheduleIdentifier getIdentifier() {
-    return new ScheduleIdentifier(getTradeId(), getProductClass(), getValuationDate(), getEndDate());
-  }
-
 }

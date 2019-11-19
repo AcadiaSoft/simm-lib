@@ -22,10 +22,10 @@
 
 package com.acadiasoft.im.simm.model.param.equity;
 
+import com.acadiasoft.im.simm.model.DefaultSensitivity;
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketType;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
-import com.acadiasoft.im.simm.model.Sensitivity;
 import com.acadiasoft.im.simm.model.param.SimmBucketCorrelation;
 import com.acadiasoft.im.simm.model.param.SimmSensitivityCorrelation;
 import org.apache.commons.lang3.StringUtils;
@@ -227,7 +227,7 @@ public class EquityCorrelation implements SimmBucketCorrelation, SimmSensitivity
 
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass si, WeightingClass sk) {
-    if (StringUtils.equalsIgnoreCase(Sensitivity.RESIDUAL, si.getBucket()) || StringUtils.equalsIgnoreCase(Sensitivity.RESIDUAL, sk.getBucket())) {
+    if (StringUtils.equalsIgnoreCase(DefaultSensitivity.RESIDUAL, si.getBucket()) || StringUtils.equalsIgnoreCase(DefaultSensitivity.RESIDUAL, sk.getBucket())) {
       return RESIDUAL;
     } else {
       // NOTE: both sensitivities should be in the same bucket, so bi and bk should be equal

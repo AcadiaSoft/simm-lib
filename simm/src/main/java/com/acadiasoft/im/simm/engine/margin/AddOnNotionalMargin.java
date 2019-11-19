@@ -22,62 +22,48 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.margin.GroupMargin;
+import com.acadiasoft.im.base.util.BigDecimalUtils;
+import com.acadiasoft.im.simm.config.SimmConfig;
+import com.acadiasoft.im.simm.model.Notional;
+import com.acadiasoft.im.simm.model.NotionalFactor;
+import com.acadiasoft.im.simm.model.Sensitivity;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
-import com.acadiasoft.im.simm.model.AddOnNotional;
-import com.acadiasoft.im.simm.model.AddOnNotionalFactor;
-import com.acadiasoft.im.base.util.BigDecimalUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class AddOnNotionalMargin implements ImTree {
+public class AddOnNotionalMargin extends GroupMargin {
 
   private static final String LEVEL = "4.AddOnNotional";
-  private final AddOnSubClass addOnSubClass;
-  private final BigDecimal margin;
 
   private AddOnNotionalMargin(AddOnSubClass addOnSubClass, BigDecimal margin) {
-    this.addOnSubClass = addOnSubClass;
-    this.margin = margin;
+    super(LEVEL, addOnSubClass, margin, Collections.emptyList());
   }
 
-  public static AddOnNotionalMargin calculate(Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals) {
-    AddOnSubClass subClass = AddOnSubClass.determineAddOnSubClass(AddOnSubType.NOTIONAL, AddOnSubType.NOTIONAL.getLabel());
-    BigDecimal notionalMargin = factors.entrySet().stream()
-        .filter(e -> notionals.containsKey(e.getKey()))
-        .map(e -> {
-          BigDecimal factor = e.getValue().getPercentFactor();
-          BigDecimal productNotional = BigDecimalUtils.sum(notionals.get(e.getKey()), n -> n.getNotionalUsd().abs());
+  public static AddOnNotionalMargin calculate(List<Sensitivity> notionalAddOns, SimmConfig config) {
+    AddOnSubClass subClass = AddOnSubClass.determineAddOnSubClass(AddOnSubType.NOTIONAL, AddOnSubType.NOTIONAL.getMarginIdentifier());
+    Map<String, NotionalFactor> factors = notionalAddOns.stream()
+      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR))
+      .collect(Collectors.toMap(NotionalFactor::getNotionalProduct, Function.identity()));
+    Map<String, List<Notional>> notionals = notionalAddOns.stream()
+      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL))
+      .collect(Collectors.groupingBy(Notional::getNotionalProduct, Collectors.toList()));
+    BigDecimal notionalMargin = factors.keySet().stream()
+        .filter(notionals::containsKey)
+        .map(product -> {
+          BigDecimal factor = factors.get(product).getPercentFactor();
+          BigDecimal productNotional = BigDecimalUtils.sum(notionals.get(product), n -> n.getAmountUsd(config.fxRate()).abs());
           return factor.multiply(productNotional);
         })
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     return new AddOnNotionalMargin(subClass, notionalMargin);
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return addOnSubClass;
-  }
-
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
   }
 
 }

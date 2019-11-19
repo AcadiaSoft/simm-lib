@@ -26,7 +26,6 @@ import com.acadiasoft.im.simm.model.imtree.identifiers.BucketClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmBucketCorrelation;
 import com.acadiasoft.im.simm.model.param.SimmFxSensitivityCorrelation;
-import com.acadiasoft.im.simm.model.param.SimmSensitivityCorrelation;
 
 import java.math.BigDecimal;
 import java.util.Collections;

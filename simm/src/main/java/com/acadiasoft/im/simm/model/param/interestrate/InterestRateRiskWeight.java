@@ -22,8 +22,8 @@
 
 package com.acadiasoft.im.simm.model.param.interestrate;
 
+import com.acadiasoft.im.simm.model.SensitivityIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
-import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,7 +90,7 @@ public class InterestRateRiskWeight implements SimmRiskWeight {
   }
 
   @Override
-  public BigDecimal getDeltaRiskWeight(WeightingClass s) {
+  public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {
     if (StringUtils.equalsIgnoreCase(s.getRiskType(), RiskClass.RISK_TYPE_INFLATION)) {
       return INFLATION;
     } else if (s.getRiskType().equalsIgnoreCase(RiskClass.RISK_TYPE_XCCY_BASIS)) {
@@ -103,7 +103,7 @@ public class InterestRateRiskWeight implements SimmRiskWeight {
   }
 
   @Override
-  public BigDecimal getVegaRiskWeight(WeightingClass s) {
+  public BigDecimal getVegaRiskWeight(SensitivityIdentifier s) {
     return VEGA;
   }
 

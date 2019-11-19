@@ -22,49 +22,25 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.margin.GroupMargin;
+import com.acadiasoft.im.simm.model.ProductMultiplier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
-public class ProductMultiplierMargin implements ImTree {
+public class ProductMultiplierMargin extends GroupMargin {
 
   private static final String LEVEL = "4.ProductMultiplier";
-  private final AddOnSubClass addOnSubClass;
-  private final BigDecimal margin;
 
   private ProductMultiplierMargin(AddOnSubClass addOnSubClass, BigDecimal margin) {
-    this.addOnSubClass = addOnSubClass;
-    this.margin = margin;
+    super(LEVEL, addOnSubClass, margin, Collections.emptyList());
   }
 
-  public static ProductMultiplierMargin calculate(ProductMargin margin, BigDecimal multiplier) {
-    AddOnSubClass subClass = AddOnSubClass.determineAddOnSubClass(AddOnSubType.PRODUCT_MULTIPLIER, margin.getProductClass().getLabel());
-    return new ProductMultiplierMargin(subClass, margin.getMargin().multiply(multiplier));
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return addOnSubClass;
-  }
-
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
+  public static ProductMultiplierMargin calculate(ProductMultiplier multiplier, ProductMargin margin) {
+    AddOnSubClass subClass = AddOnSubClass.determineAddOnSubClass(AddOnSubType.PRODUCT_MULTIPLIER, multiplier.getQualifier());
+    return new ProductMultiplierMargin(subClass, margin.getMargin().multiply(multiplier.getMultiplier()));
   }
 
 }

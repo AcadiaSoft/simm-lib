@@ -22,7 +22,7 @@
 
 package com.acadiasoft.im.simm.model.param.commodity;
 
-import com.acadiasoft.im.simm.model.utils.ConcentrationRiskGroup;
+import com.acadiasoft.im.simm.model.ConcentrationRiskGroup;
 import com.acadiasoft.im.simm.model.param.SimmConcentrationThreshold;
 
 import java.math.BigDecimal;

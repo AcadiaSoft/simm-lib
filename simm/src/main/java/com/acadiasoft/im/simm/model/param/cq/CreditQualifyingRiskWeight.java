@@ -22,8 +22,8 @@
 
 package com.acadiasoft.im.simm.model.param.cq;
 
+import com.acadiasoft.im.simm.model.SensitivityIdentifier;
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketType;
-import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
 
 import java.math.BigDecimal;
@@ -57,12 +57,12 @@ public class CreditQualifyingRiskWeight implements SimmRiskWeight {
   private static final BigDecimal VEGA = new BigDecimal("0.39");
 
   @Override
-  public BigDecimal getDeltaRiskWeight(WeightingClass s) {
+  public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {
     return WEIGHTS.get(s.getBucketIdentifier().getBucketType());
   }
 
   @Override
-  public BigDecimal getVegaRiskWeight(WeightingClass s) {
+  public BigDecimal getVegaRiskWeight(SensitivityIdentifier s) {
     return VEGA;
   }
 

@@ -22,28 +22,50 @@
 
 package com.acadiasoft.im.simm.model.param;
 
+import com.acadiasoft.im.simm.config.HoldingPeriod;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 
 import java.math.BigDecimal;
 
 public interface SimmHvr {
 
+  BigDecimal CM_HVR_ONE_DAY = new BigDecimal("0.69");
+  BigDecimal EQ_HVR_ONE_DAY = new BigDecimal("0.55");
+  BigDecimal FX_HVR_ONE_DAY = new BigDecimal("0.82");
+  BigDecimal IR_HVR_ONE_DAY = new BigDecimal("0.59");
+
   BigDecimal CM_HVR = new BigDecimal("0.78");
   BigDecimal EQ_HVR = new BigDecimal("0.61");
   BigDecimal FX_HVR = new BigDecimal("0.65");
   BigDecimal IR_HVR = new BigDecimal("0.53");
 
-  public static BigDecimal get(RiskClass riskClass) {
-    if (riskClass.equals(RiskClass.COMMODITY)) {
-      return CM_HVR;
-    } else if (riskClass.equals(RiskClass.EQUITY)) {
-      return EQ_HVR;
-    } else if (riskClass.equals(RiskClass.FX)) {
-      return FX_HVR;
-    } else if (riskClass.equals(RiskClass.INTEREST_RATE)) {
-      return IR_HVR;
+  String BAD_RISK_CLASS = "tried to get HVR for non-HVR risk class: [%s]!";
+
+  public static BigDecimal get(RiskClass riskClass, HoldingPeriod period) {
+    if (period.equals(HoldingPeriod.TEN_DAY)) {
+      if (riskClass.equals(RiskClass.COMMODITY)) {
+        return CM_HVR;
+      } else if (riskClass.equals(RiskClass.EQUITY)) {
+        return EQ_HVR;
+      } else if (riskClass.equals(RiskClass.FX)) {
+        return FX_HVR;
+      } else if (riskClass.equals(RiskClass.INTEREST_RATE)) {
+        return IR_HVR;
+      } else {
+        throw new IllegalStateException(String.format(BAD_RISK_CLASS, riskClass));
+      }
     } else {
-      throw new RuntimeException("tried to get HVR for non-HVR risk class: [" + riskClass + "]!");
+      if (riskClass.equals(RiskClass.COMMODITY)) {
+        return CM_HVR_ONE_DAY;
+      } else if (riskClass.equals(RiskClass.EQUITY)) {
+        return EQ_HVR_ONE_DAY;
+      } else if (riskClass.equals(RiskClass.FX)) {
+        return FX_HVR_ONE_DAY;
+      } else if (riskClass.equals(RiskClass.INTEREST_RATE)) {
+        return IR_HVR_ONE_DAY;
+      } else {
+        throw new IllegalStateException(String.format(BAD_RISK_CLASS, riskClass));
+      }
     }
   }
 

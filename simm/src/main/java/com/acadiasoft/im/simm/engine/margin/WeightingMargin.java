@@ -22,63 +22,31 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
-import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
-import com.acadiasoft.im.simm.model.utils.ConcentrationRiskGroup;
+import com.acadiasoft.im.base.margin.SingleMargin;
+import com.acadiasoft.im.simm.config.SimmConfig;
+import com.acadiasoft.im.simm.model.ConcentrationRiskGroup;
 import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
-public class WeightingMargin implements ImTree {
+public class WeightingMargin extends SingleMargin {
 
-  private final String LEVEL = "7.Weighted Sensitivity";
-  private final WeightingClass weightingClass;
-  private final BigDecimal margin;
-  private final ConcentrationRiskGroup concentrationRiskClass;
+  private static final String LEVEL = "7.WeightedSensitivity";
 
-  private WeightingMargin(WeightingClass weightingClass, BigDecimal margin, ConcentrationRiskGroup concentrationRiskClass) {
-    this.weightingClass = weightingClass;
-    this.margin = margin;
-    this.concentrationRiskClass = concentrationRiskClass;
+  private WeightingMargin(WeightingClass weightingClass, BigDecimal margin) {
+    super(LEVEL, weightingClass, margin);
   }
 
-  public static WeightingMargin calculate(Sensitivity sensitivity, ConcentrationRiskGroup concentrationRiskClass, String calculationCurrency) {
-    WeightingClass weightingClass = WeightingClass.determineWeightingClass(sensitivity.getWeightingClassIdentifier());
-    BigDecimal riskWeight = SimmRiskWeight.get(sensitivity.getSensitivityIdentifier(), weightingClass, calculationCurrency);
-    BigDecimal amountUsd = sensitivity.getAmountUsd();
+  public static WeightingMargin calculate(WeightingClass weightingClass, List<Sensitivity> sensitivities,
+                                          ConcentrationRiskGroup concentrationRiskClass, SimmConfig config) {
+    BigDecimal nettedAmount = sensitivities.stream()
+      .map(sensitivity -> sensitivity.getAmountUsd(config.fxRate()))
+      .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal riskWeight = SimmRiskWeight.get(weightingClass.getSensitivityClass(), weightingClass, config);
     BigDecimal concentrationRisk = concentrationRiskClass.getConcentrationRisk();
-    return new WeightingMargin(weightingClass, riskWeight.multiply(amountUsd).multiply(concentrationRisk), concentrationRiskClass);
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return weightingClass;
-  }
-
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
-  }
-
-  public WeightingClass getWeightingClass() {
-    return weightingClass;
-  }
-
-  public ConcentrationRiskGroup getConcentrationRiskClass() {
-    return concentrationRiskClass;
+    return new WeightingMargin(weightingClass, riskWeight.multiply(nettedAmount).multiply(concentrationRisk));
   }
 }

@@ -22,40 +22,47 @@
 
 package com.acadiasoft.im.simm.model;
 
+import com.acadiasoft.im.base.model.amount.ValueAmount;
+import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
 import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProductMultiplier implements Serializable {
+public interface ProductMultiplier extends Serializable, ValueAmount {
 
-  private final String productClass;
-  private final BigDecimal multiplier;
+  String BAD_CALL = "Risk type was not 'Param_ProductClassMultiplier' as it was expected to be: [%s]";
 
-  public ProductMultiplier(String productClass, BigDecimal multiplier) {
-    this.multiplier = multiplier.stripTrailingZeros();
-    this.productClass = productClass;
+  String getRiskType();
+
+  String getQualifier();
+
+  public static Sensitivity of(String productClass, String amount) {
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, productClass,
+      null, null, null, amount, null, null);
   }
 
-  public ProductMultiplier(String productClass, String multiplier) {
-    this.multiplier = new BigDecimal(multiplier).stripTrailingZeros();
-    this.productClass = productClass;
+  public static Sensitivity of(ProductMultiplier multiplier) {
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, multiplier.getQualifier(),
+      null, null, null, multiplier.getAmountAsString(), null, null);
   }
 
-  public String getProductLabel() {
-    return productClass;
+  default ProductClass getMultiplierProduct() {
+    if (this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER)) {
+      // the qualifier of a product multiplier sensitivity is exactly the product class of that multiplier
+      return ProductClass.determineProductClass(this.getQualifier());
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, this.getRiskType()));
+    }
   }
 
-  public ProductClass getProductClass() {
-    return ProductClass.determineProductClass(productClass);
-  }
-
-  public BigDecimal getMultiplier() {
-    return multiplier;
-  }
-
-  public String getMultiplierString() {
-    return multiplier.toPlainString();
+  default BigDecimal getMultiplier() {
+    if (this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER)) {
+      // the multipliers need to have one subtracted from them
+      return this.getAmount().subtract(BigDecimal.ONE);
+    } else {
+      throw new IllegalStateException(String.format(BAD_CALL, this.getRiskType()));
+    }
   }
 
 }

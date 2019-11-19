@@ -22,96 +22,121 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.identifiers.ImModelClass;
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
-import com.acadiasoft.im.simm.model.*;
-import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
+import com.acadiasoft.im.base.margin.ModelMargin;
+import com.acadiasoft.im.base.margin.SiloMargin;
+import com.acadiasoft.im.base.model.imtree.identifiers.ImModelClass;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
-import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
+import com.acadiasoft.im.base.util.ListUtils;
+import com.acadiasoft.im.simm.config.SimmCalculationType;
+import com.acadiasoft.im.simm.config.SimmConfig;
+import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.SensitivityIdentifier;
+import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
+import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
+import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
+import com.acadiasoft.im.simm.model.utils.CurvatureSensitivityUtils;
+import com.acadiasoft.im.simm.model.utils.VolWeightUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class SimmMargin implements ImTree {
+public class SimmMargin extends ModelMargin {
 
-  private final static String LEVEL = "2.ImModel";
-  private final BigDecimal margin;
-  private final List<ImTree> children = new ArrayList<>();
-
-  private SimmMargin(BigDecimal margin, List<ProductMargin> marginByBucket, AddOnMargin addOn) {
-    this.margin = margin;
-    this.children.addAll(marginByBucket);
-    this.children.add(addOn);
+  private SimmMargin(BigDecimal margin, List<SiloMargin> children) {
+    super(ImModelClass.SIMM, margin, children);
   }
 
-  private SimmMargin(BigDecimal margin, AddOnMargin addOn) {
-    this.margin = margin;
-    this.children.add(addOn);
-  }
+  public static SimmMargin calculate(List<Sensitivity> sensitivities, SimmConfig config) {
+    // separate the add on and regular sensitivity types
+    List<Sensitivity> filterForStandard = sensitivities.stream()
+      .filter(SensitivityIdentifier::isSimmStandard)
+      .collect(Collectors.toList());
 
-  private SimmMargin(BigDecimal margin, List<ProductMargin> marginByBucket) {
-    this.margin = margin;
-    this.children.addAll(marginByBucket);
-  }
+    // filter out any fx delta risk to the calculation currency
+    List<Sensitivity> fxFiltered = filterDeltaFxRiskInCalcCurrency(filterForStandard, config.calculationCurrency());
 
-  public static SimmMargin calculateStandard(List<Sensitivity> inputSensitivities, String calculationCurrency) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, calculationCurrency);
+    // build any curvature sensitivities from vegas, and then vol-weight the vega and curvature
+    List<Sensitivity> weighted = addCurvaturesAndVolWeight(fxFiltered, config);
+
+    // calculate the exposure for each product class present
+    List<ProductMargin> marginByProductClass = getMarginByProductClass(weighted, config);
     BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, ProductMargin::getMargin);
-    return new SimmMargin(productSum, marginByProductClass);
+
+    // now determine which mode we are in and calculate accordingly
+    if (config.simmCalculationType().equals(SimmCalculationType.STANDARD)) {
+      return new SimmMargin(productSum, new ArrayList<>(marginByProductClass));
+    } else {
+      // calculate the add on exposure
+      List<Sensitivity> addOns = sensitivities.stream()
+        .filter(SensitivityIdentifier::isAddOn)
+        .collect(Collectors.toList());
+      AddOnMargin addOnMargin = AddOnMargin.calculate(addOns, marginByProductClass, config);
+
+      // now return the add on exposure based on the settings
+      if (config.simmCalculationType().equals(SimmCalculationType.ADDITIONAL)) {
+        return new SimmMargin(addOnMargin.getMargin(), Collections.singletonList(addOnMargin));
+      } else if (addOnMargin.getMargin().setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO)) {
+        return new SimmMargin(productSum, new ArrayList<>(marginByProductClass));
+      } else if (productSum.setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO)) {
+        return new SimmMargin(addOnMargin.getMargin(), Collections.singletonList(addOnMargin));
+      } else {
+        List<SiloMargin> simmSiloMargin = new ArrayList<>(marginByProductClass);
+        simmSiloMargin.add(addOnMargin);
+        return new SimmMargin(productSum.add(addOnMargin.getMargin()), simmSiloMargin);
+      }
+    }
   }
 
-  public static SimmMargin calculateAdditional(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers,
-      Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, calculationCurrency);
-    AddOnMargin addOn = AddOnMargin.calculate(marginByProductClass, multipliers, factors, notionals, fixed);
-    return new SimmMargin(addOn.getMargin(), addOn);
-  }
-
-  public static SimmMargin calculateTotal(List<Sensitivity> inputSensitivities, Map<ProductClass, ProductMultiplier> multipliers,
-      Map<String, AddOnNotionalFactor> factors, Map<String, List<AddOnNotional>> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    List<ProductMargin> marginByProductClass = getMarginByProductClass(inputSensitivities, calculationCurrency);
-    AddOnMargin addOn = AddOnMargin.calculate(marginByProductClass, multipliers, factors, notionals, fixed);
-    BigDecimal productSum = BigDecimalUtils.sum(marginByProductClass, ProductMargin::getMargin);
-    if (addOn.getMargin().setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO)) return new SimmMargin(productSum, marginByProductClass);
-    else if (productSum.setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO)) return new SimmMargin(addOn.getMargin(), addOn);
-    else return new SimmMargin(productSum.add(addOn.getMargin()), marginByProductClass, addOn);
-  }
-
-  private static List<ProductMargin> getMarginByProductClass(List<Sensitivity> inputSensitivities, String calculationCurrency) {
-    // get all input sensitivities on the same "level"
-    List<Sensitivity> allSensitivities = SensitivityUtils.handleInputSensitivities(inputSensitivities, calculationCurrency);
-
-    // Now that we have gotten all of the input sensitivities on he same level and generate curvature sensitivities, we net
-    List<Sensitivity> nettedSensitivities = SensitivityUtils.netSensitivitiesByRiskFactor(allSensitivities);
-
+  private static List<ProductMargin> getMarginByProductClass(List<Sensitivity> sensitivities, SimmConfig config) {
     // map sensitivities by product class, build the exposure of each product class
-    return SensitivityUtils.listByMargin(
-        e -> ProductMargin.calculate(e.getKey(), e.getValue(), calculationCurrency),
-        SensitivityUtils.mapByIdentifier(s -> s.getProductIdentifier(), nettedSensitivities)
-    );
+    return ListUtils.groupBy(sensitivities, SensitivityIdentifier::getProductIdentifier).entrySet().stream()
+      .map(entry -> {
+        ProductClass productClass = config.useSingleProductClass() ? ProductClass.SINGLE : entry.getKey();
+        return ProductMargin.calculate(productClass, entry.getValue(), config);
+      }).collect(Collectors.toList());
   }
 
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return ImModelClass.SIMM;
+  private static List<Sensitivity> filterDeltaFxRiskInCalcCurrency(List<Sensitivity> list, String calculationCurrency) {
+    return list.stream()
+      .filter(sensitivity -> !(sensitivity.getRiskType().equalsIgnoreCase(RiskClass.RISK_TYPE_FX)
+        && sensitivity.getQualifier().equalsIgnoreCase(calculationCurrency)))
+      .collect(Collectors.toList());
   }
 
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
+  /**
+   * First, we make the curvature sensitivities from the vega sensitivities and then scale them by SF(t)
+   * we get all the sensitivities on the same "level"
+   * EQ, FX, and CM vega & curvature sensitivities have not been multiplied by volatility factor,
+   * while IR, CRQ, and CRNQ sensitivities have been, so we do this multiplication now
+   *
+   * @param sensitivities the set of sensitivities
+   * @return the set of sensitivities with curvatures added and scaled, and curvatures/vegas vol-weighted
+   */
+  private static List<Sensitivity> addCurvaturesAndVolWeight(List<Sensitivity> sensitivities, SimmConfig config) {
+    Map<SensitivityClass, List<Sensitivity>> map = ListUtils.groupBy(sensitivities, SensitivityIdentifier::getSensitivityClass);
+    if (map.containsKey(SensitivityClass.VEGA)) {
+      // get the vegas and the scaled curvature sensitivities
+      List<Sensitivity> baseVegas = map.get(SensitivityClass.VEGA);
+      List<Sensitivity> scaledCurvatures = CurvatureSensitivityUtils.makeAndScaleCurvatures(baseVegas, config);
+
+      // vol weight both sets of sensitivities
+      List<Sensitivity> volWeightedVegas = VolWeightUtils.volWeightSensitivities(baseVegas, config);
+      List<Sensitivity> volWeightedCurvatures = VolWeightUtils.volWeightSensitivities(scaledCurvatures, config);
+
+      // add them back to the set of delta sensitivities
+      List<Sensitivity> list = Optional.ofNullable(map.get(SensitivityClass.DELTA))
+        .orElse(new ArrayList<>());
+      list.addAll(Optional.ofNullable(map.get(SensitivityClass.BASECORR)).orElse(Collections.emptyList()));
+      list.addAll(volWeightedVegas);
+      list.addAll(volWeightedCurvatures);
+      return list;
+    } else {
+      // there are no vega sensitivities so just return the original list as we don't have to do anything
+      return sensitivities;
+    }
   }
 
-  @Override
-  public List<ImTree> getChildren() {
-    return new ArrayList<>(children);
-  }
 
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
-  }
 }

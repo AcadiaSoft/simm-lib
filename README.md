@@ -18,9 +18,10 @@ calculate initial margin for their or their clients’ non-cleared
 derivatives transactions. Please contact isdalegal@isda.org for more
 information on licensing the ISDA SIMM™.
 
-### Updates: 2019-10-15
-The Library is now passing ISDA's unit tests for SIMM 2.2, as well as the optional test
-to test worst-of calculation functionality.
+### Updates: 2019-11-19
+- The library received a pretty major clean-up but all old interfaces should still be available.
+- The library is now also passing the unit tests for 1-day SIMM.
+- The library now supports jackson annotations for serialization of im-trees and CRIF.
 
 ## Getting Started
 Simm-Lib is built with Apache Maven, so one must get Maven
@@ -164,44 +165,3 @@ associated with the winning regulator, and finally the currency of all of the ma
 self-explanatory: `calculateSimmWorstOf()` returns the winning regulator calculating using only SIMM model `Crif`, `calculateScheduleWorstOf()` returns the winning regulator
 calculating using only Schedule model `Crif`, and `calculateWorstOf()` returns the winning regulator calculating over the `Crif` in both models.
 
-### Change Log
-
-#### 2018-09-14
-- `Schedule` class has been added to handle Schedule IM calculation. New CRIF formatted objects
-`ScheduleNotional` and `SchedulePv` are the inputs to the model. Methods for calculating Schedule IM
-both with an input Net Gross Rate, or with the NGR being calculated from the input PVs have been provided
-- `Simmple` class has been added to handle 'Worst-Of' regulator handling and calculation by role. The CRIF formatted
-object `Crif` which is a super-set of the `Sensitivity`, `ScheduleNotional`, `SchedulePv`, `ProductMultiplier`, etc.
-objects has been added to simm-ple to allow for easier translation from a standard CRIF file to the libraries objects
-- Simm-ple handles three modes of regulation handling: all regulators left blank, 'include', and standard regulator names.
-- The SIMM calculation models inputs have been changed slightly. Now instead of redundantly requiring a `Map` object of the
-input `AddOnType`s, the calculation methods instead take in a `List`. This streamlines testing and makes usage easier.
-- A calculation currency input has been added to the SIMM model with v2.1, so now the model explicitly
-filters out FX Delta risk to the calculation currency from the input sensitivities.
-- Simm-Lib passes ISDA's Unit Test for SIMM™ 2.1.
-
-#### 2018-04-04
-- Simm-lib has been restructured to be more easily parsed, and also to more easily implement `ImTree` functionality.
-As a result, ImTree functionality has been expanded to include Additional-IM sensitivities, and the strict `Bucket` level
-view that the library took previously has been loosened.
-- `ImTree` is now an interface, and **no longer** parses directly to the standard IM-Tree CSV format. Instead, a CSV formatted `String`
-can be obtained from the `static` method `ImTree.parseToFlatCsv()` which takes an ImTree object as an input.
-
-#### 2017-12-11
-- Simm-Lib now includes IM-Tree functionality for non-Additional-IM Sensitivities.
-An `ImTree` data structure, which parses directly to the standard IM-Tree CSV format, has been added to carry the IM-Tree structure.
-- `ImTree` takes a strict view of the 'Bucket' level of IM-Tree and doesn't distinguish between different
-currencies in the FX risk class as all currencies are in the same bucket per ISDA's documentation.
-- Simm-Lib has added the Base Correlation Sensitivity Type to the Credit Qualifying risk class.
-- Simm-Lib now passes ISDA's Unit Test for SIMM™ 2.0 confirming the accuracy of the calculated exposure.
-
-#### 2018-11-25
--The library has been expanded to now include both a Schedule IM calculation model, and
-a SIMM calculation model. Post and Collect regulation handling has been added, taking a
-'Worst-Of' approach, and along with this IM can now be calculated by role (either Pledgor
-or Secured) for both the SIMM and Schedule models.
--The Schedule IM model is (unsurprisingly) contained in the schedule model. Following the
-same format as the SIMM model, the main methods of the module can be found in the `Schedule`
-class. See below for more specifici information on the module.
--The 'Worst-Of' handling and role calculation is handled by the simm-ple module. The main calculation
-methods can again be found in the `Simmple` class. Again, see below for more specific details.

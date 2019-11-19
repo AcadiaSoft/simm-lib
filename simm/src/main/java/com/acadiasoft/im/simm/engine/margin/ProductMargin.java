@@ -22,70 +22,40 @@
 
 package com.acadiasoft.im.simm.engine.margin;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
-import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
-import com.acadiasoft.im.simm.model.Sensitivity;
-import com.acadiasoft.im.simm.model.param.SimmRiskClassCorrelation;
+import com.acadiasoft.im.base.margin.GroupMargin;
+import com.acadiasoft.im.base.margin.SiloMargin;
 import com.acadiasoft.im.base.util.BigDecimalUtils;
-import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
+import com.acadiasoft.im.base.util.ListUtils;
+import com.acadiasoft.im.simm.config.SimmConfig;
+import com.acadiasoft.im.simm.model.Sensitivity;
+import com.acadiasoft.im.simm.model.SensitivityIdentifier;
+import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
+import com.acadiasoft.im.simm.model.param.SimmRiskClassCorrelation;
+import com.acadiasoft.im.simm.model.utils.MarginUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class ProductMargin implements ImTree {
+public class ProductMargin extends SiloMargin {
 
   private static final String LEVEL = "3.Silo";
-  private final ProductClass productClass;
-  private final BigDecimal margin;
-  private final List<RiskMargin> marginByRiskClass = new ArrayList<>();
 
-  private ProductMargin(ProductClass productClass, BigDecimal margin, List<RiskMargin> marginByRiskClass) {
-    this.productClass = productClass;
-    this.margin = margin;
-    this.marginByRiskClass.addAll(marginByRiskClass);
+  private ProductMargin(ProductClass productClass, BigDecimal margin, List<GroupMargin> marginByRiskClass) {
+    super(LEVEL, productClass, margin, marginByRiskClass);
   }
 
-  @Override
-  public BigDecimal getMargin() {
-    return margin;
-  }
-
-  @Override
-  public MarginIdentifier getMarginIdentifier() {
-    return productClass;
-  }
-
-  @Override
-  public List<ImTree> getChildren() {
-    List<ImTree> list = new ArrayList<>();
-    list.addAll(marginByRiskClass);
-    return list;
-  }
-
-  @Override
-  public String getTreeLevel() {
-    return LEVEL;
-  }
-
-  public static ProductMargin calculate(ProductClass product, List<Sensitivity> sensitivities, String calculationCurrency) {
-    List<RiskMargin> marginByRiskClass = SensitivityUtils.listByMargin(
-        e -> RiskMargin.calculate(e.getKey(), e.getValue(), calculationCurrency),
-        SensitivityUtils.mapByIdentifier(s -> s.getRiskIdentifier(), sensitivities)
-    );
-    BigDecimal sumSquared = BigDecimalUtils.sumSquared(marginByRiskClass, m -> m.getMargin());
-    BigDecimal sumCorrelated = BigDecimalUtils.sumCorrelated(
-        marginByRiskClass,
-        (m) -> m.getMargin(),
-        (r, s) -> SimmRiskClassCorrelation.get(r.getRiskClass(), s.getRiskClass()),
-        (r, s) -> !r.getRiskClass().equals(s.getRiskClass())
+  public static ProductMargin calculate(ProductClass product, List<Sensitivity> sensitivities, SimmConfig config) {
+    List<RiskMargin> marginByRiskClass = ListUtils.groupBy(sensitivities, SensitivityIdentifier::getRiskIdentifier).entrySet().stream()
+      .map(entry -> RiskMargin.calculate(entry.getKey(), entry.getValue(), config))
+      .collect(Collectors.toList());
+    BigDecimal sumSquared = BigDecimalUtils.sumSquared(marginByRiskClass, RiskMargin::getMargin);
+    BigDecimal sumCorrelated = MarginUtils.sumCorrelated(
+      marginByRiskClass, RiskMargin::getMargin, SimmRiskClassCorrelation::get
     );
     BigDecimal sqrt = BigDecimalUtils.sqrt(sumSquared.add(sumCorrelated));
-    return new ProductMargin(product, sqrt, marginByRiskClass);
+    return new ProductMargin(product, sqrt, new ArrayList<>(marginByRiskClass));
   }
 
-  public ProductClass getProductClass() {
-    return productClass;
-  }
 }

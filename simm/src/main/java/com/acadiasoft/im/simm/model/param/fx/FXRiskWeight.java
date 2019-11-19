@@ -24,7 +24,7 @@ package com.acadiasoft.im.simm.model.param.fx;
 
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmFxRiskWeight;
-import com.acadiasoft.im.simm.model.param.SimmRiskWeight;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;

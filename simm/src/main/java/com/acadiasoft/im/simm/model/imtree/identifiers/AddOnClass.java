@@ -22,21 +22,14 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.model.imtree.identifiers.SiloClass;
 
-public enum AddOnClass implements MarginIdentifier {
+public class AddOnClass extends SiloClass {
 
-  ADDON("AddOn");
-
-  private final String label;
+  public static final AddOnClass ADDON = new AddOnClass("AddOn");
 
   private AddOnClass(String label) {
-    this.label = label;
-  }
-
-  @Override
-  public String getLabel() {
-    return label;
+    super(label);
   }
 
 }

@@ -22,46 +22,35 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.model.imtree.identifiers.BatchClass;
 import org.apache.commons.lang3.StringUtils;
 
-public enum SensitivityClass implements MarginIdentifier {
+public class SensitivityClass extends BatchClass {
 
-  DELTA("Delta"),
-  VEGA("Vega"),
-  CURVATURE("Curvature"),
-  BASECORR("BaseCorr"); // Base Correlation
+  public static final SensitivityClass DELTA = new SensitivityClass("Delta");
+  public static final SensitivityClass VEGA = new SensitivityClass("Vega");
+  public static final SensitivityClass CURVATURE = new SensitivityClass("Curvature");
+  public static final SensitivityClass BASECORR = new SensitivityClass("BaseCorr"); // Base Correlation
 
-  private final String label;
   public static final String VEGA_SUFFIX = "Vol";
+  private static final String BAD_RISK_TYPE = "Unknown risk type specified: [%s]";
 
   private SensitivityClass(String label) {
-    this.label = label;
-  }
-
-  @Override
-  public String getLabel() {
-    return label;
+    super(label);
   }
 
   public static SensitivityClass determineByRiskType(String riskType) {
-    if (StringUtils.containsIgnoreCase(riskType, VEGA_SUFFIX)) {
+    if (AddOnSubType.isAddOnSubType(riskType)) {
+      return null; // add on sensitivities do not have a sensitivity type
+    } else if (StringUtils.containsIgnoreCase(riskType, VEGA_SUFFIX)) {
       return VEGA;
     } else if (StringUtils.equalsIgnoreCase(riskType, RiskClass.RISK_TYPE_BASE_CORR)) {
       return BASECORR;
-    } else {
+    } else if (RiskClass.isSimmRiskType(riskType)) {
       return DELTA;
+    } else {
+      throw new IllegalStateException(String.format(BAD_RISK_TYPE, riskType));
     }
-  }
-
-  public static SensitivityClass getByLabel(String label) {
-    for (SensitivityClass s: values()) {
-      if (label.equalsIgnoreCase(s.getLabel())) {
-        return s;
-      }
-    }
-
-    throw new IllegalStateException("tried to get sensitivity class label that doesn't exist: [" + label + "]!");
   }
 
 }

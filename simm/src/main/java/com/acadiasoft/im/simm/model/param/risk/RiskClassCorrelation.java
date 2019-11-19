@@ -26,75 +26,74 @@ import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simm.model.param.SimmRiskClassCorrelation;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * As defined in Appendix 1 section K of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
  */
 public class RiskClassCorrelation implements SimmRiskClassCorrelation {
+  
+  private static final Map<RiskClass, Map<RiskClass, BigDecimal>> CORRELATIONS = new HashMap<>();
+  
+  static {
+    Map<RiskClass, BigDecimal> IR = new HashMap<>();
+    IR.put(RiskClass.INTEREST_RATE, new BigDecimal("1"));
+    IR.put(RiskClass.CREDIT_QUALIFYING, new BigDecimal("0.27"));
+    IR.put(RiskClass.CREDIT_NON_QUALIFYING, new BigDecimal("0.26"));
+    IR.put(RiskClass.EQUITY, new BigDecimal("0.29"));
+    IR.put(RiskClass.COMMODITY, new BigDecimal("0.31"));
+    IR.put(RiskClass.FX, new BigDecimal("0.14"));
+    CORRELATIONS.put(RiskClass.INTEREST_RATE, IR);
 
-  /**
-   * Ordering of risk classes in RiskClass:
-   *  - IR
-   *  - CreditQ
-   *  - CreditNonQ
-   *  - Equity
-   *  - Commodity
-   *  - FX
-   */
-  private static final BigDecimal[][] CORRELATIONS =
-    {
-        { // IR
-            new BigDecimal("1"), // IR
-            new BigDecimal("0.27"), // CreditQ
-            new BigDecimal("0.26"), // CreditNonQ
-            new BigDecimal("0.29"), // Equity
-            new BigDecimal("0.31"), // Commodity
-            new BigDecimal("0.14"), // FX
-        },
-        { // CreditQ
-            new BigDecimal("0.27"), // IR
-            new BigDecimal("1"), // CreditQ
-            new BigDecimal("0.19"), // CreditNonQ
-            new BigDecimal("0.63"), // Equity
-            new BigDecimal("0.42"), // Commodity
-            new BigDecimal("0.25"), // FX
-        },
-        { // CreditNonQ
-            new BigDecimal("0.26"), // IR
-            new BigDecimal("0.19"), // CreditQ
-            new BigDecimal("1"), // CreditNonQ
-            new BigDecimal("0.19"), // Equity
-            new BigDecimal("0.20"), // Commodity
-            new BigDecimal("0.14") // FX
-        },
-        { // Equity
-            new BigDecimal("0.29"), // IR
-            new BigDecimal("0.63"), // CreditQ
-            new BigDecimal("0.19"), // CreditNonQ
-            new BigDecimal("1"), // Equity
-            new BigDecimal("0.43"), // Commodity
-            new BigDecimal("0.25") // FX
-        },
-        { // Commodity
-            new BigDecimal("0.31"), // IR
-            new BigDecimal("0.42"), // CreditQ
-            new BigDecimal("0.20"), // CreditNonQ
-            new BigDecimal("0.43"), // Equity
-            new BigDecimal("1"), // Commodity
-            new BigDecimal("0.30") // FX
-        },
-        { // FX
-            new BigDecimal("0.14"), // IR
-            new BigDecimal("0.25"), // CreditQ
-            new BigDecimal("0.14"), // CreditNonQ
-            new BigDecimal("0.25"), // Equity
-            new BigDecimal("0.30"), // Commodity
-            new BigDecimal("1"), // FX
-        }
-    };
+    Map<RiskClass, BigDecimal> CQ = new HashMap<>();
+    CQ.put(RiskClass.INTEREST_RATE, new BigDecimal("0.27"));
+    CQ.put(RiskClass.CREDIT_QUALIFYING, new BigDecimal("1"));
+    CQ.put(RiskClass.CREDIT_NON_QUALIFYING, new BigDecimal("0.19"));
+    CQ.put(RiskClass.EQUITY, new BigDecimal("0.63"));
+    CQ.put(RiskClass.COMMODITY, new BigDecimal("0.42"));
+    CQ.put(RiskClass.FX, new BigDecimal("0.25"));
+    CORRELATIONS.put(RiskClass.CREDIT_QUALIFYING, CQ);
+    
+    Map<RiskClass, BigDecimal> CN = new HashMap<>();
+    CN.put(RiskClass.INTEREST_RATE, new BigDecimal("0.26"));
+    CN.put(RiskClass.CREDIT_QUALIFYING, new BigDecimal("0.19"));
+    CN.put(RiskClass.CREDIT_NON_QUALIFYING, new BigDecimal("1"));
+    CN.put(RiskClass.EQUITY, new BigDecimal("0.19"));
+    CN.put(RiskClass.COMMODITY, new BigDecimal("0.20"));
+    CN.put(RiskClass.FX, new BigDecimal("0.14"));
+    CORRELATIONS.put(RiskClass.CREDIT_NON_QUALIFYING, CN);
+    
+    Map<RiskClass, BigDecimal> EQ = new HashMap<>();
+    EQ.put(RiskClass.INTEREST_RATE, new BigDecimal("0.29"));
+    EQ.put(RiskClass.CREDIT_QUALIFYING, new BigDecimal("0.63"));
+    EQ.put(RiskClass.CREDIT_NON_QUALIFYING, new BigDecimal("0.19"));
+    EQ.put(RiskClass.EQUITY, new BigDecimal("1"));
+    EQ.put(RiskClass.COMMODITY, new BigDecimal("0.43"));
+    EQ.put(RiskClass.FX, new BigDecimal("0.25"));
+    CORRELATIONS.put(RiskClass.EQUITY, EQ);
+
+    Map<RiskClass, BigDecimal> CM = new HashMap<>();
+    CM.put(RiskClass.INTEREST_RATE, new BigDecimal("0.31"));
+    CM.put(RiskClass.CREDIT_QUALIFYING, new BigDecimal("0.42"));
+    CM.put(RiskClass.CREDIT_NON_QUALIFYING, new BigDecimal("0.20"));
+    CM.put(RiskClass.EQUITY, new BigDecimal("0.43"));
+    CM.put(RiskClass.COMMODITY, new BigDecimal("1"));
+    CM.put(RiskClass.FX, new BigDecimal("0.30"));
+    CORRELATIONS.put(RiskClass.COMMODITY, CM);
+
+    Map<RiskClass, BigDecimal> FX = new HashMap<>();
+    FX.put(RiskClass.INTEREST_RATE, new BigDecimal("0.14"));
+    FX.put(RiskClass.CREDIT_QUALIFYING, new BigDecimal("0.25"));
+    FX.put(RiskClass.CREDIT_NON_QUALIFYING, new BigDecimal("0.14"));
+    FX.put(RiskClass.EQUITY, new BigDecimal("0.25"));
+    FX.put(RiskClass.COMMODITY, new BigDecimal("0.30"));
+    FX.put(RiskClass.FX, new BigDecimal("1"));
+    CORRELATIONS.put(RiskClass.FX, FX);
+  }
 
   @Override
   public BigDecimal getRiskClassCorrelation(RiskClass riskClass, RiskClass riskClass2) {
-    return CORRELATIONS[RiskClass.indexOf(riskClass)][RiskClass.indexOf(riskClass2)];
+    return CORRELATIONS.get(riskClass).get(riskClass2);
   }
 }

@@ -22,22 +22,18 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.model.imtree.identifiers.BundleClass;
 import com.acadiasoft.im.simm.model.param.interestrate.InterestRateCurrencyVolatility;
 
-public class BucketClass implements MarginIdentifier {
+public class BucketClass extends BundleClass {
 
   private final BucketType type;
   private final String bucketName;
 
   private BucketClass(BucketType type, String bucketName) {
+    super(bucketName);
     this.bucketName = bucketName;
     this.type = type;
-  }
-
-  @Override
-  public String getLabel() {
-    return bucketName;
   }
 
   public BucketType getBucketType() {
@@ -62,12 +58,11 @@ public class BucketClass implements MarginIdentifier {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof BucketClass)) return false;
-    BucketClass other = (BucketClass) obj;
-    if (type.equals(other.getBucketType()) && bucketName.equalsIgnoreCase(other.getBucketName())) {
-      return true;
-    } else {
+    if (!(obj instanceof BucketClass)) {
       return false;
+    } else {
+      BucketClass other = (BucketClass) obj;
+      return type.equals(other.getBucketType()) && bucketName.equalsIgnoreCase(other.getBucketName());
     }
   }
 

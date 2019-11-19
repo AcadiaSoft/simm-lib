@@ -22,14 +22,11 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
-import org.apache.commons.collections4.CollectionUtils;
+import com.acadiasoft.im.base.model.imtree.MarginIdentifier;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public enum AddOnSubType implements MarginIdentifier {
 
@@ -43,23 +40,24 @@ public enum AddOnSubType implements MarginIdentifier {
   public static final String ADD_ON_NOTIONAL = "Notional";
   public static final String ADD_ON_NOTIONAL_FACTOR = "Param_AddOnNotionalFactor";
   public static final String ADD_ON_PRODUCT_MULTIPLIER = "Param_ProductClassMultiplier";
-  public static final List<String> ADD_ON_TYPES_LIST = Collections.unmodifiableList(
-      Arrays.asList(ADD_ON_FIXED_AMOUNT, ADD_ON_NOTIONAL, ADD_ON_NOTIONAL_FACTOR, ADD_ON_PRODUCT_MULTIPLIER)
+  public static final Supplier<Stream<String>> ADD_ON_TYPES_LIST = () -> Stream.of(
+      ADD_ON_FIXED_AMOUNT, ADD_ON_NOTIONAL, ADD_ON_NOTIONAL_FACTOR, ADD_ON_PRODUCT_MULTIPLIER
   );
 
   private String label;
 
-  private AddOnSubType(String label) {
+  AddOnSubType(String label) {
     this.label = label;
   }
 
   @Override
-  public String getLabel() {
+  public String getMarginIdentifier() {
     return label;
   }
 
   public static boolean isAddOnSubType(String riskType) {
-    return ADD_ON_TYPES_LIST.stream().anyMatch(riskType::equalsIgnoreCase);
+    if (riskType == null) { return false; }
+    return ADD_ON_TYPES_LIST.get().anyMatch(riskType::equalsIgnoreCase);
   }
 
   public static AddOnSubType determineAddOnType(String riskType) {

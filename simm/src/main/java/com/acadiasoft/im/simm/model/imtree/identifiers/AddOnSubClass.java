@@ -22,21 +22,17 @@
 
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
-import com.acadiasoft.im.base.imtree.identifiers.MarginIdentifier;
+import com.acadiasoft.im.base.model.imtree.identifiers.GroupClass;
 
-public class AddOnSubClass implements MarginIdentifier {
+public class AddOnSubClass extends GroupClass {
 
   private final AddOnSubType type;
   private final String name;
 
   private AddOnSubClass(AddOnSubType type, String name) {
+    super(name);
     this.type = type;
     this.name = name;
-  }
-
-  @Override
-  public String getLabel() {
-    return name;
   }
 
   public AddOnSubType getType() {

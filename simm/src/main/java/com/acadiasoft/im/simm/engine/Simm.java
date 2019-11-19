@@ -22,61 +22,182 @@
 
 package com.acadiasoft.im.simm.engine;
 
-import com.acadiasoft.im.base.imtree.ImTree;
-import com.acadiasoft.im.base.imtree.TotalMargin;
+import com.acadiasoft.im.base.margin.ModelMargin;
+import com.acadiasoft.im.base.margin.TotalMargin;
+import com.acadiasoft.im.simm.config.HoldingPeriod;
+import com.acadiasoft.im.simm.config.SimmCalculationType;
+import com.acadiasoft.im.simm.config.SimmConfig;
 import com.acadiasoft.im.simm.engine.margin.SimmMargin;
 import com.acadiasoft.im.simm.model.*;
-import com.acadiasoft.im.simm.model.imtree.identifiers.ProductClass;
-import com.acadiasoft.im.simm.model.utils.SensitivityUtils;
-import com.acadiasoft.im.simm.model.utils.SimmCalculationType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author alec.stewart
  */
 public class Simm {
 
+  // --------------------- CONFIGURABLE CALCULATION ------------------------
+
+  public static ModelMargin calculate(List<Sensitivity> inputSensitivities, SimmConfig config) {
+    return SimmMargin.calculate(inputSensitivities, config);
+  }
+
+  // ------------------- LEGACY CALCULATION FUNCTIONS ----------------------
+
   public static BigDecimal calculateStandard(List<Sensitivity> inputSensitivities, String calculationCurrency) {
-    return calculate(inputSensitivities, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), calculationCurrency, SimmCalculationType.STANDARD).getMargin();
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .build();
+    return calculate(inputSensitivities, config).getMargin();
   }
 
-  public static BigDecimal calculateAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.ADDITIONAL).getMargin();
+  public static BigDecimal calculateAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                               List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                               String calculationCurrency) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.ADDITIONAL)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return calculate(allInputs, config).getMargin();
   }
 
-  public static BigDecimal calculateTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.TOTAL).getMargin();
+  public static BigDecimal calculateTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                          List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                          String calculationCurrency) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.TOTAL)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return calculate(allInputs, config).getMargin();
   }
 
-  public static ImTree calculateTreeStandard(List<Sensitivity> inputSensitivities, String calculationCurrency) {
-    return TotalMargin.build(calculate(inputSensitivities, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), calculationCurrency, SimmCalculationType.STANDARD));
+  public static TotalMargin calculateTreeStandard(List<Sensitivity> inputSensitivities, String calculationCurrency) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .build();
+    return TotalMargin.build(calculate(inputSensitivities, config));
   }
 
-  public static ImTree calculateTreeAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return TotalMargin.build(calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.ADDITIONAL));
+  public static TotalMargin calculateTreeAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                               List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                               String calculationCurrency) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.ADDITIONAL)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return TotalMargin.build(calculate(allInputs, config));
   }
 
-  public static ImTree calculateTreeTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency) {
-    return TotalMargin.build(calculate(inputSensitivities, multipliers, factors, notionals, fixed, calculationCurrency, SimmCalculationType.TOTAL));
+  public static TotalMargin calculateTreeTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                          List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                          String calculationCurrency) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.TOTAL)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return TotalMargin.build(calculate(allInputs, config));
   }
 
-  public static ImTree calculate(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers, List<AddOnNotionalFactor> factors, List<AddOnNotional> notionals, List<AddOnFixedAmount> fixed, String calculationCurrency, SimmCalculationType type) {
-    List<Sensitivity> filtered = SensitivityUtils.filterDeltaFxRiskInCalcCurrency(inputSensitivities, calculationCurrency);
-    if (type.equals(SimmCalculationType.STANDARD)) return SimmMargin.calculateStandard(filtered, calculationCurrency);
-    Map<ProductClass, ProductMultiplier> multiplierMap = SensitivityUtils.groupByThenTakeFirst(multipliers, ProductMultiplier::getProductClass);
-    Map<String, AddOnNotionalFactor> factorMap = SensitivityUtils.groupByThenTakeFirst(factors, AddOnNotionalFactor::getProduct);
-    Map<String, List<AddOnNotional>> notionalMap = SensitivityUtils.groupBy(notionals, AddOnNotional::getProduct);
-    if (type.equals(SimmCalculationType.ADDITIONAL)) {
-      return SimmMargin.calculateAdditional(filtered, multiplierMap, factorMap, notionalMap, fixed, calculationCurrency);
-    } else if (type.equals(SimmCalculationType.TOTAL)) {
-      return SimmMargin.calculateTotal(filtered, multiplierMap, factorMap, notionalMap, fixed, calculationCurrency);
-    } else {
-      throw new RuntimeException("Called a SIMM calculation with unknown type: [" + type + "]");
-    }
+  public static BigDecimal calculateStandard(List<Sensitivity> inputSensitivities, String calculationCurrency, HoldingPeriod period) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .holdingPeriod(period)
+      .build();
+    return calculate(inputSensitivities, config).getMargin();
+  }
+
+  public static BigDecimal calculateAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                               List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                               String calculationCurrency, HoldingPeriod period) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.ADDITIONAL)
+      .holdingPeriod(period)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return calculate(allInputs, config).getMargin();
+  }
+
+  public static BigDecimal calculateTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                          List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                          String calculationCurrency, HoldingPeriod period) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.TOTAL)
+      .holdingPeriod(period)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return calculate(allInputs, config).getMargin();
+  }
+
+  public static TotalMargin calculateTreeStandard(List<Sensitivity> inputSensitivities, String calculationCurrency, HoldingPeriod period) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .holdingPeriod(period)
+      .build();
+    return TotalMargin.build(calculate(inputSensitivities, config));
+  }
+
+  public static TotalMargin calculateTreeAdditional(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                               List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                               String calculationCurrency, HoldingPeriod period) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.ADDITIONAL)
+      .holdingPeriod(period)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return TotalMargin.build(calculate(allInputs, config));
+  }
+
+  public static TotalMargin calculateTreeTotal(List<Sensitivity> inputSensitivities, List<ProductMultiplier> multipliers,
+                                          List<NotionalFactor> factors, List<Notional> notionals, List<FixedAmount> fixed,
+                                          String calculationCurrency, HoldingPeriod period) {
+    SimmConfig config = SimmConfig.Builder()
+      .calculationCurrency(calculationCurrency)
+      .simmCalculationType(SimmCalculationType.TOTAL)
+      .holdingPeriod(period)
+      .build();
+    List<Sensitivity> allInputs = new ArrayList<>(inputSensitivities);
+    multipliers.stream().map(ProductMultiplier::of).forEach(allInputs::add);
+    factors.stream().map(NotionalFactor::of).forEach(allInputs::add);
+    notionals.stream().map(Notional::of).forEach(allInputs::add);
+    fixed.stream().map(FixedAmount::of).forEach(allInputs::add);
+    return TotalMargin.build(calculate(allInputs, config));
   }
 }
-
