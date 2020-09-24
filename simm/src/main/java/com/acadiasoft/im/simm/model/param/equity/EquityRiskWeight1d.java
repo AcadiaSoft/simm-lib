@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 AcadiaSoft, Inc.
+ * Copyright (c) 2020 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,22 +39,22 @@ public class EquityRiskWeight1d implements SimmRiskWeight {
 
   static {
     WEIGHTS.put(BucketType.EQ1, new BigDecimal("7.6"));
-    WEIGHTS.put(BucketType.EQ2, new BigDecimal("8.4"));
-    WEIGHTS.put(BucketType.EQ3, new BigDecimal("9.7"));
-    WEIGHTS.put(BucketType.EQ4, new BigDecimal("8.4"));
+    WEIGHTS.put(BucketType.EQ2, new BigDecimal("8.1"));
+    WEIGHTS.put(BucketType.EQ3, new BigDecimal("9.4"));
+    WEIGHTS.put(BucketType.EQ4, new BigDecimal("8.3"));
     WEIGHTS.put(BucketType.EQ5, new BigDecimal("6.8"));
     WEIGHTS.put(BucketType.EQ6, new BigDecimal("7.4"));
-    WEIGHTS.put(BucketType.EQ7, new BigDecimal("8.7"));
-    WEIGHTS.put(BucketType.EQ8, new BigDecimal("8.7"));
-    WEIGHTS.put(BucketType.EQ9, new BigDecimal("9.9"));
-    WEIGHTS.put(BucketType.EQ10, new BigDecimal("9.6"));
-    WEIGHTS.put(BucketType.EQ11, new BigDecimal("7"));
-    WEIGHTS.put(BucketType.EQ12, new BigDecimal("7"));
-    WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("9.9"));
+    WEIGHTS.put(BucketType.EQ7, new BigDecimal("8.5"));
+    WEIGHTS.put(BucketType.EQ8, new BigDecimal("8.6"));
+    WEIGHTS.put(BucketType.EQ9, new BigDecimal("9.4"));
+    WEIGHTS.put(BucketType.EQ10, new BigDecimal("9.3"));
+    WEIGHTS.put(BucketType.EQ11, new BigDecimal("5.5"));
+    WEIGHTS.put(BucketType.EQ12, new BigDecimal("5.5"));
+    WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("9.4"));
   }
 
-  private static final BigDecimal VEGA = new BigDecimal("0.066");
-  private static final BigDecimal VEGA12 = new BigDecimal("0.21");
+  private static final BigDecimal VEGA = new BigDecimal("0.065");
+  private static final BigDecimal VEGA12 = new BigDecimal("0.22");
 
   @Override
   public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 AcadiaSoft, Inc.
+ * Copyright (c) 2020 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,22 +39,22 @@ public class CreditQualifyingRiskWeight1d implements SimmRiskWeight {
   private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.CRQ1, new BigDecimal("16"));
-    WEIGHTS.put(BucketType.CRQ2, new BigDecimal("21"));
-    WEIGHTS.put(BucketType.CRQ3, new BigDecimal("15"));
+    WEIGHTS.put(BucketType.CRQ1, new BigDecimal("17"));
+    WEIGHTS.put(BucketType.CRQ2, new BigDecimal("22"));
+    WEIGHTS.put(BucketType.CRQ3, new BigDecimal("14"));
     WEIGHTS.put(BucketType.CRQ4, new BigDecimal("11"));
-    WEIGHTS.put(BucketType.CRQ5, new BigDecimal("10"));
-    WEIGHTS.put(BucketType.CRQ6, new BigDecimal("12"));
-    WEIGHTS.put(BucketType.CRQ7, new BigDecimal("37"));
-    WEIGHTS.put(BucketType.CRQ8, new BigDecimal("42"));
-    WEIGHTS.put(BucketType.CRQ9, new BigDecimal("31"));
-    WEIGHTS.put(BucketType.CRQ10, new BigDecimal("33"));
-    WEIGHTS.put(BucketType.CRQ11, new BigDecimal("29"));
-    WEIGHTS.put(BucketType.CRQ12, new BigDecimal("27"));
-    WEIGHTS.put(BucketType.CRQRESIDUAL, new BigDecimal("42"));
+    WEIGHTS.put(BucketType.CRQ5, new BigDecimal("11"));
+    WEIGHTS.put(BucketType.CRQ6, new BigDecimal("9.5"));
+    WEIGHTS.put(BucketType.CRQ7, new BigDecimal("39"));
+    WEIGHTS.put(BucketType.CRQ8, new BigDecimal("63"));
+    WEIGHTS.put(BucketType.CRQ9, new BigDecimal("28"));
+    WEIGHTS.put(BucketType.CRQ10, new BigDecimal("45"));
+    WEIGHTS.put(BucketType.CRQ11, new BigDecimal("32"));
+    WEIGHTS.put(BucketType.CRQ12, new BigDecimal("35"));
+    WEIGHTS.put(BucketType.CRQRESIDUAL, new BigDecimal("63"));
   }
 
-  private static final BigDecimal VEGA = new BigDecimal("0.084");
+  private static final BigDecimal VEGA = new BigDecimal("0.091");
 
   @Override
   public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {

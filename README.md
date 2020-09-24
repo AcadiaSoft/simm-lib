@@ -1,7 +1,7 @@
 # Simm-Lib
 
-Simm-Lib is an implementation of version 2.2 of the value at risk Standard Initial
-Margin Model ([SIMM™ 2.2](https://www2.isda.org/functional-areas/wgmr-implementation/))
+Simm-Lib is an implementation of version 2.3 of the value at risk Standard Initial
+Margin Model ([SIMM™ 2.3](https://www2.isda.org/functional-areas/wgmr-implementation/))
 developed by ISDA, see [here](https://www.isda.org/category/margin/isda-simm/) for methodology specifications.
 It has been built to be compatible with the Common
 Risk Interchange Format (CRIF) and it's correlation parameters and risk
@@ -18,10 +18,10 @@ calculate initial margin for their or their clients’ non-cleared
 derivatives transactions. Please contact isdalegal@isda.org for more
 information on licensing the ISDA SIMM™.
 
-### Updates: 2019-11-19
-- The library received a pretty major clean-up but all old interfaces should still be available.
-- The library is now also passing the unit tests for 1-day SIMM.
-- The library now supports jackson annotations for serialization of im-trees and CRIF.
+### Updates: 2020-09-23
+- SIMM v2.3
+- Passing one-day benchmarks for version 2.3 including optional tests under Simmple module
+- Passing ten-day benchmarks for version 2.3 including optional tests under Simmple module
 
 ## Getting Started
 Simm-Lib is built with Apache Maven, so one must get Maven
@@ -91,7 +91,7 @@ calculation, checking the result against SIMM's result:
 ```java
 @Test
 public void test() {
-    Sensitivity IR1 = new Sensitivity("RatesFX", "Risk_IRCurve", "GBP", "1", "6m", "OIS", new BigDecimal("200000000"));
+    Sensitivity IR1 = new DefaultSensitivity("RatesFX", "Risk_IRCurve", "GBP", "1", "6m", "OIS", new BigDecimal("200000000"));
     Assert.assertEquals(new BigDecimal("13400000000"), Simm.calculateStandard(Arrays.asList(IR1)).setScale(0, RoundingMode.HALF_UP));
 }
 ```

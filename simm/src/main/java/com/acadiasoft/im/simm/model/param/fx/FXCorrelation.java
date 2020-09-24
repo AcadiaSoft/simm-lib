@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 AcadiaSoft, Inc.
+ * Copyright (c) 2020 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,29 +38,12 @@ public class FXCorrelation implements SimmBucketCorrelation, SimmFxSensitivityCo
 
   public static final BigDecimal CORRELATION = new BigDecimal("0.5");
 
-  private static final List<String> HIGH_VOLATILITY = Collections.singletonList("BRL");
-  private static final BigDecimal ONE = new BigDecimal("0.729");
-  private static final BigDecimal TWO = new BigDecimal("0.368");
+  private static final List<String> HIGH_VOLATILITY = Collections.emptyList();
 
 
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass si, WeightingClass sk, String calculationCurrency) {
-    String ccy1 = si.getQualifier();
-    String ccy2 = sk.getQualifier();
-    if (HIGH_VOLATILITY.contains(calculationCurrency)) {
-      if (!HIGH_VOLATILITY.contains(ccy1) && !HIGH_VOLATILITY.contains(ccy2)) {
-        return ONE;
-      } else {
-        return CORRELATION;
-      }
-    } else {
-      if ((HIGH_VOLATILITY.contains(ccy1) && HIGH_VOLATILITY.contains(ccy2))
-        || (!HIGH_VOLATILITY.contains(ccy1) && !HIGH_VOLATILITY.contains(ccy2))) {
-        return CORRELATION;
-      } else {
-        return TWO;
-      }
-    }
+    return CORRELATION;
   }
 
   @Override

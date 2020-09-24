@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 AcadiaSoft, Inc.
+ * Copyright (c) 2020 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,29 +52,29 @@ public class CommodityConcentrationRisk implements SimmConcentrationThreshold {
   private static final Map<List<String>, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
 
   static {
-    DELTA_THRESHOLD.put(COAL, new BigDecimal("250").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(CRUDE_OIL, new BigDecimal("2300").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(OIL_FRACTIONS, new BigDecimal("1600").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(NATURAL_GAS, new BigDecimal("2200").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(COAL, new BigDecimal("310").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(CRUDE_OIL, new BigDecimal("1700").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(OIL_FRACTIONS, new BigDecimal("1300").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(NATURAL_GAS, new BigDecimal("2800").multiply(ConcentrationRiskGroup.MM));
     DELTA_THRESHOLD.put(POWER, new BigDecimal("2200").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(FREIGHT, new BigDecimal("51").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(BASE_METALS, new BigDecimal("370").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(PRECIOUS_METALS, new BigDecimal("870").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(AGRICULTURE, new BigDecimal("27").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(OTHER, new BigDecimal("27").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(INDEXES, new BigDecimal("4100").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(FREIGHT, new BigDecimal("52").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(BASE_METALS, new BigDecimal("490").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(PRECIOUS_METALS, new BigDecimal("1300").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(AGRICULTURE, new BigDecimal("73").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(OTHER, new BigDecimal("52").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(INDEXES, new BigDecimal("4000").multiply(ConcentrationRiskGroup.MM));
 
-    VEGA_THRESHOLD.put(COAL, new BigDecimal("290").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(CRUDE_OIL, new BigDecimal("1500").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(OIL_FRACTIONS, new BigDecimal("230").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(NATURAL_GAS, new BigDecimal("2600").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(POWER, new BigDecimal("900").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(FREIGHT, new BigDecimal("100").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(BASE_METALS, new BigDecimal("390").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(PRECIOUS_METALS, new BigDecimal("600").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(AGRICULTURE, new BigDecimal("680").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(OTHER, new BigDecimal("100").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(INDEXES, new BigDecimal("270").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(COAL, new BigDecimal("130").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(CRUDE_OIL, new BigDecimal("1700").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(OIL_FRACTIONS, new BigDecimal("290").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(NATURAL_GAS, new BigDecimal("2300").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(POWER, new BigDecimal("800").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(FREIGHT, new BigDecimal("74").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(BASE_METALS, new BigDecimal("420").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(PRECIOUS_METALS, new BigDecimal("700").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(AGRICULTURE, new BigDecimal("560").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(OTHER, new BigDecimal("74").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(INDEXES, new BigDecimal("300").multiply(ConcentrationRiskGroup.MM));
   }
 
   @Override

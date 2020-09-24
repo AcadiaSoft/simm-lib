@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 AcadiaSoft, Inc.
+ * Copyright (c) 2020 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,10 +37,10 @@ import java.math.BigDecimal;
  */
 public class CreditNonQualifyingCorrelation implements SimmBucketCorrelation, SimmSensitivityCorrelation {
 
-  public static final BigDecimal AGGREGATE_SAME = new BigDecimal("0.43");
-  public static final BigDecimal AGGREGATE_DIFF = new BigDecimal("0.15");
+  public static final BigDecimal AGGREGATE_SAME = new BigDecimal("0.77");
+  public static final BigDecimal AGGREGATE_DIFF = new BigDecimal("0.47");
   public static final BigDecimal RESIDUAL = new BigDecimal("0.50");
-  public static final BigDecimal NON_RESIDUAL_TO_NON_RESIDUAL = new BigDecimal("0.17");
+  public static final BigDecimal NON_RESIDUAL_TO_NON_RESIDUAL = new BigDecimal("0.69");
 
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass si, WeightingClass sk) {

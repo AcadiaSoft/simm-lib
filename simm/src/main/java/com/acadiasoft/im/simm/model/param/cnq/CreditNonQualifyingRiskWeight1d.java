@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 AcadiaSoft, Inc.
+ * Copyright (c) 2020 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,12 +38,12 @@ public class CreditNonQualifyingRiskWeight1d implements SimmRiskWeight {
   private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.CRNQ1, new BigDecimal("20"));
-    WEIGHTS.put(BucketType.CRNQ2, new BigDecimal("320"));
-    WEIGHTS.put(BucketType.CRNQRESIDUAL, new BigDecimal("320"));
+    WEIGHTS.put(BucketType.CRNQ1, new BigDecimal("83"));
+    WEIGHTS.put(BucketType.CRNQ2, new BigDecimal("220"));
+    WEIGHTS.put(BucketType.CRNQRESIDUAL, new BigDecimal("220"));
   }
 
-  private static final BigDecimal VEGA = new BigDecimal("0.084");
+  private static final BigDecimal VEGA = new BigDecimal("0.091");
 
   @Override
   public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {

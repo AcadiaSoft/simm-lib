@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 AcadiaSoft, Inc.
+ * Copyright (c) 2020 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,27 +34,17 @@ import java.util.List;
  */
 public class FXRiskWeight implements SimmFxRiskWeight {
 
-  private static final List<String> HIGH_VOLATILITY = Collections.singletonList("BRL");
-  private static final BigDecimal REG_TO_REG = new BigDecimal("7.57");
-  private static final BigDecimal ELSE = new BigDecimal("10.28");
+  private static final List<String> HIGH_VOLATILITY = Collections.emptyList();
+  private static final BigDecimal WEIGHT = new BigDecimal("7.5");
   private static final BigDecimal VEGA = new BigDecimal("0.30");
 
   @Override
   public BigDecimal getDeltaRiskWeight(WeightingClass s, String calculationCurrency) {
-    String ccy = s.getQualifier();
-    if (!HIGH_VOLATILITY.contains(ccy) && !HIGH_VOLATILITY.contains(calculationCurrency)) {
-      return REG_TO_REG;
-    }  else {
-      return ELSE;
-    }
+    return WEIGHT;
   }
 
   public BigDecimal getDeltaRiskWeight(String ccy1, String ccy2) {
-    if (!HIGH_VOLATILITY.contains(ccy1) && !HIGH_VOLATILITY.contains(ccy2)) {
-      return REG_TO_REG;
-    }  else {
-      return ELSE;
-    }
+    return WEIGHT;
   }
 
   @Override
