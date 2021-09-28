@@ -1,6 +1,6 @@
 # Simm-Lib
 
-Simm-Lib is an implementation of version 2.3 of the value at risk Standard Initial
+Simm-Lib is an implementation of version 2.4 of the value at risk Standard Initial
 Margin Model ([SIMM™ 2.4](https://www2.isda.org/functional-areas/wgmr-implementation/))
 developed by ISDA, see [here](https://www.isda.org/category/margin/isda-simm/) for methodology specifications.
 It has been built to be compatible with the Common
