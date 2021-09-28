@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 package com.acadiasoft.im.simm.model.imtree.identifiers;
 
 import com.acadiasoft.im.base.model.imtree.identifiers.BundleClass;
+import com.acadiasoft.im.simm.model.param.fx.FXCurrencyVolatility;
 import com.acadiasoft.im.simm.model.param.interestrate.InterestRateCurrencyVolatility;
 
 public class BucketClass extends BundleClass {
@@ -47,7 +48,8 @@ public class BucketClass extends BundleClass {
 
   public static BucketClass determineBucketClass(RiskClass riskClass, String qualifier, String bucket) {
     if (riskClass.equals(RiskClass.FX)) {
-      return new BucketClass(BucketType.FX, "FX");
+      String volatilityNumber = FXCurrencyVolatility.get(qualifier).getVolatilityType();
+      return new BucketClass(BucketType.determineBucketType(riskClass, volatilityNumber), qualifier);
     } else if (riskClass.equals(RiskClass.INTEREST_RATE)) {
       String volatilityNumber = InterestRateCurrencyVolatility.get(qualifier).getVolatilityType();
       return new BucketClass(BucketType.determineBucketType(riskClass, volatilityNumber), qualifier);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,15 +44,15 @@ public class InterestRateConcentrationRisk implements SimmConcentrationThreshold
   private static final List<String> LOW_VOL = Arrays.asList("JPY");
 
   static {
-    DELTA_THRESHOLD.put(HIGH_VOL, new BigDecimal("31").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("220").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(REGULAR_VOL_LESS_TRADED, new BigDecimal("41").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(LOW_VOL, new BigDecimal("99").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(HIGH_VOL, new BigDecimal("22").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("240").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(REGULAR_VOL_LESS_TRADED, new BigDecimal("44").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(LOW_VOL, new BigDecimal("120").multiply(ConcentrationRiskGroup.MM));
 
-    VEGA_THRESHOLD.put(HIGH_VOL, new BigDecimal("93").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("2400").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(REGULAR_VOL_LESS_TRADED, new BigDecimal("240").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(LOW_VOL, new BigDecimal("740").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(HIGH_VOL, new BigDecimal("83").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(REGULAR_VOL_WELL_TRADED, new BigDecimal("2600").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(REGULAR_VOL_LESS_TRADED, new BigDecimal("270").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(LOW_VOL, new BigDecimal("980").multiply(ConcentrationRiskGroup.MM));
   }
 
   @Override

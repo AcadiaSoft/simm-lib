@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,8 @@ import static com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass.*;
 
 public enum BucketType {
 
-  FX(RiskClass.FX, 1, "The single FX bucket"),
+  FXHIGH(RiskClass.FX, 1, "FX High Volatility Currency"),
+  FX(RiskClass.FX, 2, "FX Regular Volatility Bucket"),
   IRREG(RiskClass.INTEREST_RATE, 1, "Regular Volatility Currency"),
   IRLOW(RiskClass.INTEREST_RATE, 2, "Low Volatility Currency"),
   IRHIGH(RiskClass.INTEREST_RATE, 3, "High Volatility Currency"),

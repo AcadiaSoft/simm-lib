@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -90,6 +90,9 @@ public class BasicImTreeSerializationIT {
 
     ModelMargin model = new Impl(ImModelClass.SIMM, new BigDecimal(30.1203), new ArrayList<>());
     TotalMargin total = TotalMargin.build(model);
+
+    BasicImTree imTree = new BasicImTree(total);
+    Assert.assertEquals(new BigDecimal(30.1203), imTree.getMargin());
 
     String serialized = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(total);
     System.out.println(serialized);

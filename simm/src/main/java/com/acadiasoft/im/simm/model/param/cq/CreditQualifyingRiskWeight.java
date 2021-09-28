@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,22 +39,22 @@ public class CreditQualifyingRiskWeight implements SimmRiskWeight {
   private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.CRQ1, new BigDecimal("75"));
-    WEIGHTS.put(BucketType.CRQ2, new BigDecimal("89"));
-    WEIGHTS.put(BucketType.CRQ3, new BigDecimal("68"));
-    WEIGHTS.put(BucketType.CRQ4, new BigDecimal("51"));
-    WEIGHTS.put(BucketType.CRQ5, new BigDecimal("50"));
-    WEIGHTS.put(BucketType.CRQ6, new BigDecimal("47"));
-    WEIGHTS.put(BucketType.CRQ7, new BigDecimal("157"));
-    WEIGHTS.put(BucketType.CRQ8, new BigDecimal("333"));
-    WEIGHTS.put(BucketType.CRQ9, new BigDecimal("142"));
-    WEIGHTS.put(BucketType.CRQ10, new BigDecimal("214"));
-    WEIGHTS.put(BucketType.CRQ11, new BigDecimal("143"));
-    WEIGHTS.put(BucketType.CRQ12, new BigDecimal("160"));
-    WEIGHTS.put(BucketType.CRQRESIDUAL, new BigDecimal("333"));
+    WEIGHTS.put(BucketType.CRQ1,        new BigDecimal("81")  );
+    WEIGHTS.put(BucketType.CRQ2,        new BigDecimal("96")  );
+    WEIGHTS.put(BucketType.CRQ3,        new BigDecimal("86")  );
+    WEIGHTS.put(BucketType.CRQ4,        new BigDecimal("53")  );
+    WEIGHTS.put(BucketType.CRQ5,        new BigDecimal("59")  );
+    WEIGHTS.put(BucketType.CRQ6,        new BigDecimal("47")  );
+    WEIGHTS.put(BucketType.CRQ7,        new BigDecimal("181") );
+    WEIGHTS.put(BucketType.CRQ8,        new BigDecimal("452") );
+    WEIGHTS.put(BucketType.CRQ9,        new BigDecimal("252") );
+    WEIGHTS.put(BucketType.CRQ10,       new BigDecimal("261") );
+    WEIGHTS.put(BucketType.CRQ11,       new BigDecimal("218") );
+    WEIGHTS.put(BucketType.CRQ12,       new BigDecimal("195") );
+    WEIGHTS.put(BucketType.CRQRESIDUAL, new BigDecimal("452")  );
   }
 
-  private static final BigDecimal VEGA = new BigDecimal("0.46");
+  private static final BigDecimal VEGA = new BigDecimal("0.73");
 
   @Override
   public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {

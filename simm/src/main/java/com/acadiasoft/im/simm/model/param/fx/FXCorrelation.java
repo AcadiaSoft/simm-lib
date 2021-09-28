@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,14 @@
 
 package com.acadiasoft.im.simm.model.param.fx;
 
+import static com.acadiasoft.im.simm.model.param.fx.FXCurrencyVolatility.REGULAR_VOLATILITY;
+
 import com.acadiasoft.im.simm.model.imtree.identifiers.BucketClass;
 import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmBucketCorrelation;
 import com.acadiasoft.im.simm.model.param.SimmFxSensitivityCorrelation;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * As defined in Appendix 1 section I of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
@@ -38,18 +38,51 @@ public class FXCorrelation implements SimmBucketCorrelation, SimmFxSensitivityCo
 
   public static final BigDecimal CORRELATION = new BigDecimal("0.5");
 
-  private static final List<String> HIGH_VOLATILITY = Collections.emptyList();
+  private static final BigDecimal[][] HIGH_CALC_CURRENCY_CORRELATIONS = {
+      { // High
+          new BigDecimal("0.5"), // High
+          new BigDecimal("0.39"), // Regular
+      },
+      { // Regular
+          new BigDecimal("0.39"), // High
+          new BigDecimal("0.85"), // Regular
+      } };
 
+  private static final BigDecimal[][] REGULAR_CALC_CURRENCY_CORRELATIONS = {
+      { // High
+          new BigDecimal("0.69"), // High
+          new BigDecimal("0.28"), // Regular
+      },
+      { // Regular
+          new BigDecimal("0.28"), // High
+          new BigDecimal("0.5"), // Regular
+      } };
 
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass si, WeightingClass sk, String calculationCurrency) {
-    return CORRELATION;
+    FXCurrencyVolatility siCurrencyVolatility = FXCurrencyVolatility.get(si.getQualifier());
+    FXCurrencyVolatility skCurrencyVolatility = FXCurrencyVolatility.get(si.getQualifier());
+    int siBucket = Integer.valueOf(siCurrencyVolatility.getVolatilityType());
+    int skBucket = Integer.valueOf(skCurrencyVolatility.getVolatilityType());
+    return getBucketCorrelation(calculationCurrency, siBucket, skBucket);
+  }
+
+  public BigDecimal getBucketCorrelation(String calculationCurrency, int siBucket, int skBucket) {
+    FXCurrencyVolatility calcCurrencyVolatility = FXCurrencyVolatility.get(calculationCurrency);
+    if (REGULAR_VOLATILITY.equals(calcCurrencyVolatility)) {
+      return REGULAR_CALC_CURRENCY_CORRELATIONS[siBucket - 1][skBucket - 1];
+    } else {
+      return HIGH_CALC_CURRENCY_CORRELATIONS[siBucket - 1][skBucket - 1];
+    }
+  }
+
+  public BigDecimal getBucketCorrelation(String calculationCurrency, BucketClass bi, BucketClass bk) {
+    return getBucketCorrelation(calculationCurrency, bi.getBucketType().getBucketNumber(), bk.getBucketType().getBucketNumber());
   }
 
   @Override
+  @Deprecated
   public BigDecimal getBucketCorrelation(BucketClass bi, BucketClass bk) {
-    // all FX in the same bucket, so we should actually never call this method
-    return BigDecimal.ONE;
+    throw new UnsupportedOperationException();
   }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@ public class CreditNonQualifyingConcentrationRisk implements SimmConcentrationTh
 
   @Override
   public BigDecimal getVegaThreshold(String bucket) {
-    return new BigDecimal("56").multiply(ConcentrationRiskGroup.MM);
+    return new BigDecimal("85").multiply(ConcentrationRiskGroup.MM);
   }
 
   private String determineGroup(String bucket) {

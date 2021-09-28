@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public enum InterestRateCurrencyVolatility {
 
-  REGULAR(1, Arrays.asList("USD", "EUR", "GBP", "CHF", "AUD", "NZD", "CAD", "SEK", "NOK", "DKK", "HKD", "KRW", "SGD", "TWD")), //
+  REGULAR(1, Arrays.asList("USD", "EUR", "GBP", "AUD", "CAD", "CHF", "DKK", "HKD", "KRW", "NOK", "NZD", "SEK", "SGD", "TWD")), //
   LOW_VOLATILITY(2, Arrays.asList("JPY")), //
   HIGH_VOLATILITY(3, null);
 

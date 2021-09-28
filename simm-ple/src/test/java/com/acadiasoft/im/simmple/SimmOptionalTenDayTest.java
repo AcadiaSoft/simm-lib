@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("100000000"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("112000000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 
@@ -74,7 +74,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("12885341"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("12288749"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 
@@ -94,7 +94,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("31500000"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("27000000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 
@@ -114,7 +114,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("67000000"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("70000000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 
@@ -154,7 +154,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("71250000"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("75000000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 
@@ -174,7 +174,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("72000000"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("75000000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 
@@ -214,7 +214,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("166000000"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("170000000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 
@@ -234,7 +234,7 @@ public class SimmOptionalTenDayTest implements SimmOptionalCrifMixin {
       .simmCalculationType(SimmCalculationType.TOTAL)
       .build();
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
-    Assert.assertEquals(new BigDecimal("301000000"), amount.setScale(0, RoundingMode.HALF_UP));
+    Assert.assertEquals(new BigDecimal("305000000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
 
 }

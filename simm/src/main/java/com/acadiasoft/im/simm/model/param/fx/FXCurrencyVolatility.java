@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,39 +20,40 @@
  * SOFTWARE.
  */
 
-package com.acadiasoft.im.simmple.model;
+package com.acadiasoft.im.simm.model.param.fx;
 
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- *
- * The role of the calculation
- *
- * @author alec.stewart
- *
+ * As defined in Appendix 1 section d of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
  */
-public enum ImRole implements Serializable {
+public enum FXCurrencyVolatility {
 
-  SECURED("Secured"),
-  PLEDGOR("Pledgor");
+  HIGH_VOLATILITY("1", Arrays.asList("ARS", "BRL", "MXN", "TRY", "ZAR")), //
+  REGULAR_VOLATILITY("2", null);
 
-  private final String role;
+  private final String volatilityType;
+  private final List<String> currencies;
 
-  ImRole(String role) {
-    this.role = role;
+  private FXCurrencyVolatility(String volatilityType, List<String> currencies) {
+    this.volatilityType = volatilityType;
+    this.currencies = currencies;
   }
 
-  public static ImRole swapRole(ImRole imRole) {
-    if (imRole.equals(SECURED)) {
-      return PLEDGOR;
+  public String getVolatilityType() {
+    return volatilityType;
+  }
+
+  public List<String> getCurrencies() {
+    return currencies;
+  }
+
+  public static FXCurrencyVolatility get(String currency) {
+    if (HIGH_VOLATILITY.getCurrencies().contains(currency)) {
+      return FXCurrencyVolatility.HIGH_VOLATILITY;
     } else {
-      return SECURED;
+      return FXCurrencyVolatility.REGULAR_VOLATILITY;
     }
   }
-
-  @Override
-  public String toString() {
-    return this.role;
-  }
-
 }

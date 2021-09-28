@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ public interface SimmBucketCorrelation {
       } else if (riskClass.equals(RiskClass.COMMODITY)) {
         return new CommodityCorrelation().getBucketCorrelation(r, s);
       } else if (riskClass.equals(RiskClass.FX)) {
-        return new FXCorrelation().getBucketCorrelation(r, s);
+        return new FXCorrelation().getBucketCorrelation(config.calculationCurrency(), r, s);
       } else {
         throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
       }
@@ -72,7 +72,7 @@ public interface SimmBucketCorrelation {
       } else if (riskClass.equals(RiskClass.COMMODITY)) {
         return new CommodityCorrelation1d().getBucketCorrelation(r, s);
       } else if (riskClass.equals(RiskClass.FX)) {
-        return new FXCorrelation1d().getBucketCorrelation(r, s);
+        return new FXCorrelation1d().getBucketCorrelation(config.calculationCurrency(), r, s);
       } else {
         throw new IllegalStateException("tried to get a threshold for unknown risk class: [" + riskClass + "]!");
       }

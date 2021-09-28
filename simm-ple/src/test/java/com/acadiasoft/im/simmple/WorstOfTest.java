@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,13 @@ package com.acadiasoft.im.simmple;
 
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.fx.NoConversionFxRate;
+import com.acadiasoft.im.simm.config.HoldingPeriod;
 import com.acadiasoft.im.simm.config.SimmCalculationType;
+import com.acadiasoft.im.simm.config.SimmConfig;
 import com.acadiasoft.im.simm.engine.Simm;
 import com.acadiasoft.im.simmple.config.ImRole;
+import com.acadiasoft.im.simmple.config.SimmpleCalculationType;
+import com.acadiasoft.im.simmple.config.SimmpleConfig;
 import com.acadiasoft.im.simmple.engine.Simmple;
 import com.acadiasoft.im.simmple.model.Crif;
 import com.acadiasoft.im.simmple.model.DefaultCrif;
@@ -45,6 +49,34 @@ import java.util.Arrays;
 public class WorstOfTest {
 
   public final FxRate fx = new NoConversionFxRate();
+
+  @Test
+  public void testWorstOfWithOneDay() {
+    // build some crif examples
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "included", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "", "included");
+
+    // set up the simm config for the calculation currency and an fx rate of 'no conversion'
+    SimmConfig simmConfig = SimmConfig.Builder()
+      .calculationCurrency("USD")
+      .holdingPeriod(HoldingPeriod.ONE_DAY)
+      .build();
+    BigDecimal amountPost = Simm.calculate(Arrays.asList(one, two), simmConfig).getMargin();
+
+    // set up the simm-ple config to have result currency, calculation currency, simm standard, pledgor, and no conversion fx
+    SimmpleConfig simmpleConfig = SimmpleConfig.Builder()
+      .imRole(ImRole.PLEDGOR)
+      .resultCurrency("USD")
+      .calculationCurrency("USD")
+      .simmCalculationType(SimmCalculationType.STANDARD)
+      .simmpleCalculationType(SimmpleCalculationType.SIMM)
+      .holdingPeriod(HoldingPeriod.ONE_DAY)
+      .build();
+    SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two), simmpleConfig);
+    Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
+    Assert.assertEquals("included", post.getRegulator());
+    Assert.assertEquals("USD", post.getCurrency());
+  }
 
   @Test
   public void testWorstOfInclude() {

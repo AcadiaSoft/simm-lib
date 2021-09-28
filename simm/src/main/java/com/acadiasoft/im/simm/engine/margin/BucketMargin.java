@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 AcadiaSoft, Inc.
+ * Copyright (c) 2021 AcadiaSoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -89,7 +89,9 @@ public class BucketMargin extends BundleMargin {
 
     if (riskClass.equals(RiskClass.FX)) {
       // weighted sensitivity level values are exactly the currencies, so we store them
-      return new BucketMargin(bucketClass, bucketTotal, new ArrayList<>(weightMargins));
+	    // Fixes 10d testC79
+      ConcentrationRiskGroup concentrationRiskClass = concentrationClasses.values().stream().findFirst().orElse(null);
+      return new BucketMargin(bucketClass, bucketTotal, new ArrayList<>(weightMargins), concentrationRiskClass);
     } else if (riskClass.equals(RiskClass.INTEREST_RATE)) {
       // for interest rate we want to store the single calculated concentration class to the bucket margin itself, so we get the single class from the classes map
       // we don't store weighted sensitivity level values in the tree for IR
