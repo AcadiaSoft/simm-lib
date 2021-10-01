@@ -61,7 +61,7 @@ public class FXCorrelation implements SimmBucketCorrelation, SimmFxSensitivityCo
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass si, WeightingClass sk, String calculationCurrency) {
     FXCurrencyVolatility siCurrencyVolatility = FXCurrencyVolatility.get(si.getQualifier());
-    FXCurrencyVolatility skCurrencyVolatility = FXCurrencyVolatility.get(si.getQualifier());
+    FXCurrencyVolatility skCurrencyVolatility = FXCurrencyVolatility.get(sk.getQualifier());
     int siBucket = Integer.valueOf(siCurrencyVolatility.getVolatilityType());
     int skBucket = Integer.valueOf(skCurrencyVolatility.getVolatilityType());
     return getBucketCorrelation(calculationCurrency, siBucket, skBucket);
