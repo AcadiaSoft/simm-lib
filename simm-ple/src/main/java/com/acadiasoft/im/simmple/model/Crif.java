@@ -86,7 +86,7 @@ public interface Crif extends Sensitivity, ScheduleSensitivity {
   // -------------------- im model class methods ---------------------------
 
   String MODEL_OMMITTED_FOR_NOTIONAL = "Tried to determine model from risk type since the model field was omitted" +
-    "but the risk type was notional which could be either SIMM or SCHEDULE";
+    " but the risk type was notional which could be either SIMM or SCHEDULE";
   String UNKNOWN_RISK_TYPE = "Unknown risk type found while trying to identify omitted model: [%s]!";
 
   default ImModelClass getImModelIdentifier() {
