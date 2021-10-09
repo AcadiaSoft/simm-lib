@@ -236,4 +236,128 @@ public class SimmOptionalOneDayTest implements SimmOptionalCrifMixin {
     BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
     Assert.assertEquals(new BigDecimal("99700000"), amount.setScale(0, RoundingMode.HALF_UP));
   }
+
+  /**
+   * Required Passes: None
+   * Element Tested: IR Risk Weight with sensitivity subject to SEC rules
+   * Risk Measure: Delta
+   * Group: Rates & Fx
+   * Calculation Mode: Segregated
+   */
+  @Test
+  public void testJS1_Segregated() {
+    List<Crif> sensitivities = Arrays.asList(SS_IR_64_Seg, SS_IR_65_Seg, SS_IR_66_Seg);
+    SimmpleConfig config = SimmpleConfig.Builder()
+            .calculationCurrency("USD")
+            .holdingPeriod(HoldingPeriod.ONE_DAY)
+            .imRole(ImRole.SECURED)
+            .simmCalculationType(SimmCalculationType.TOTAL)
+            .build();
+    BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
+    Assert.assertEquals(new BigDecimal("29000000"), amount.setScale(0, RoundingMode.HALF_UP));
+  }
+
+  /**
+   * Required Passes: None
+   * Element Tested: IR Risk Weight with sensitivity subject to SEC rules
+   * Risk Measure: Delta
+   * Group: Rates & Fx
+   * Calculation Mode: Unsegregated
+   */
+  @Test
+  public void testJS1_Unsegregated() {
+    List<Crif> sensitivities = Arrays.asList(SS_IR_64_Unseg, SS_IR_65_Unseg, SS_IR_66_Unseg);
+    SimmpleConfig config = SimmpleConfig.Builder()
+            .calculationCurrency("USD")
+            .holdingPeriod(HoldingPeriod.ONE_DAY)
+            .imRole(ImRole.SECURED)
+            .simmCalculationType(SimmCalculationType.TOTAL)
+            .build();
+    BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
+    Assert.assertEquals(new BigDecimal("72672773"), amount.setScale(0, RoundingMode.HALF_UP));
+  }
+
+
+  /**
+   * Required Passes: None
+   * Element Tested: IR Risk Weight with sensitivity subject to SEC rules
+   * Risk Measure: Delta
+   * Group: Rates & Fx
+   * Calculation Mode: Total
+   */
+  @Test
+  public void testJS1_Total() {
+    List<Crif> sensitivities = Arrays.asList(SS_IR_64, SS_IR_65, SS_IR_66);
+    SimmpleConfig config = SimmpleConfig.Builder()
+            .calculationCurrency("USD")
+            .holdingPeriod(HoldingPeriod.ONE_DAY)
+            .imRole(ImRole.SECURED)
+            .simmCalculationType(SimmCalculationType.TOTAL)
+            .build();
+    BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
+    Assert.assertEquals(new BigDecimal("72672773"), amount.setScale(0, RoundingMode.HALF_UP));
+  }
+
+
+  /**
+   * Required Passes: None
+   * Element Tested: IR Risk Weight with sensitivity subject to SEC rules
+   * Risk Measure: Delta
+   * Group: Rates & Fx
+   * Calculation Mode: Segregated
+   */
+  @Test
+  public void testJS2_Segregated() {
+    List<Crif> sensitivities = Arrays.asList(SS_IR_66_Seg, SS_IR_67_Seg, SS_IR_68);
+    SimmpleConfig config = SimmpleConfig.Builder()
+            .calculationCurrency("USD")
+            .holdingPeriod(HoldingPeriod.ONE_DAY)
+            .imRole(ImRole.SECURED)
+            .simmCalculationType(SimmCalculationType.TOTAL)
+            .build();
+    BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
+    Assert.assertEquals(new BigDecimal("61224302"), amount.setScale(0, RoundingMode.HALF_UP));
+  }
+
+  /**
+   * Required Passes: None
+   * Element Tested: IR Risk Weight with sensitivity subject to SEC rules
+   * Risk Measure: Delta
+   * Group: Rates & Fx
+   * Calculation Mode: Unsegregated
+   */
+  @Test
+  public void testJS2_Unsegregated() {
+    List<Crif> sensitivities = Arrays.asList(SS_IR_66_Unseg, SS_IR_67_Unseg, SS_IR_68);
+    SimmpleConfig config = SimmpleConfig.Builder()
+            .calculationCurrency("USD")
+            .holdingPeriod(HoldingPeriod.ONE_DAY)
+            .imRole(ImRole.SECURED)
+            .simmCalculationType(SimmCalculationType.TOTAL)
+            .build();
+    BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
+    Assert.assertEquals(new BigDecimal("34141060"), amount.setScale(0, RoundingMode.HALF_UP));
+  }
+
+
+  /**
+   * Required Passes: None
+   * Element Tested: IR Risk Weight with sensitivity subject to SEC rules
+   * Risk Measure: Delta
+   * Group: Rates & Fx
+   * Calculation Mode: Total
+   */
+  @Test
+  public void testJS2_Total() {
+    List<Crif> sensitivities = Arrays.asList(SS_IR_66, SS_IR_67, SS_IR_68);
+    SimmpleConfig config = SimmpleConfig.Builder()
+            .calculationCurrency("USD")
+            .holdingPeriod(HoldingPeriod.ONE_DAY)
+            .imRole(ImRole.SECURED)
+            .simmCalculationType(SimmCalculationType.TOTAL)
+            .build();
+    BigDecimal amount = Simmple.calculateWorstOf(sensitivities, config).getImTree().getMargin();
+    Assert.assertEquals(new BigDecimal("61224302"), amount.setScale(0, RoundingMode.HALF_UP));
+  }
+
 }

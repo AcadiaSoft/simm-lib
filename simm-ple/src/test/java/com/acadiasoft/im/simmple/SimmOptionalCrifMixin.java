@@ -56,4 +56,17 @@ public interface SimmOptionalCrifMixin {
   Crif JS_MUL_8 = new DefaultCrif("", "", "", "", "","", "", AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, "Credit", "", "", "", "1.5", "", "", "", "USPR");
   Crif JS_MUL_9 = new DefaultCrif("", "", "", "", "","", "", AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, "RatesFX", "", "", "", "2.5", "", "", "", "JFSA");
 
+  Crif SS_IR_64 = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "3y", "Libor6m", "5000000", FxRate.USD, "5000000", "", "SEC-unseg,USPR");
+  Crif SS_IR_64_Seg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "3y", "Libor6m", "5000000", FxRate.USD, "5000000", "", "USPR");
+  Crif SS_IR_64_Unseg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "3y", "Libor6m", "5000000", FxRate.USD, "5000000", "", "SEC-unseg");
+  Crif SS_IR_65 = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "5y", "Libor6m", "4000000", FxRate.USD, "4000000", "", "SEC-unseg,JFSA");
+  Crif SS_IR_65_Seg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "5y", "Libor6m", "4000000", FxRate.USD, "4000000", "", "JFSA");
+  Crif SS_IR_65_Unseg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "5y", "Libor6m", "4000000", FxRate.USD, "4000000", "", "SEC-unseg");
+  Crif SS_IR_66 = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "5y", "Libor6m", "2500000", FxRate.USD, "2500000", "", "SEC-unseg,ESA");
+  Crif SS_IR_66_Seg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "5y", "Libor6m", "2500000", FxRate.USD, "2500000", "", "ESA");
+  Crif SS_IR_66_Unseg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "5y", "Libor6m", "2500000", FxRate.USD, "2500000", "", "SEC-unseg");
+  Crif SS_IR_67 = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "3y", "Libor6m", "3000000", FxRate.USD, "3000000", "", "SEC-unseg,ESA");
+  Crif SS_IR_67_Seg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "3y", "Libor6m", "3000000", FxRate.USD, "3000000", "", "ESA");
+  Crif SS_IR_67_Unseg = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "3y", "Libor6m", "3000000", FxRate.USD, "3000000", "", "SEC-unseg");
+  Crif SS_IR_68 = new DefaultCrif("", "", "", "", "","SIMM","RatesFX", "Risk_IRCurve", "JPY", "2", "5y", "Libor6m", "4000000", FxRate.USD, "4000000", "", "ESA");
 }
