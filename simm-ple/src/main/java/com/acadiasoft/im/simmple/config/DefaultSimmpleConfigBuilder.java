@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,55 +53,73 @@ public class DefaultSimmpleConfigBuilder implements SimmpleConfigBuilder {
 
   @Override
   public SimmpleConfigBuilder fxRate(FxRate fx) {
-    if (fx != null) { this.fx = fx; }
+    if (fx != null) {
+      this.fx = fx;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder resultCurrency(String resultCurrency) {
-    if (resultCurrency != null) { this.resultCurrency = resultCurrency; }
+    if (resultCurrency != null) {
+      this.resultCurrency = resultCurrency;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder imRole(ImRole role) {
-    if (role != null) { this.imRole = role; }
+    if (role != null) {
+      this.imRole = role;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder simmpleCalculationType(SimmpleCalculationType simmpleCalculationType) {
-    if (simmpleCalculationType != null) { this.simmpleCalculationType = simmpleCalculationType; }
+    if (simmpleCalculationType != null) {
+      this.simmpleCalculationType = simmpleCalculationType;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder scheduleCalculationType(ScheduleCalculationType type) {
-    if (type != null) { this.scheduleCalculationType = type; }
+    if (type != null) {
+      this.scheduleCalculationType = type;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder netGrossRate(BigDecimal ngr) {
-    if (ngr != null) { this.netGrossRate = ngr; }
+    if (ngr != null) {
+      this.netGrossRate = ngr;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder holdingPeriod(HoldingPeriod period) {
-    if (period != null) { this.holdingPeriod = period; }
+    if (period != null) {
+      this.holdingPeriod = period;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder simmCalculationType(SimmCalculationType type) {
-    if (type != null) { this.simmCalculationType = type; }
+    if (type != null) {
+      this.simmCalculationType = type;
+    }
     return this;
   }
 
   @Override
   public SimmpleConfigBuilder calculationCurrency(String calculationCurrency) {
-    if (calculationCurrency != null) { this.calculationCurrency = calculationCurrency; }
+    if (calculationCurrency != null) {
+      this.calculationCurrency = calculationCurrency;
+    }
     return this;
   }
 

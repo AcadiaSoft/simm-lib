@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,8 @@ import java.math.BigDecimal;
 public interface ScheduleNotional extends ScheduleIdentifier, CurrencyAmount {
 
   static ScheduleSensitivity of(ScheduleNotional notional) {
-    return new DefaultScheduleSensitivity(notional.getTradeId(), notional.getProductClass(),
-      ScheduleRiskType.SCHEDULE_NOTIONAL, notional.getValuationDateAsString(), notional.getEndDateAsString(),
-      notional.getAmountAsString(), notional.getAmountCurrency(), notional.getAmountUsdAsString());
+    return new DefaultScheduleSensitivity(notional.getTradeId(), notional.getProductClass(), ScheduleRiskType.SCHEDULE_NOTIONAL, notional.getValuationDateAsString(),
+        notional.getEndDateAsString(), notional.getAmountAsString(), notional.getAmountCurrency(), notional.getAmountUsdAsString());
   }
 
   String BAD_CALL = "Risk type was not 'Notional' as it was expected to be: [%s]";

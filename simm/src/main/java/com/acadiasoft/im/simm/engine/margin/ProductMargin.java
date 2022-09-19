@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 public class ProductMargin extends SiloMargin {
 
+  private static final long serialVersionUID = 1L;
   private static final String LEVEL = "3.Silo";
 
   private ProductMargin(ProductClass productClass, BigDecimal margin, List<GroupMargin> marginByRiskClass) {
@@ -48,12 +49,9 @@ public class ProductMargin extends SiloMargin {
 
   public static ProductMargin calculate(ProductClass product, List<Sensitivity> sensitivities, SimmConfig config) {
     List<RiskMargin> marginByRiskClass = ListUtils.groupBy(sensitivities, SensitivityIdentifier::getRiskIdentifier).entrySet().stream()
-      .map(entry -> RiskMargin.calculate(entry.getKey(), entry.getValue(), config))
-      .collect(Collectors.toList());
+        .map(entry -> RiskMargin.calculate(entry.getKey(), entry.getValue(), config)).collect(Collectors.toList());
     BigDecimal sumSquared = BigDecimalUtils.sumSquared(marginByRiskClass, RiskMargin::getMargin);
-    BigDecimal sumCorrelated = MarginUtils.sumCorrelated(
-      marginByRiskClass, RiskMargin::getMargin, SimmRiskClassCorrelation::get
-    );
+    BigDecimal sumCorrelated = MarginUtils.sumCorrelated(marginByRiskClass, RiskMargin::getMargin, SimmRiskClassCorrelation::get);
     BigDecimal sqrt = BigDecimalUtils.sqrt(sumSquared.add(sumCorrelated));
     return new ProductMargin(product, sqrt, new ArrayList<>(marginByRiskClass));
   }

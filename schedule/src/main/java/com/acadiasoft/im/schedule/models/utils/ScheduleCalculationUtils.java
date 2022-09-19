@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,6 @@ public class ScheduleCalculationUtils {
     return pv -> pv.getPresentValueInUsd(fx).negate();
   }
 
-
   private static Function<SchedulePv, BigDecimal> getInversePvMaxZero(FxRate fx) {
     return pv -> pv.getPresentValueInUsd(fx).negate().max(BigDecimal.ZERO);
   }
@@ -57,14 +56,14 @@ public class ScheduleCalculationUtils {
     // Gross_Replacement_Cost = sum(max(0, -MtM))
     BigDecimal grossReplacementCost = BigDecimalUtils.sum(pvs, getInversePvMaxZero(fx));
     // now calculate the NGR - if the gross cost is zero we default to 1
-    return (grossReplacementCost.setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO))
-      ? BigDecimal.ONE : BigDecimalUtils.divideWithPrecision(netReplacementCost, grossReplacementCost);
+    return (grossReplacementCost.setScale(0, RoundingMode.UP).equals(BigDecimal.ZERO)) ? BigDecimal.ONE
+        : BigDecimalUtils.divideWithPrecision(netReplacementCost, grossReplacementCost);
   }
 
   public static BigDecimal calculateGrossIm(List<ScheduleNotional> notionals, FxRate fx) {
-    return notionals.stream()
-      .map(notional -> notional.getNotionalInUsd(fx).abs())
-      .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return notionals.stream() //
+        .map(notional -> notional.getNotionalInUsd(fx).abs()) //
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
 }

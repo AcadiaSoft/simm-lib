@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@ package com.acadiasoft.im.base.margin;
 import com.acadiasoft.im.base.model.imtree.ImTree;
 import com.acadiasoft.im.base.model.imtree.identifiers.ImModelClass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -34,6 +33,7 @@ import java.util.List;
 
 public abstract class ModelMargin implements ImTree<ImModelClass, SiloMargin> {
 
+  private static final long serialVersionUID = 1L;
   private final static String LEVEL = "2.ImModel";
   private final List<SiloMargin> children = new ArrayList<>();
   private final BigDecimal margin;

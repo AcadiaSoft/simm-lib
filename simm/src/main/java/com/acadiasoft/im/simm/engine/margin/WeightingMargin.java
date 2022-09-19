@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,17 +34,17 @@ import java.util.List;
 
 public class WeightingMargin extends SingleMargin {
 
+  private static final long serialVersionUID = 1L;
   private static final String LEVEL = "7.WeightedSensitivity";
 
   private WeightingMargin(WeightingClass weightingClass, BigDecimal margin) {
     super(LEVEL, weightingClass, margin);
   }
 
-  public static WeightingMargin calculate(WeightingClass weightingClass, List<Sensitivity> sensitivities,
-                                          ConcentrationRiskGroup concentrationRiskClass, SimmConfig config) {
-    BigDecimal nettedAmount = sensitivities.stream()
-      .map(sensitivity -> sensitivity.getAmountUsd(config.fxRate()))
-      .reduce(BigDecimal.ZERO, BigDecimal::add);
+  public static WeightingMargin calculate(WeightingClass weightingClass, List<Sensitivity> sensitivities, ConcentrationRiskGroup concentrationRiskClass, SimmConfig config) {
+    BigDecimal nettedAmount = sensitivities.stream() //
+        .map(sensitivity -> sensitivity.getAmountUsd(config.fxRate())) //
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
     BigDecimal riskWeight = SimmRiskWeight.get(weightingClass.getSensitivityClass(), weightingClass, config);
     BigDecimal concentrationRisk = concentrationRiskClass.getConcentrationRisk();
     return new WeightingMargin(weightingClass, riskWeight.multiply(nettedAmount).multiply(concentrationRisk));

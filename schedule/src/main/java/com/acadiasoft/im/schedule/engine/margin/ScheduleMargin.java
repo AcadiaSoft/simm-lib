@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,25 +45,26 @@ import java.util.stream.Collectors;
  */
 public class ScheduleMargin extends ModelMargin {
 
+  private static final long serialVersionUID = 1L;
+
   private ScheduleMargin(BigDecimal margin, List<SiloMargin> children) {
     super(ImModelClass.SCHEDULE, margin, children);
   }
 
   public static ScheduleMargin calculate(List<ScheduleSensitivity> sensitivities, ScheduleConfig config) {
     List<ScheduleProductMargin> products = ListUtils.groupBy(sensitivities, ScheduleIdentifier::getScheduleProductClass).entrySet().stream()
-      .map(entry -> ScheduleProductMargin.calculate(entry.getKey(), entry.getValue(), config))
-      .collect(Collectors.toList());
-    List<ScheduleNotional> notionals = products.stream()
-      .map(ScheduleProductMargin::getNettedTrades)
-      .flatMap(Collection::stream)
-      .map(ScheduleTradeMargin::getNettedNotional)
-      .collect(Collectors.toList());
+        .map(entry -> ScheduleProductMargin.calculate(entry.getKey(), entry.getValue(), config)).collect(Collectors.toList());
+    List<ScheduleNotional> notionals = products.stream() //
+        .map(ScheduleProductMargin::getNettedTrades) //
+        .flatMap(Collection::stream) //
+        .map(ScheduleTradeMargin::getNettedNotional) //
+        .collect(Collectors.toList());
     BigDecimal grossIm = ScheduleCalculationUtils.calculateGrossIm(notionals, config.fxRate());
-    List<SchedulePv> pvs = products.stream()
-      .map(ScheduleProductMargin::getNettedTrades)
-      .flatMap(Collection::stream)
-      .map(ScheduleTradeMargin::getNettedPv)
-      .collect(Collectors.toList());
+    List<SchedulePv> pvs = products.stream() //
+        .map(ScheduleProductMargin::getNettedTrades) //
+        .flatMap(Collection::stream) //
+        .map(ScheduleTradeMargin::getNettedPv) //
+        .collect(Collectors.toList());
     BigDecimal ngr = (config.useConfiguredNgr()) ? config.netGrossRate() : ScheduleCalculationUtils.calculateNgr(pvs, config.fxRate());
     return new ScheduleMargin(ScheduleCalculationUtils.calculateMargin(grossIm, ngr), new ArrayList<>(products));
   }

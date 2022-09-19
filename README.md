@@ -1,7 +1,7 @@
 # Simm-Lib
 
-Simm-Lib is an implementation of version 2.4 of the value at risk Standard Initial
-Margin Model ([SIMM™ 2.4](https://www2.isda.org/functional-areas/wgmr-implementation/))
+Simm-Lib is an implementation of version 2.5 of the value at risk Standard Initial
+Margin Model ([SIMM™ 2.5](https://www2.isda.org/functional-areas/wgmr-implementation/))
 developed by ISDA, see [here](https://www.isda.org/category/margin/isda-simm/) for methodology specifications.
 It has been built to be compatible with the Common
 Risk Interchange Format (CRIF) and it's correlation parameters and risk
@@ -18,10 +18,10 @@ calculate initial margin for their or their clients’ non-cleared
 derivatives transactions. Please contact isdalegal@isda.org for more
 information on licensing the ISDA SIMM™.
 
-### Updates: 2021-09-27
-- SIMM v2.4 - including new FX currency volatility changes
-- Passing one-day benchmarks for version 2.4 including optional tests under Simmple module
-- Passing ten-day benchmarks for version 2.4 including optional tests under Simmple module
+### Updates: 2022-09-12
+- SIMM v2.5 - full recalibration and industry backtesting of the methodology 
+- Passing one-day benchmarks for version 2.5 including optional tests under Simmple module, checking acorss multiple applicable regulations, as well as Segregated and Unsegregated modes
+- Passing ten-day benchmarks for version 2.5 including optional tests under Simmple module, checking acorss multiple applicable regulations, as well as Segregated and Unsegregated modes
 
 ## Getting Started
 Simm-Lib is built with Apache Maven, so one must get Maven

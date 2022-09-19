@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ public class CurvatureSensitivityUtils {
 
   // Curvature scaling suffixes
   private static final String TENOR_SUFFIX_WEEKS = "w";
+
   private static final String TENOR_SUFFIX_MONTHS = "m";
   private static final String TENOR_SUFFIX_YEARS = "y";
 
@@ -60,14 +61,14 @@ public class CurvatureSensitivityUtils {
   };
 
   public static List<Sensitivity> makeAndScaleCurvatures(List<Sensitivity> sensitivities, SimmConfig config) {
-    return sensitivities.stream()
-      .filter(FILTER_EQUITY_VOL_BUCKET_12)
-      .map(sensitivity -> Sensitivity.curvatureFromVega(sensitivity, config))
-      .map(sensitivity -> {
-        BigDecimal scalingFactor = getScalingFunction(sensitivity.getLabel1(), config);
-        BigDecimal scaledAmountUsd = sensitivity.getAmountUsd(config.fxRate()).multiply(scalingFactor);
-        return Sensitivity.fromIdentifier(sensitivity, scaledAmountUsd);
-      }).collect(Collectors.toList());
+    return sensitivities.stream() //
+        .filter(FILTER_EQUITY_VOL_BUCKET_12) //
+        .map(sensitivity -> Sensitivity.curvatureFromVega(sensitivity, config)) //
+        .map(sensitivity -> { //
+          BigDecimal scalingFactor = getScalingFunction(sensitivity.getLabel1(), config);
+          BigDecimal scaledAmountUsd = sensitivity.getAmountUsd(config.fxRate()).multiply(scalingFactor);
+          return Sensitivity.fromIdentifier(sensitivity, scaledAmountUsd);
+        }).collect(Collectors.toList());
   }
 
   private static BigDecimal getNumberOfDays(String expiry) {

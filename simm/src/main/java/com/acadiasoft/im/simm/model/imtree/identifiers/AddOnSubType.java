@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,9 @@ import java.util.stream.Stream;
 
 public enum AddOnSubType implements MarginIdentifier {
 
-  FIXED_AMOUNT("AddOnFixed"),
-  NOTIONAL("AddOnNotional"),
-  NOTIONAL_FACTOR("AddOnFactor"),
+  FIXED_AMOUNT("AddOnFixed"), //
+  NOTIONAL("AddOnNotional"), //
+  NOTIONAL_FACTOR("AddOnFactor"), //
   PRODUCT_MULTIPLIER("AddOnMultiplier");
 
   // ADD ON PARAMETER'S RISK TYPES
@@ -40,8 +40,8 @@ public enum AddOnSubType implements MarginIdentifier {
   public static final String ADD_ON_NOTIONAL = "Notional";
   public static final String ADD_ON_NOTIONAL_FACTOR = "Param_AddOnNotionalFactor";
   public static final String ADD_ON_PRODUCT_MULTIPLIER = "Param_ProductClassMultiplier";
-  public static final Supplier<Stream<String>> ADD_ON_TYPES_LIST = () -> Stream.of(
-      ADD_ON_FIXED_AMOUNT, ADD_ON_NOTIONAL, ADD_ON_NOTIONAL_FACTOR, ADD_ON_PRODUCT_MULTIPLIER
+  public static final Supplier<Stream<String>> ADD_ON_TYPES_LIST = () -> Stream.of( //
+      ADD_ON_FIXED_AMOUNT, ADD_ON_NOTIONAL, ADD_ON_NOTIONAL_FACTOR, ADD_ON_PRODUCT_MULTIPLIER //
   );
 
   private String label;
@@ -56,7 +56,9 @@ public enum AddOnSubType implements MarginIdentifier {
   }
 
   public static boolean isAddOnSubType(String riskType) {
-    if (riskType == null) { return false; }
+    if (riskType == null) {
+      return false;
+    }
     return ADD_ON_TYPES_LIST.get().anyMatch(riskType::equalsIgnoreCase);
   }
 

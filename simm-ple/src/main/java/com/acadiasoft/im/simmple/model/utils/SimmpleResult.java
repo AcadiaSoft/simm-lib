@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,13 +34,17 @@ import java.io.Serializable;
 /**
  *
  * @author alec.stewart
+ * @author joe.peterson
+ *
  */
 public class SimmpleResult implements Serializable {
 
+  private static final long serialVersionUID = 1L;
   private final String regulator;
   private final String currency;
   private final ConversionImTree tree;
 
+  @SuppressWarnings("rawtypes")
   public SimmpleResult(ImTree<? extends MarginIdentifier, ? extends ImTree> tree, String regulator, SimmpleConfig config) {
     this.tree = new ConversionImTree(tree).convert(config.imRole(), config.fxRate(), FxRate.USD, config.resultCurrency());
     this.regulator = regulator;

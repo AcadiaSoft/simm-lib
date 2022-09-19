@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,20 +28,24 @@ import com.acadiasoft.im.simm.model.param.SimmSensitivityCorrelationBaseCorr;
 
 import java.math.BigDecimal;
 
+/**
+ * @author joe.peterson
+ *
+ */
 public class BaseCorrRisk implements SimmRiskWeightBaseCorr, SimmSensitivityCorrelationBaseCorr {
 
   @Override
   public BigDecimal getRiskWeight(WeightingClass w) {
     // currently only one org.acadiasoft.simm.model.risk weight for base corr but the method is here
     // to handle a more complex weighting system if necessary
-    return new BigDecimal("11");
+    return new BigDecimal("10");
   }
 
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass r, WeightingClass s) {
     // currently only one value for correlation but method is here if
     // base corr gets updated to org.acadiasoft.simm.model.sensitivity dependent correlations
-    return new BigDecimal("0.25");
+    return new BigDecimal("0.24");
   }
 
 }

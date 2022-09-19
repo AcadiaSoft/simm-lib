@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@ public interface CurrencyAmount {
 
   /**
    *
-   * @return the currency that the value is associated with
-   *  this currency should be a standard three character currency code
+   * @return the currency that the value is associated with this currency should be a standard three character currency
+   *         code
    */
   String getAmountCurrency();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 
 public class ConcentrationRiskGroup implements Serializable {
 
+  private static final long serialVersionUID = 1L;
+
   public static final BigDecimal MM = new BigDecimal("1000000");
 
   private final SensitivityIdentifier identifier;
@@ -69,18 +71,18 @@ public class ConcentrationRiskGroup implements Serializable {
 
   /**
    *
-   * @param concentrationGroup list of sensitivities all belonging to the same concentration class
+   * @param concentrationGroup
+   *          list of sensitivities all belonging to the same concentration class
    * @return concentration class of the input sensitivities
    */
-  public static ConcentrationRiskGroup build(SensitivityIdentifier id, String thresholdIdentifier,
-                                             List<Sensitivity> concentrationGroup, SimmConfig config) {
+  public static ConcentrationRiskGroup build(SensitivityIdentifier id, String thresholdIdentifier, List<Sensitivity> concentrationGroup, SimmConfig config) {
     if (config.enableConcentrationThreshold()) {
       // we need to remove Xccy Basis sensitivities from this sum
       // base corr sensitivities need to be removed as well, but we filter those out of other sensitivities earlier on
       if (id.getRiskIdentifier().equals(RiskClass.INTEREST_RATE)) {
-        concentrationGroup = concentrationGroup.stream()
-          .filter(s -> !StringUtils.equalsIgnoreCase(s.getRiskType(), RiskClass.RISK_TYPE_XCCY_BASIS))
-          .collect(Collectors.toList());
+        concentrationGroup = concentrationGroup.stream() //
+            .filter(s -> !StringUtils.equalsIgnoreCase(s.getRiskType(), RiskClass.RISK_TYPE_XCCY_BASIS)) //
+            .collect(Collectors.toList());
       }
 
       BigDecimal absSum = BigDecimalUtils.sum(concentrationGroup, s -> s.getAmountUsd(config.fxRate())).abs();
@@ -92,8 +94,7 @@ public class ConcentrationRiskGroup implements Serializable {
     }
   }
 
-  public static ConcentrationRiskGroup findConcentrationClass(SensitivityIdentifier identifier,
-                                                              Map<SensitivityIdentifier, ConcentrationRiskGroup> mapByIdentifier) {
+  public static ConcentrationRiskGroup findConcentrationClass(SensitivityIdentifier identifier, Map<SensitivityIdentifier, ConcentrationRiskGroup> mapByIdentifier) {
     if (mapByIdentifier.containsKey(identifier)) {
       return mapByIdentifier.get(identifier);
     } else {

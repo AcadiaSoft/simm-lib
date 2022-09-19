@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,13 +34,12 @@ public interface Notional extends CurrencyAmount {
   String getNotionalProduct();
 
   public static Sensitivity of(String product, String amount, String amountCurrency, String amountUsd) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL, product,
-      null, null, null, amount, amountCurrency, amountUsd);
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL, product, null, null, null, amount, amountCurrency, amountUsd);
   }
 
   public static Sensitivity of(Notional notional) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL, notional.getNotionalProduct(),
-      null, null, null, notional.getAmountAsString(), notional.getAmountCurrency(), notional.getAmountUsdAsString());
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL, notional.getNotionalProduct(), null, null, null, notional.getAmountAsString(), notional.getAmountCurrency(),
+        notional.getAmountUsdAsString());
   }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,13 +32,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * As defined in Appendix 1 section D of doc/ISDA-SIMM-2.0.pdf
+ * @author joe.peterson
+ *
  */
 public class InterestRateRiskWeight1d implements SimmRiskWeight {
 
-  private static final BigDecimal VEGA = new BigDecimal("0.046");
   private static final BigDecimal INFLATION = new BigDecimal("15");
-  private static final BigDecimal XCCY = new BigDecimal("5.6");
+  private static final BigDecimal XCCY = new BigDecimal("5.9");
+  private static final BigDecimal VEGA = new BigDecimal("0.047");
 
   private static final Map<InterestRateCurrencyVolatility, Map<InterestRateTenor, BigDecimal>> WEIGHTS = new HashMap<>();
   private static final Map<InterestRateTenor, BigDecimal> HIGH = new HashMap<>();
@@ -46,46 +47,46 @@ public class InterestRateRiskWeight1d implements SimmRiskWeight {
   private static final Map<InterestRateTenor, BigDecimal> REGULAR = new HashMap<>();
 
   static {
-    REGULAR.put(InterestRateTenor._2W,   new BigDecimal("18"));
-    REGULAR.put(InterestRateTenor._1M,   new BigDecimal("15"));
-    REGULAR.put(InterestRateTenor._3M,   new BigDecimal("12"));
-    REGULAR.put(InterestRateTenor._6M,   new BigDecimal("12"));
-    REGULAR.put(InterestRateTenor._1YR,  new BigDecimal("13"));
-    REGULAR.put(InterestRateTenor._2YR,  new BigDecimal("15"));
-    REGULAR.put(InterestRateTenor._3YR,  new BigDecimal("16"));
-    REGULAR.put(InterestRateTenor._5YR,  new BigDecimal("16"));
-    REGULAR.put(InterestRateTenor._10YR, new BigDecimal("16"));
-    REGULAR.put(InterestRateTenor._15YR, new BigDecimal("17"));
-    REGULAR.put(InterestRateTenor._20YR, new BigDecimal("16"));
-    REGULAR.put(InterestRateTenor._30YR, new BigDecimal("17"));
+    REGULAR.put(InterestRateTenor._2W, new BigDecimal("19"));
+    REGULAR.put(InterestRateTenor._1M, new BigDecimal("16"));
+    REGULAR.put(InterestRateTenor._3M, new BigDecimal("12"));
+    REGULAR.put(InterestRateTenor._6M, new BigDecimal("12"));
+    REGULAR.put(InterestRateTenor._1Y, new BigDecimal("13"));
+    REGULAR.put(InterestRateTenor._2Y, new BigDecimal("16"));
+    REGULAR.put(InterestRateTenor._3Y, new BigDecimal("16"));
+    REGULAR.put(InterestRateTenor._5Y, new BigDecimal("16"));
+    REGULAR.put(InterestRateTenor._10Y, new BigDecimal("16"));
+    REGULAR.put(InterestRateTenor._15Y, new BigDecimal("17"));
+    REGULAR.put(InterestRateTenor._20Y, new BigDecimal("16"));
+    REGULAR.put(InterestRateTenor._30Y, new BigDecimal("17"));
     WEIGHTS.put(InterestRateCurrencyVolatility.REGULAR, REGULAR);
 
-    LOW.put(InterestRateTenor._2W,   new BigDecimal("1.7"));  
-    LOW.put(InterestRateTenor._1M,   new BigDecimal("3.4"));
-    LOW.put(InterestRateTenor._3M,   new BigDecimal("1.6"));
-    LOW.put(InterestRateTenor._6M,   new BigDecimal("2"));
-    LOW.put(InterestRateTenor._1YR,  new BigDecimal("3"));
-    LOW.put(InterestRateTenor._2YR,  new BigDecimal("4.8"));
-    LOW.put(InterestRateTenor._3YR,  new BigDecimal("5.8"));
-    LOW.put(InterestRateTenor._5YR,  new BigDecimal("6.8"));
-    LOW.put(InterestRateTenor._10YR, new BigDecimal("6.5"));
-    LOW.put(InterestRateTenor._15YR, new BigDecimal("7"));
-    LOW.put(InterestRateTenor._20YR, new BigDecimal("7.5"));
-    LOW.put(InterestRateTenor._30YR, new BigDecimal("8.3"));
+    LOW.put(InterestRateTenor._2W, new BigDecimal("1.7"));
+    LOW.put(InterestRateTenor._1M, new BigDecimal("3.4"));
+    LOW.put(InterestRateTenor._3M, new BigDecimal("1.8"));
+    LOW.put(InterestRateTenor._6M, new BigDecimal("2.0"));
+    LOW.put(InterestRateTenor._1Y, new BigDecimal("3.3"));
+    LOW.put(InterestRateTenor._2Y, new BigDecimal("4.8"));
+    LOW.put(InterestRateTenor._3Y, new BigDecimal("5.8"));
+    LOW.put(InterestRateTenor._5Y, new BigDecimal("6.8"));
+    LOW.put(InterestRateTenor._10Y, new BigDecimal("6.5"));
+    LOW.put(InterestRateTenor._15Y, new BigDecimal("7.0"));
+    LOW.put(InterestRateTenor._20Y, new BigDecimal("7.5"));
+    LOW.put(InterestRateTenor._30Y, new BigDecimal("8.3"));
     WEIGHTS.put(InterestRateCurrencyVolatility.LOW_VOLATILITY, LOW);
 
-    HIGH.put(InterestRateTenor._2W,   new BigDecimal("36"));
-    HIGH.put(InterestRateTenor._1M,   new BigDecimal("27"));
-    HIGH.put(InterestRateTenor._3M,   new BigDecimal("16"));
-    HIGH.put(InterestRateTenor._6M,   new BigDecimal("19"));
-    HIGH.put(InterestRateTenor._1YR,  new BigDecimal("23"));
-    HIGH.put(InterestRateTenor._2YR,  new BigDecimal("23"));
-    HIGH.put(InterestRateTenor._3YR,  new BigDecimal("32"));
-    HIGH.put(InterestRateTenor._5YR,  new BigDecimal("31"));
-    HIGH.put(InterestRateTenor._10YR, new BigDecimal("32"));
-    HIGH.put(InterestRateTenor._15YR, new BigDecimal("30"));
-    HIGH.put(InterestRateTenor._20YR, new BigDecimal("32"));
-    HIGH.put(InterestRateTenor._30YR, new BigDecimal("27"));
+    HIGH.put(InterestRateTenor._2W, new BigDecimal("49"));
+    HIGH.put(InterestRateTenor._1M, new BigDecimal("24"));
+    HIGH.put(InterestRateTenor._3M, new BigDecimal("16"));
+    HIGH.put(InterestRateTenor._6M, new BigDecimal("20"));
+    HIGH.put(InterestRateTenor._1Y, new BigDecimal("23"));
+    HIGH.put(InterestRateTenor._2Y, new BigDecimal("23"));
+    HIGH.put(InterestRateTenor._3Y, new BigDecimal("33"));
+    HIGH.put(InterestRateTenor._5Y, new BigDecimal("31"));
+    HIGH.put(InterestRateTenor._10Y, new BigDecimal("34"));
+    HIGH.put(InterestRateTenor._15Y, new BigDecimal("33"));
+    HIGH.put(InterestRateTenor._20Y, new BigDecimal("33"));
+    HIGH.put(InterestRateTenor._30Y, new BigDecimal("27"));
     WEIGHTS.put(InterestRateCurrencyVolatility.HIGH_VOLATILITY, HIGH);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import java.util.Objects;
 
 public class DefaultSensitivityIdentifier extends SingleClass implements SensitivityIdentifier {
 
+  private static final long serialVersionUID = 1L;
   private static final String CALLED_SENSI_CLASS_FOR_ADD_ON = "Called for sensitivity class identifier when the sensitivity was an add on type: [%s]";
   private static final String CALLED_RISK_TYPE_FOR_ADD_ON = "Called for risk class identifier when the sensitivity was an add on type: [%s]";
 
@@ -150,8 +151,8 @@ public class DefaultSensitivityIdentifier extends SingleClass implements Sensiti
     this.riskClass = id.getRiskIdentifier();
   }
 
-  public DefaultSensitivityIdentifier(String tradeId, String productClass, String riskType, String qualifier, String bucket,
-                                      String label1, String label2, SensitivityClass sensitivityClass, RiskClass riskClass) {
+  public DefaultSensitivityIdentifier(String tradeId, String productClass, String riskType, String qualifier, String bucket, String label1, String label2,
+      SensitivityClass sensitivityClass, RiskClass riskClass) {
     super(qualifier);
     this.tradeId = tradeId;
     this.productClass = productClass;
@@ -181,8 +182,8 @@ public class DefaultSensitivityIdentifier extends SingleClass implements Sensiti
 
   @Override
   public String getQualifier() {
-    if (isSimmStandard() && riskClass.equals(RiskClass.FX)
-      && (sensitivityClass.equals(SensitivityClass.VEGA) || sensitivityClass.equals(SensitivityClass.CURVATURE))) {
+    if (isSimmStandard() && riskClass.equals(RiskClass.FX) //
+        && (sensitivityClass.equals(SensitivityClass.VEGA) || sensitivityClass.equals(SensitivityClass.CURVATURE))) {
       return normalizeFxVegaQualifier(qualifier);
     } else {
       return qualifier;
@@ -228,15 +229,15 @@ public class DefaultSensitivityIdentifier extends SingleClass implements Sensiti
       return false;
     } else {
       SensitivityIdentifier other = (SensitivityIdentifier) obj;
-      return StringUtils.equalsIgnoreCase(tradeId, other.getTradeId())
-        && StringUtils.equalsIgnoreCase(productClass, other.getProductClass())
-        && StringUtils.equalsIgnoreCase(riskType, other.getRiskType())
-        && StringUtils.equalsIgnoreCase(qualifier, other.getQualifier())
-        && StringUtils.equalsIgnoreCase(bucket, other.getBucket())
-        && StringUtils.equalsIgnoreCase(label1, other.getLabel1())
-        && StringUtils.equalsIgnoreCase(label2, other.getLabel2())
-        && Objects.equals(sensitivityClass, other.getSensitivityClass())
-        && Objects.equals(riskClass, other.getRiskIdentifier());
+      return StringUtils.equalsIgnoreCase(tradeId, other.getTradeId()) //
+          && StringUtils.equalsIgnoreCase(productClass, other.getProductClass()) //
+          && StringUtils.equalsIgnoreCase(riskType, other.getRiskType()) //
+          && StringUtils.equalsIgnoreCase(qualifier, other.getQualifier()) //
+          && StringUtils.equalsIgnoreCase(bucket, other.getBucket()) //
+          && StringUtils.equalsIgnoreCase(label1, other.getLabel1()) //
+          && StringUtils.equalsIgnoreCase(label2, other.getLabel2()) //
+          && Objects.equals(sensitivityClass, other.getSensitivityClass()) //
+          && Objects.equals(riskClass, other.getRiskIdentifier());
     }
   }
 
@@ -252,7 +253,6 @@ public class DefaultSensitivityIdentifier extends SingleClass implements Sensiti
 
   @Override
   public String toString() {
-    return String.format(TO_STRING, tradeId, productClass, riskClass, riskType,
-      qualifier, bucket, label1, label2, sensitivityClass);
+    return String.format(TO_STRING, tradeId, productClass, riskClass, riskType, qualifier, bucket, label1, label2, sensitivityClass);
   }
 }

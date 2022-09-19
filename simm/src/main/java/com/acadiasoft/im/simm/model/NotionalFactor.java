@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,13 +40,11 @@ public interface NotionalFactor extends Serializable, ValueAmount {
   String getNotionalProduct();
 
   public static Sensitivity of(String productClass, String amount) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL_FACTOR, productClass,
-      null, null, null, amount, null, null);
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL_FACTOR, productClass, null, null, null, amount, null, null);
   }
 
   public static Sensitivity of(NotionalFactor factor) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL_FACTOR, factor.getNotionalProduct(),
-      null, null, null, factor.getAmountAsString(), null, null);
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_NOTIONAL_FACTOR, factor.getNotionalProduct(), null, null, null, factor.getAmountAsString(), null, null);
   }
 
   default BigDecimal getPercentFactor() {

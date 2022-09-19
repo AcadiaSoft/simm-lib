@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,8 @@
 
 package com.acadiasoft.im.schedule.engine.margin;
 
+import static com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleTradeClass.determineWeightingClass;
+
 import com.acadiasoft.im.base.margin.SiloMargin;
 import com.acadiasoft.im.base.util.ListUtils;
 import com.acadiasoft.im.schedule.config.ScheduleConfig;
@@ -30,7 +32,6 @@ import com.acadiasoft.im.schedule.models.ScheduleNotional;
 import com.acadiasoft.im.schedule.models.SchedulePv;
 import com.acadiasoft.im.schedule.models.ScheduleSensitivity;
 import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass;
-import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleTradeClass;
 import com.acadiasoft.im.schedule.models.utils.ScheduleCalculationUtils;
 
 import java.math.BigDecimal;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 
 public class ScheduleProductMargin extends SiloMargin {
 
+  private static final long serialVersionUID = 1L;
   private static final String LEVEL = "3.Silo";
   private final List<ScheduleTradeMargin> nettedTrades;
 
@@ -51,8 +53,8 @@ public class ScheduleProductMargin extends SiloMargin {
 
   public static ScheduleProductMargin calculate(ScheduleProductClass productClass, List<ScheduleSensitivity> sensitivities, ScheduleConfig config) {
     List<ScheduleTradeMargin> trades = ListUtils.groupBy(sensitivities, ScheduleIdentifier::getScheduleTradeIdentifier).entrySet().stream()
-      .map(entry -> ScheduleTradeMargin.calculate(ScheduleTradeClass.determineWeightingClass(entry.getKey()), entry.getValue(), config))
-      .collect(Collectors.toList());
+        .map(entry -> ScheduleTradeMargin.calculate(determineWeightingClass(entry.getKey()), entry.getValue(), config))//
+        .collect(Collectors.toList());
     List<ScheduleNotional> notionals = trades.stream().map(ScheduleTradeMargin::getNettedNotional).collect(Collectors.toList());
     BigDecimal grossIm = ScheduleCalculationUtils.calculateGrossIm(notionals, config.fxRate());
     List<SchedulePv> pvs = trades.stream().map(ScheduleTradeMargin::getNettedPv).collect(Collectors.toList());

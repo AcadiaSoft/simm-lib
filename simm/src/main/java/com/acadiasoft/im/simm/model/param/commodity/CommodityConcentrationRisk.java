@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by alec.stewart on 8/8/17.
+ * @author joe.peterson
+ *
  */
 public class CommodityConcentrationRisk implements SimmConcentrationThreshold {
 
@@ -58,23 +59,23 @@ public class CommodityConcentrationRisk implements SimmConcentrationThreshold {
     DELTA_THRESHOLD.put(NATURAL_GAS, new BigDecimal("3200").multiply(ConcentrationRiskGroup.MM));
     DELTA_THRESHOLD.put(POWER, new BigDecimal("2700").multiply(ConcentrationRiskGroup.MM));
     DELTA_THRESHOLD.put(FREIGHT, new BigDecimal("52").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(BASE_METALS, new BigDecimal("600").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(BASE_METALS, new BigDecimal("530").multiply(ConcentrationRiskGroup.MM));
     DELTA_THRESHOLD.put(PRECIOUS_METALS, new BigDecimal("1600").multiply(ConcentrationRiskGroup.MM));
     DELTA_THRESHOLD.put(AGRICULTURE, new BigDecimal("100").multiply(ConcentrationRiskGroup.MM));
     DELTA_THRESHOLD.put(OTHER, new BigDecimal("52").multiply(ConcentrationRiskGroup.MM));
     DELTA_THRESHOLD.put(INDEXES, new BigDecimal("4000").multiply(ConcentrationRiskGroup.MM));
-
-    VEGA_THRESHOLD.put(COAL, new BigDecimal("160").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(CRUDE_OIL, new BigDecimal("2600").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(OIL_FRACTIONS, new BigDecimal("280").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(NATURAL_GAS, new BigDecimal("3500").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(POWER, new BigDecimal("750").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(FREIGHT, new BigDecimal("89").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(BASE_METALS, new BigDecimal("340").multiply(ConcentrationRiskGroup.MM));
+    
+    VEGA_THRESHOLD.put(COAL, new BigDecimal("210").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(CRUDE_OIL, new BigDecimal("2700").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(OIL_FRACTIONS, new BigDecimal("290").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(NATURAL_GAS, new BigDecimal("5000").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(POWER, new BigDecimal("920").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(FREIGHT, new BigDecimal("100").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(BASE_METALS, new BigDecimal("350").multiply(ConcentrationRiskGroup.MM));
     VEGA_THRESHOLD.put(PRECIOUS_METALS, new BigDecimal("720").multiply(ConcentrationRiskGroup.MM));
     VEGA_THRESHOLD.put(AGRICULTURE, new BigDecimal("500").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(OTHER, new BigDecimal("63").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(INDEXES, new BigDecimal("63").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(OTHER, new BigDecimal("65").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(INDEXES, new BigDecimal("65").multiply(ConcentrationRiskGroup.MM));
   }
 
   @Override
@@ -88,9 +89,9 @@ public class CommodityConcentrationRisk implements SimmConcentrationThreshold {
   }
 
   private List<String> determineGroup(String bucket) {
-    if (bucket.equals("1")) {
+    if (COAL.contains(bucket)) {
       return COAL;
-    } else if (bucket.equals("2")) {
+    } else if (CRUDE_OIL.contains(bucket)) {
       return CRUDE_OIL;
     } else if (OIL_FRACTIONS.contains(bucket)) {
       return OIL_FRACTIONS;
@@ -98,17 +99,17 @@ public class CommodityConcentrationRisk implements SimmConcentrationThreshold {
       return NATURAL_GAS;
     } else if (POWER.contains(bucket)) {
       return POWER;
-    } else if (bucket.equals("10")) {
+    } else if (FREIGHT.contains(bucket)) {
       return FREIGHT;
-    } else if (bucket.equals("11")) {
+    } else if (BASE_METALS.contains(bucket)) {
       return BASE_METALS;
-    } else if (bucket.equals("12")) {
+    } else if (PRECIOUS_METALS.contains(bucket)) {
       return PRECIOUS_METALS;
     } else if (AGRICULTURE.contains(bucket)) {
       return AGRICULTURE;
-    } else if (bucket.equals("16")) {
+    } else if (OTHER.contains(bucket)) {
       return OTHER;
-    } else if (bucket.equals("17")) {
+    } else if (INDEXES.contains(bucket)) {
       return INDEXES;
     } else {
       throw new RuntimeException("found bucket not in groups: " + bucket);

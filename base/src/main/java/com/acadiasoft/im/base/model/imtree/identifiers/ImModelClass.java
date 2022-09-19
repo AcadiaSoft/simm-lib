@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public enum ImModelClass implements MarginIdentifier {
 
-  SIMM("SIMM-P"),
-  SCHEDULE("Schedule");
+  SIMM("SIMM-P"), SCHEDULE("Schedule");
 
   private final static String SIMM1 = "SIMM-P";
   private final static String SIMM2 = "SIMM";

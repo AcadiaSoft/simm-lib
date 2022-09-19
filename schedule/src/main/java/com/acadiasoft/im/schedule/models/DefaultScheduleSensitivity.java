@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 
 public class DefaultScheduleSensitivity extends DefaultScheduleIdentifier implements ScheduleSensitivity {
 
+  private static final long serialVersionUID = 1L;
   private final String tradeNotional;
   private final String tradeCurrency;
   private final String amount;
@@ -52,8 +53,8 @@ public class DefaultScheduleSensitivity extends DefaultScheduleIdentifier implem
     this.tradeCurrency = tradeCurrency;
   }
 
-  public DefaultScheduleSensitivity(String tradeId, String productClass, String riskType, String valuationDate, String endDate,
-                                    String amount, String amountCurrency, String amountUsd) {
+  public DefaultScheduleSensitivity(String tradeId, String productClass, String riskType, String valuationDate, String endDate, String amount, String amountCurrency,
+      String amountUsd) {
     // set up the identifier and check to make sure values are valid
     super(tradeId, productClass, riskType, valuationDate, endDate);
     checkScheduleIdentifier(tradeId, productClass, riskType, valuationDate, endDate);
@@ -67,8 +68,8 @@ public class DefaultScheduleSensitivity extends DefaultScheduleIdentifier implem
     this.tradeCurrency = null;
   }
 
-  public DefaultScheduleSensitivity(String tradeId, String tradeNotional, String tradeCurrency, String productClass, String riskType,
-                                    String valuationDate, String endDate, String amount, String amountCurrency, String amountUsd) {
+  public DefaultScheduleSensitivity(String tradeId, String tradeNotional, String tradeCurrency, String productClass, String riskType, String valuationDate, String endDate,
+      String amount, String amountCurrency, String amountUsd) {
     // set up the identifier and check to make sure values are valid
     super(tradeId, productClass, riskType, valuationDate, endDate);
     checkScheduleIdentifier(tradeId, productClass, riskType, valuationDate, endDate);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
 
 package com.acadiasoft.im.simmple.model.utils;
 
-
 import com.acadiasoft.im.base.fx.FxRate;
 import com.acadiasoft.im.base.model.imtree.ImTree;
 import com.acadiasoft.im.base.model.imtree.MarginIdentifier;
@@ -42,43 +41,48 @@ import java.util.stream.Collectors;
  * Swaps sign and currency of the input ImTree object
  *
  * @author alec.stewart
+ * @author joe.peterson
  *
  */
 public class ConversionImTree implements ImTree<BasicIdentifier, ConversionImTree> {
 
+  private static final long serialVersionUID = 1L;
   private final String level;
   private final BigDecimal margin;
   private final String identifier;
   private final List<ConversionImTree> children;
 
   @JsonCreator
-  public ConversionImTree(@JsonProperty("level") String level, @JsonProperty("label") String label,
-                     @JsonProperty("margin") BigDecimal margin, @JsonProperty("children") List<ConversionImTree> children) {
+  public ConversionImTree(@JsonProperty("level") String level, @JsonProperty("label") String label, @JsonProperty("margin") BigDecimal margin,
+      @JsonProperty("children") List<ConversionImTree> children) {
     this.level = level;
     this.margin = margin;
     this.identifier = label;
     this.children = new ArrayList<>(children);
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public ConversionImTree(ImTree<? extends MarginIdentifier, ? extends ImTree> tree) {
     this.level = tree.getTreeLevel();
     this.margin = tree.getMargin();
     this.identifier = tree.getMarginIdentifier().getMarginIdentifier();
     this.children = tree.getChildren().stream()
-      // FIXME: why does compiler require this cast??? should be redundant...
-      .map(t -> new ConversionImTree((ImTree<MarginIdentifier, ImTree>) t))
-      .collect(Collectors.toList());
+
+        .map(t -> new ConversionImTree((ImTree<MarginIdentifier, ImTree>) t)) //
+        .collect(Collectors.toList());
   }
 
   public ConversionImTree convert(ImRole role, FxRate fx, String from, String to) {
-    List<ConversionImTree> newChildren = this.getChildren().stream()
-      .map(c -> c.convert(role, fx, from, to))
-      .collect(Collectors.toList());
+    List<ConversionImTree> newChildren = this.getChildren().stream() //
+        .map(c -> c.convert(role, fx, from, to)) //
+        .collect(Collectors.toList());
     BigDecimal convertedMargin = fx.convert(this.getMargin(), from, to).abs();
-    if (role.equals(ImRole.PLEDGOR)) convertedMargin = convertedMargin.negate(); // we want to display pledgor im as negative
+    if (role.equals(ImRole.PLEDGOR))
+      convertedMargin = convertedMargin.negate(); // we want to display pledgor im as negative
     return new ConversionImTree(level, identifier, convertedMargin, newChildren);
   }
 
+  @SuppressWarnings("rawtypes")
   public static ConversionImTree convert(ImTree<? extends MarginIdentifier, ? extends ImTree> tree, SimmpleConfig config) {
     return new ConversionImTree(tree).convert(config.imRole(), config.fxRate(), FxRate.USD, config.resultCurrency());
   }

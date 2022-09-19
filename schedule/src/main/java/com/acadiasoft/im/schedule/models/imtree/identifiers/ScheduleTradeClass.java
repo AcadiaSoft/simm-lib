@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@ import com.acadiasoft.im.schedule.models.DefaultScheduleIdentifier;
 import com.acadiasoft.im.schedule.models.ScheduleIdentifier;
 
 public class ScheduleTradeClass extends DefaultScheduleIdentifier implements MarginIdentifier {
+
+  private static final long serialVersionUID = 1L;
 
   private ScheduleTradeClass(ScheduleIdentifier identifier) {
     super(identifier, null);

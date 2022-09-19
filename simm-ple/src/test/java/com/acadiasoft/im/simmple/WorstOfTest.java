@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -57,21 +57,12 @@ public class WorstOfTest {
     DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "", "included");
 
     // set up the simm config for the calculation currency and an fx rate of 'no conversion'
-    SimmConfig simmConfig = SimmConfig.Builder()
-      .calculationCurrency("USD")
-      .holdingPeriod(HoldingPeriod.ONE_DAY)
-      .build();
+    SimmConfig simmConfig = SimmConfig.Builder().calculationCurrency("USD").holdingPeriod(HoldingPeriod.ONE_DAY).build();
     BigDecimal amountPost = Simm.calculate(Arrays.asList(one, two), simmConfig).getMargin();
 
     // set up the simm-ple config to have result currency, calculation currency, simm standard, pledgor, and no conversion fx
-    SimmpleConfig simmpleConfig = SimmpleConfig.Builder()
-      .imRole(ImRole.PLEDGOR)
-      .resultCurrency("USD")
-      .calculationCurrency("USD")
-      .simmCalculationType(SimmCalculationType.STANDARD)
-      .simmpleCalculationType(SimmpleCalculationType.SIMM)
-      .holdingPeriod(HoldingPeriod.ONE_DAY)
-      .build();
+    SimmpleConfig simmpleConfig = SimmpleConfig.Builder().imRole(ImRole.PLEDGOR).resultCurrency("USD").calculationCurrency("USD").simmCalculationType(SimmCalculationType.STANDARD)
+        .simmpleCalculationType(SimmpleCalculationType.SIMM).holdingPeriod(HoldingPeriod.ONE_DAY).build();
     SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two), simmpleConfig);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("included", post.getRegulator());
@@ -84,7 +75,7 @@ public class WorstOfTest {
     DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "", "included");
 
     BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
-    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("included", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
@@ -92,16 +83,16 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfAllSame() {
-    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC,SEC", "");
-    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "CFTC,SEC", "");
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC,SEC", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "CFTC,SEC", "");
 
     BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
-    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
 
-    SimmpleResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
+    SimmpleResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
     Assert.assertEquals(BigDecimal.ZERO, collect.getImTree().getMargin());
     Assert.assertEquals("", collect.getRegulator());
     Assert.assertEquals("USD", collect.getCurrency());
@@ -109,16 +100,16 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfAllSameReverse() {
-    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "SEC,CFTC", "");
-    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "SEC,CFTC", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
 
     BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
-    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
 
-    SimmpleResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
+    SimmpleResult collect = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "USD", fx, "USD", ImRole.SECURED, SimmCalculationType.STANDARD);
     Assert.assertEquals(BigDecimal.ZERO, collect.getImTree().getMargin());
     Assert.assertEquals("", collect.getRegulator());
     Assert.assertEquals("USD", collect.getCurrency());
@@ -126,11 +117,11 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfCompound() {
-    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
-    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
 
     BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two), "USD");
-    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
@@ -138,13 +129,13 @@ public class WorstOfTest {
 
   @Test
   public void testAlwaysIncludedFunctionality() {
-    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
-    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
-    DefaultCrif three = new DefaultCrif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00",  Crif.ALL_REGULATORS_STRING, "" );
-
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif three =
+        new DefaultCrif("3", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", Crif.ALL_REGULATORS_STRING, "");
 
     BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two, three), "USD");
-    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    SimmpleResult post = Simmple.calculateSimmWorstOf(Arrays.asList(one, two, three), "USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
@@ -153,12 +144,13 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfOnlyAddsNonZeroMarginClassesWhenPossible() {
-    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "" );
-    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
-    DefaultCrif three = new DefaultCrif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00",  Crif.ALL_REGULATORS_STRING, "" );
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "5000.00", "SEC,CFTC", "");
+    DefaultCrif three =
+        new DefaultCrif("3", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "1000.00", Crif.ALL_REGULATORS_STRING, "");
 
     BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two, three), "USD");
-    SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three), "USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate(), post.getImTree().getMargin());
     Assert.assertEquals("CFTC", post.getRegulator());
     Assert.assertEquals("USD", post.getCurrency());
@@ -169,12 +161,13 @@ public class WorstOfTest {
 
   @Test
   public void testWorstOfReturnsBlankTreeWhenZero() {
-    DefaultCrif one = new DefaultCrif("1","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0", "CFTC", "" );
-    DefaultCrif two = new DefaultCrif("2","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "0", "SEC,CFTC", "");
-    DefaultCrif three = new DefaultCrif("3","2018-02-01", "2019-02-01", null, null,"SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0",  Crif.ALL_REGULATORS_STRING, "" );
+    DefaultCrif one = new DefaultCrif("1", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0", "CFTC", "");
+    DefaultCrif two = new DefaultCrif("2", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "5000.00", "USD", "0", "SEC,CFTC", "");
+    DefaultCrif three =
+        new DefaultCrif("3", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "Credit", "Risk_FX", "EUR", "", "", "", "1000.00", "USD", "0", Crif.ALL_REGULATORS_STRING, "");
 
     BigDecimal amountPost = Simm.calculateStandard(Arrays.asList(one, two, three), "USD");
-    SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three),"USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
+    SimmpleResult post = Simmple.calculateWorstOf(Arrays.asList(one, two, three), "USD", fx, "USD", ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(amountPost.negate().setScale(0, RoundingMode.HALF_UP), post.getImTree().getMargin().setScale(0, BigDecimal.ROUND_HALF_UP));
     Assert.assertTrue(post.getImTree().getChildren().isEmpty());
   }

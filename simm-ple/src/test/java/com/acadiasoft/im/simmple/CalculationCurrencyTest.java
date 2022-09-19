@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,8 @@ public class CalculationCurrencyTest {
 
   @Test
   public void testCalculationCurrencyBasic() {
-    DefaultCrif one = new DefaultCrif("1a","2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "USD", "", "", "","1000.00","USD","1000.00", "CFTC", "CFTC");
-    DefaultCrif two = new DefaultCrif("1b","2018-02-01", "2019-02-01", null, null,"SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "","5000.00","USD","5000.00", "CFTC", "CFTC");
+    DefaultCrif one = new DefaultCrif("1a", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "USD", "", "", "", "1000.00", "USD", "1000.00", "CFTC", "CFTC");
+    DefaultCrif two = new DefaultCrif("1b", "2018-02-01", "2019-02-01", null, null, "SIMM-P", "RatesFX", "Risk_FX", "EUR", "", "", "", "5000.00", "USD", "5000.00", "CFTC", "CFTC");
     BigDecimal simmLibAmount = Simm.calculateStandard(Collections.singletonList(one), "GBP").negate();
     SimmpleResult simmpleAmount = Simmple.calculateSimmWorstOf(Arrays.asList(one, two), "EUR", fx, FxRate.USD, ImRole.PLEDGOR, SimmCalculationType.STANDARD);
     Assert.assertEquals(simmLibAmount, simmpleAmount.getImTree().getMargin());

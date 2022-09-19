@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.util.stream.Stream;
 
-
 public interface SensitivityIdentifier extends Serializable {
 
   String getTradeId();
@@ -55,9 +54,7 @@ public interface SensitivityIdentifier extends Serializable {
   String BAD_QUALIFIER = "The qualifier was null or empty when it was required";
   String BAD_PRODUCT = "The product class was null or empty when it was required";
 
-
-  default void checkSensitivityIdentifier(String productClass, String riskType, String qualifier,
-                                          String bucket, String label1, String label2) {
+  default void checkSensitivityIdentifier(String productClass, String riskType, String qualifier, String bucket, String label1, String label2) {
     if (riskType == null || riskType.isEmpty()) {
       throw new IllegalStateException(BAD_RISK_TYPE);
     } else if ((qualifier == null || qualifier.isEmpty()) && !riskType.equalsIgnoreCase(AddOnSubType.ADD_ON_FIXED_AMOUNT)) {
@@ -94,21 +91,18 @@ public interface SensitivityIdentifier extends Serializable {
     if (risk.equals(RiskClass.CREDIT_NON_QUALIFYING) || risk.equals(RiskClass.CREDIT_QUALIFYING)) {
       // for credit risk, the concentration is summed over risk factors with the same issuer and seniority,
       // irrespective of tenor or payment currency. Issuer and seniority should be identified by the qualifier
-      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(),
-        null, null, null, this.getSensitivityClass(), risk);
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(), null, null, null, this.getSensitivityClass(), risk);
     } else if (risk.equals(RiskClass.INTEREST_RATE)) {
       // concentration risk is summed over the currencies, which are exactly the buckets of IR and are indicated by
       // the qualifier
-      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(),
-        null, null, null, this.getSensitivityClass(), risk);
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(), null, null, null, this.getSensitivityClass(), risk);
     } else if (risk.equals(RiskClass.FX)) {
       // fx is also over the currency (qualifier) but in this case there should be only one sensitivity per currency
-      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(),
-        null, null, null, this.getSensitivityClass(), risk);
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), null, this.getQualifier(), null, null, null, this.getSensitivityClass(), risk);
     } else {
       // CM or EQ are over the individual sensitivities, so our string should be exact
-      return new DefaultSensitivityIdentifier(null, this.getProductClass(), this.getRiskType(), this.getQualifier(),
-        this.getBucket(), null, null, this.getSensitivityClass(), risk);
+      return new DefaultSensitivityIdentifier(null, this.getProductClass(), this.getRiskType(), this.getQualifier(), this.getBucket(), null, null, this.getSensitivityClass(),
+          risk);
     }
   }
 
@@ -119,10 +113,10 @@ public interface SensitivityIdentifier extends Serializable {
 
     if (this.getSensitivityClass().equals(SensitivityClass.VEGA) || this.getSensitivityClass().equals(SensitivityClass.CURVATURE)) {
       // we need to sum over all of the vol-tenors for certain risk types, thus we specify label1 which holds vega vol-tenor values
-      if (RiskClass.EQUITY.equals(riskClass) ||
-        RiskClass.FX.equals(riskClass) ||
-        RiskClass.COMMODITY.equals(riskClass) ||
-        (RiskClass.INTEREST_RATE.equals(riskClass) && this.getRiskType().equals(RiskClass.RISK_TYPE_INFLATION_VOL))) {
+      if (RiskClass.EQUITY.equals(riskClass) || //
+          RiskClass.FX.equals(riskClass) || //
+          RiskClass.COMMODITY.equals(riskClass) || //
+          (RiskClass.INTEREST_RATE.equals(riskClass) && this.getRiskType().equals(RiskClass.RISK_TYPE_INFLATION_VOL))) {
         label1 = null;
       }
 
@@ -134,8 +128,8 @@ public interface SensitivityIdentifier extends Serializable {
       }
     }
 
-    return new DefaultSensitivityIdentifier(null, this.getProductClass(), this.getRiskType(), qualifier,
-      this.getBucket(), label1, this.getLabel2(), this.getSensitivityClass(), riskClass);
+    return new DefaultSensitivityIdentifier(null, this.getProductClass(), this.getRiskType(), qualifier, this.getBucket(), label1, this.getLabel2(), this.getSensitivityClass(),
+        riskClass);
   }
 
 }

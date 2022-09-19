@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,15 +44,17 @@ import java.util.stream.Collectors;
 
 public class SimmMargin extends ModelMargin {
 
+  private static final long serialVersionUID = 1L;
+
   private SimmMargin(BigDecimal margin, List<SiloMargin> children) {
     super(ImModelClass.SIMM, margin, children);
   }
 
   public static SimmMargin calculate(List<Sensitivity> sensitivities, SimmConfig config) {
     // separate the add on and regular sensitivity types
-    List<Sensitivity> filterForStandard = sensitivities.stream()
-      .filter(SensitivityIdentifier::isSimmStandard)
-      .collect(Collectors.toList());
+    List<Sensitivity> filterForStandard = sensitivities.stream() //
+        .filter(SensitivityIdentifier::isSimmStandard) //
+        .collect(Collectors.toList());
 
     // filter out any fx delta risk to the calculation currency
     List<Sensitivity> fxFiltered = filterDeltaFxRiskInCalcCurrency(filterForStandard, config.calculationCurrency());
@@ -69,9 +71,9 @@ public class SimmMargin extends ModelMargin {
       return new SimmMargin(productSum, new ArrayList<>(marginByProductClass));
     } else {
       // calculate the add on exposure
-      List<Sensitivity> addOns = sensitivities.stream()
-        .filter(SensitivityIdentifier::isAddOn)
-        .collect(Collectors.toList());
+      List<Sensitivity> addOns = sensitivities.stream() //
+          .filter(SensitivityIdentifier::isAddOn) //
+          .collect(Collectors.toList());
       AddOnMargin addOnMargin = AddOnMargin.calculate(addOns, marginByProductClass, config);
 
       // now return the add on exposure based on the settings
@@ -91,27 +93,25 @@ public class SimmMargin extends ModelMargin {
 
   private static List<ProductMargin> getMarginByProductClass(List<Sensitivity> sensitivities, SimmConfig config) {
     // map sensitivities by product class, build the exposure of each product class
-    return ListUtils.groupBy(sensitivities, SensitivityIdentifier::getProductIdentifier).entrySet().stream()
-      .map(entry -> {
-        ProductClass productClass = config.useSingleProductClass() ? ProductClass.SINGLE : entry.getKey();
-        return ProductMargin.calculate(productClass, entry.getValue(), config);
-      }).collect(Collectors.toList());
+    return ListUtils.groupBy(sensitivities, SensitivityIdentifier::getProductIdentifier).entrySet().stream().map(entry -> {
+      ProductClass productClass = config.useSingleProductClass() ? ProductClass.SINGLE : entry.getKey();
+      return ProductMargin.calculate(productClass, entry.getValue(), config);
+    }).collect(Collectors.toList());
   }
 
   private static List<Sensitivity> filterDeltaFxRiskInCalcCurrency(List<Sensitivity> list, String calculationCurrency) {
     return list.stream()
-      .filter(sensitivity -> !(sensitivity.getRiskType().equalsIgnoreCase(RiskClass.RISK_TYPE_FX)
-        && sensitivity.getQualifier().equalsIgnoreCase(calculationCurrency)))
-      .collect(Collectors.toList());
+        .filter(sensitivity -> !(sensitivity.getRiskType().equalsIgnoreCase(RiskClass.RISK_TYPE_FX) && sensitivity.getQualifier().equalsIgnoreCase(calculationCurrency)))
+        .collect(Collectors.toList());
   }
 
   /**
-   * First, we make the curvature sensitivities from the vega sensitivities and then scale them by SF(t)
-   * we get all the sensitivities on the same "level"
-   * EQ, FX, and CM vega & curvature sensitivities have not been multiplied by volatility factor,
-   * while IR, CRQ, and CRNQ sensitivities have been, so we do this multiplication now
+   * First, we make the curvature sensitivities from the vega sensitivities and then scale them by SF(t) we get all the
+   * sensitivities on the same "level" EQ, FX, and CM vega & curvature sensitivities have not been multiplied by
+   * volatility factor, while IR, CRQ, and CRNQ sensitivities have been, so we do this multiplication now
    *
-   * @param sensitivities the set of sensitivities
+   * @param sensitivities
+   *          the set of sensitivities
    * @return the set of sensitivities with curvatures added and scaled, and curvatures/vegas vol-weighted
    */
   private static List<Sensitivity> addCurvaturesAndVolWeight(List<Sensitivity> sensitivities, SimmConfig config) {
@@ -126,8 +126,7 @@ public class SimmMargin extends ModelMargin {
       List<Sensitivity> volWeightedCurvatures = VolWeightUtils.volWeightSensitivities(scaledCurvatures, config);
 
       // add them back to the set of delta sensitivities
-      List<Sensitivity> list = Optional.ofNullable(map.get(SensitivityClass.DELTA))
-        .orElse(new ArrayList<>());
+      List<Sensitivity> list = Optional.ofNullable(map.get(SensitivityClass.DELTA)).orElse(new ArrayList<>());
       list.addAll(Optional.ofNullable(map.get(SensitivityClass.BASECORR)).orElse(Collections.emptyList()));
       list.addAll(volWeightedVegas);
       list.addAll(volWeightedCurvatures);
@@ -137,6 +136,5 @@ public class SimmMargin extends ModelMargin {
       return sensitivities;
     }
   }
-
 
 }

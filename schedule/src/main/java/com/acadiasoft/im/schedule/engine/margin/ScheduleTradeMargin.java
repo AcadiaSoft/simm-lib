@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 public class ScheduleTradeMargin extends GroupMargin {
 
+  private static final long serialVersionUID = 1L;
   private static final String LEVEL = "4.NettedTrades";
   private final ScheduleNotional nettedNotional;
   private final SchedulePv nettedPv;
@@ -52,17 +53,17 @@ public class ScheduleTradeMargin extends GroupMargin {
 
   public static ScheduleTradeMargin calculate(ScheduleTradeClass id, List<ScheduleSensitivity> sensitivities, ScheduleConfig config) {
     // calculate the netted amount for the present values for this trade
-    List<ScheduleSensitivity> pvs = sensitivities.stream()
-      .filter(SchedulePv::isSchedulePv)
-      .collect(Collectors.toList());
-    BigDecimal nettedPvAmount = pvs.stream()
-      .map(sensitivity -> sensitivity.getPresentValueInUsd(config.fxRate()))
-      .reduce(BigDecimal.ZERO, BigDecimal::add);
+    List<ScheduleSensitivity> pvs = sensitivities.stream() //
+        .filter(SchedulePv::isSchedulePv) //
+        .collect(Collectors.toList());
+    BigDecimal nettedPvAmount = pvs.stream() //
+        .map(sensitivity -> sensitivity.getPresentValueInUsd(config.fxRate())) //
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     // calculate the netted amount for the notional of this trade
-    List<ScheduleSensitivity> notionals = sensitivities.stream()
-      .filter(ScheduleNotional::isScheduleNotional)
-      .collect(Collectors.toList());
+    List<ScheduleSensitivity> notionals = sensitivities.stream() //
+        .filter(ScheduleNotional::isScheduleNotional) //
+        .collect(Collectors.toList());
     BigDecimal nettedNotionalAmount = getNotionalAmount(id, notionals, pvs, config.fxRate());
 
     // get the weight for this particular trade
@@ -70,22 +71,20 @@ public class ScheduleTradeMargin extends GroupMargin {
     return new ScheduleTradeMargin(id, scheduleWeight.multiply(nettedNotionalAmount), nettedPvAmount);
   }
 
-  private static final String NO_NOTIONAL_FOR_TRADE = "There are no notional sensitivities for trade: [%s]"
-    + " and the 'tradeNotional' field is not filled in for any PVs";
+  private static final String NO_NOTIONAL_FOR_TRADE = "There are no notional sensitivities for trade: [%s]" + " and the 'tradeNotional' field is not filled in for any PVs";
 
-  private static BigDecimal getNotionalAmount(ScheduleTradeClass id, List<ScheduleSensitivity> notionals,
-                                              List<ScheduleSensitivity> pvs, FxRate fx) {
+  private static BigDecimal getNotionalAmount(ScheduleTradeClass id, List<ScheduleSensitivity> notionals, List<ScheduleSensitivity> pvs, FxRate fx) {
     // if notional sensitivities were not provided we need to check the present values for the trade notional being set
     if (notionals.isEmpty()) {
-      ScheduleSensitivity sensitivity = pvs.stream()
-        .filter(ScheduleSensitivity::tradeNotionalIsSet)
-        .findAny()
-        .orElseThrow(() -> new IllegalStateException(String.format(NO_NOTIONAL_FOR_TRADE, id.getTradeId())));
+      ScheduleSensitivity sensitivity = pvs.stream() //
+          .filter(ScheduleSensitivity::tradeNotionalIsSet) //
+          .findAny() //
+          .orElseThrow(() -> new IllegalStateException(String.format(NO_NOTIONAL_FOR_TRADE, id.getTradeId())));
       return sensitivity.getTradeNotionalInUsd(fx);
     } else {
-      return notionals.stream()
-        .map(sensitivity -> sensitivity.getNotionalInUsd(fx))
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+      return notionals.stream() //
+          .map(sensitivity -> sensitivity.getNotionalInUsd(fx)) //
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
   }
 

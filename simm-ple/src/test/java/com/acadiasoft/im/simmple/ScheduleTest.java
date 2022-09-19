@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ import java.util.List;
  * @author alec.stewart
  */
 public class ScheduleTest {
-  
+
   public final FxRate fx = new NoConversionFxRate();
 
   @Test
@@ -56,9 +56,9 @@ public class ScheduleTest {
         new DefaultCrif("trade2", "2018-02-01", "2019-02-01", null, null, "Schedule", "FX", "PV", "", "", "", "", "-100.00", "USD", "-100.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "Notional", "", "", "", "", "200000.00", "USD", "200000.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "PV", "", "", "", "", "-25.00", "USD", "-25.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "300000.00", "USD", "300000.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "PV", "", "", "", "", "20.00", "USD", "20.00", "CFTC,SEC", "CFTC,SEC")
-    );
+        new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "300000.00", "USD", "300000.00", "CFTC,SEC",
+            "CFTC,SEC"),
+        new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "PV", "", "", "", "", "20.00", "USD", "20.00", "CFTC,SEC", "CFTC,SEC"));
 
     SimmpleResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR);
     SimmpleResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED);
@@ -76,21 +76,22 @@ public class ScheduleTest {
         new DefaultCrif("trade1", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "PV", "", "", "", "", "850.00", "USD", "850.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade2", "2018-02-01", "2019-02-01", null, null, "Schedule", "FX", "Notional", "", "", "", "", "-500000.00", "USD", "-500000.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade2", "2018-02-01", "2019-02-01", null, null, "Schedule", "FX", "PV", "", "", "", "", "120.00", "USD", "120.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "Notional", "", "", "", "", "-200000.00", "USD", "-200000.00", "CFTC,SEC", "CFTC,SEC"),
+        new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "Notional", "", "", "", "", "-200000.00", "USD", "-200000.00", "CFTC,SEC",
+            "CFTC,SEC"),
         new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "PV", "", "", "", "", "-45.00", "USD", "-45.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "30000.00", "USD", "30000.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "PV", "", "", "", "", "-200.00", "USD", "-200.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade5", "2018-02-01", "2022-02-01", null, null, "Schedule", "Equity", "Notional", "", "", "", "", "120000.00", "USD", "120000.00", "CFTC,SEC", "CFTC,SEC"),
+        new DefaultCrif("trade5", "2018-02-01", "2022-02-01", null, null, "Schedule", "Equity", "Notional", "", "", "", "", "120000.00", "USD", "120000.00", "CFTC,SEC",
+            "CFTC,SEC"),
         new DefaultCrif("trade5", "2018-02-01", "2022-02-01", null, null, "Schedule", "Equity", "PV", "", "", "", "", "-175.00", "USD", "-175.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade6", "2018-02-01", "2030-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "-40000.00", "USD", "-40000.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade6", "2018-02-01", "2030-02-01", null, null, "Schedule", "Credit", "PV", "", "", "", "", "230.00", "USD", "230.00", "CFTC,SEC", "CFTC,SEC")
-    );
-
+        new DefaultCrif("trade6", "2018-02-01", "2030-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "-40000.00", "USD", "-40000.00", "CFTC,SEC",
+            "CFTC,SEC"),
+        new DefaultCrif("trade6", "2018-02-01", "2030-02-01", null, null, "Schedule", "Credit", "PV", "", "", "", "", "230.00", "USD", "230.00", "CFTC,SEC", "CFTC,SEC"));
 
     SimmpleResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR);
     SimmpleResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED);
 
-//    System.out.println(pledgorScheduleIM.getAmount() + ", " + securedScheduleIM.getAmount());
+    //    System.out.println(pledgorScheduleIM.getAmount() + ", " + securedScheduleIM.getAmount());
 
     Assert.assertEquals(new BigDecimal("45109"), securedScheduleIM.getImTree().getMargin().setScale(0, RoundingMode.HALF_UP));
     Assert.assertEquals(new BigDecimal("-22840"), pledgorScheduleIM.getImTree().getMargin().setScale(0, RoundingMode.HALF_UP));
@@ -105,18 +106,20 @@ public class ScheduleTest {
         new DefaultCrif("trade1", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "PV", "", "", "", "", "850.00", "USD", "850.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade2", "2018-02-01", "2019-02-01", null, null, "Schedule", "FX", "Notional", "", "", "", "", "-500000.00", "USD", "-500000.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade2", "2018-02-01", "2019-02-01", null, null, "Schedule", "FX", "PV", "", "", "", "", "120.00", "USD", "120.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "Notional", "", "", "", "", "-200000.00", "USD", "-200000.00", "CFTC,SEC", "CFTC,SEC"),
+        new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "Notional", "", "", "", "", "-200000.00", "USD", "-200000.00", "CFTC,SEC",
+            "CFTC,SEC"),
         new DefaultCrif("trade3", "2018-02-01", "2019-02-01", null, null, "Schedule", "Rates", "PV", "", "", "", "", "-45.00", "USD", "-45.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "30000.00", "USD", "30000.00", "CFTC,SEC", "CFTC,SEC"),
         new DefaultCrif("trade4", "2018-02-01", "2019-02-01", null, null, "Schedule", "Credit", "PV", "", "", "", "", "-200.00", "USD", "-200.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade5", "2018-02-01", "2022-02-01", null, null, "Schedule", "Equity", "Notional", "", "", "", "", "120000.00", "USD", "120000.00", "CFTC,SEC", "CFTC,SEC"),
-        new DefaultCrif("trade6", "2018-02-01", "2030-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "-40000.00", "USD", "-40000.00", "CFTC,SEC", "CFTC,SEC")
-    );
+        new DefaultCrif("trade5", "2018-02-01", "2022-02-01", null, null, "Schedule", "Equity", "Notional", "", "", "", "", "120000.00", "USD", "120000.00", "CFTC,SEC",
+            "CFTC,SEC"),
+        new DefaultCrif("trade6", "2018-02-01", "2030-02-01", null, null, "Schedule", "Credit", "Notional", "", "", "", "", "-40000.00", "USD", "-40000.00", "CFTC,SEC",
+            "CFTC,SEC"));
 
     SimmpleResult pledgorScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.PLEDGOR);
     SimmpleResult securedScheduleIM = Simmple.calculateScheduleWorstOf(crifs, fx, FxRate.USD, ImRole.SECURED);
 
-//    System.out.println(pledgorScheduleIM.getAmount() + ", " + securedScheduleIM.getAmount());
+    //    System.out.println(pledgorScheduleIM.getAmount() + ", " + securedScheduleIM.getAmount());
 
     Assert.assertEquals(new BigDecimal("48447"), securedScheduleIM.getImTree().getMargin().setScale(0, RoundingMode.HALF_UP));
     Assert.assertEquals(new BigDecimal("-22840"), pledgorScheduleIM.getImTree().getMargin().setScale(0, RoundingMode.HALF_UP));

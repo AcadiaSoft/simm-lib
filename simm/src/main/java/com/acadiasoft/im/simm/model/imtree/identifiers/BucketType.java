@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +33,11 @@ import static com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass.*;
 
 public enum BucketType {
 
-  FXHIGH(RiskClass.FX, 1, "FX High Volatility Currency"),
-  FX(RiskClass.FX, 2, "FX Regular Volatility Bucket"),
-  IRREG(RiskClass.INTEREST_RATE, 1, "Regular Volatility Currency"),
-  IRLOW(RiskClass.INTEREST_RATE, 2, "Low Volatility Currency"),
-  IRHIGH(RiskClass.INTEREST_RATE, 3, "High Volatility Currency"),
+  FXHIGH(RiskClass.FX, 1, "FX High Volatility Currency"), //
+  FX(RiskClass.FX, 2, "FX Regular Volatility Bucket"), //
+  IRREG(RiskClass.INTEREST_RATE, 1, "Regular Volatility Currency"), //
+  IRLOW(RiskClass.INTEREST_RATE, 2, "Low Volatility Currency"), //
+  IRHIGH(RiskClass.INTEREST_RATE, 3, "High Volatility Currency"), //
   CM1(RiskClass.COMMODITY, 1, "Coal"), // 
   CM2(RiskClass.COMMODITY, 2, "Crude"), //  
   CM3(RiskClass.COMMODITY, 3, "Light Ends"), //  
@@ -54,10 +54,10 @@ public enum BucketType {
   CM14(RiskClass.COMMODITY, 14, "Softs"), //  
   CM15(RiskClass.COMMODITY, 15, "Livestock"), //  
   CM16(RiskClass.COMMODITY, 16, "Other"), //
-  CM17(RiskClass.COMMODITY, 17, "Indexes"),
+  CM17(RiskClass.COMMODITY, 17, "Indexes"), //
   CRNQ1(CREDIT_NON_QUALIFYING, 1, "Investment grade (IG) in RMBS/CMBS"), //
   CRNQ2(CREDIT_NON_QUALIFYING, 2, "High yield (HY) & non-rated (NR) in RMBS/CMBS"), //
-  CRNQRESIDUAL(CREDIT_NON_QUALIFYING, -1, "CRNQ Residual Bucket"),
+  CRNQRESIDUAL(CREDIT_NON_QUALIFYING, -1, "CRNQ Residual Bucket"), //
   CRQ1(CREDIT_QUALIFYING, 1, "Investment grade (IG) in Sovereigns including central banks"), //
   CRQ2(CREDIT_QUALIFYING, 2, "Investment grade (IG) in Financials including government-backed financials"), //
   CRQ3(CREDIT_QUALIFYING, 3, "Investment grade (IG) in Basic materials, energy, industrials"), //
@@ -70,19 +70,21 @@ public enum BucketType {
   CRQ10(CREDIT_QUALIFYING, 10, "High yield (HY) & non-rated (NR) in Consumer"), //
   CRQ11(CREDIT_QUALIFYING, 11, "High yield (HY) & non-rated (NR) in Technology, telecommunications"), //
   CRQ12(CREDIT_QUALIFYING, 12, "High yield (HY) & non-rated (NR) in Health care, utilities, local government, government-backed corporates (non- financial)"), //
-  CRQRESIDUAL(CREDIT_QUALIFYING, -1, "CRQ Residual Bucket"),
-  EQ1(EQUITY, 1, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities"), //
+  CRQRESIDUAL(CREDIT_QUALIFYING, -1, "CRQ Residual Bucket"), //
+  EQ1(EQUITY, 1,
+      EquitySize.LARGE + " " + EquityRegion.EMERGING + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities"), //
   EQ2(EQUITY, 2, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Telecommunications, industrials"), //
   EQ3(EQUITY, 3, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Basic materials, energy, agriculture, manufacturing, mining and quarrying "), //
   EQ4(EQUITY, 4, EquitySize.LARGE + " " + EquityRegion.EMERGING + " Financials including gov't-backed financials, real estate activities, technology"), //
-  EQ5(EQUITY, 5, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities "), //
+  EQ5(EQUITY, 5,
+      EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Consumer goods and services, transportation and storage, administrative and support service activities, utilities "), //
   EQ6(EQUITY, 6, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Telecommunications, industrials"), //
   EQ7(EQUITY, 7, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Basic materials, energy, agriculture, manufacturing, mining and quarrying "), //
   EQ8(EQUITY, 8, EquitySize.LARGE + " " + EquityRegion.DEVELOPED + " Financials including gov't-backed financials, real estate activities, technology "), //
   EQ9(EQUITY, 9, EquitySize.SMALL + " " + EquityRegion.EMERGING + " All sectors"), //
   EQ10(EQUITY, 10, EquitySize.SMALL + " " + EquityRegion.DEVELOPED + " All sectors"), //
-  EQ11(EQUITY, 11, EquitySize.ALL + " " + EquityRegion.ALL + " Indexes, Funds, ETFs"),
-  EQ12(EQUITY, 12, EquitySize.ALL + " " + EquityRegion.ALL + " Volatility Indexes"),
+  EQ11(EQUITY, 11, EquitySize.ALL + " " + EquityRegion.ALL + " Indexes, Funds, ETFs"), //
+  EQ12(EQUITY, 12, EquitySize.ALL + " " + EquityRegion.ALL + " Volatility Indexes"), //
   EQRESIDUAL(EQUITY, -1, "EQ Residual Bucket");
 
   private final RiskClass riskClass;
@@ -117,10 +119,10 @@ public enum BucketType {
     if (StringUtils.equalsIgnoreCase(bucketNumber, DefaultSensitivity.RESIDUAL)) {
       return getResidualBucket(riskClass);
     } else {
-      return Stream.of(values())
-        .filter(type -> type.getBucketRiskClass().equals(riskClass) && type.getBucketString().equals(bucketNumber))
-        .findAny()
-        .orElseThrow(() -> new IllegalStateException(String.format(COULD_NOT_FIND_BUCKET_TYPE, riskClass, bucketNumber)));
+      return Stream.of(values()) //
+          .filter(type -> type.getBucketRiskClass().equals(riskClass) && type.getBucketString().equals(bucketNumber)) //
+          .findAny() //
+          .orElseThrow(() -> new IllegalStateException(String.format(COULD_NOT_FIND_BUCKET_TYPE, riskClass, bucketNumber)));
     }
   }
 
@@ -142,12 +144,12 @@ public enum BucketType {
       return CRQRESIDUAL;
     } else if (riskClass.equals(RiskClass.CREDIT_NON_QUALIFYING)) {
       return CRNQRESIDUAL;
-    } else if (riskClass.equals(RiskClass.INTEREST_RATE)
-      || riskClass.equals(RiskClass.COMMODITY)
-      || riskClass.equals(RiskClass.FX)) {
+    } else if (riskClass.equals(RiskClass.INTEREST_RATE) //
+        || riskClass.equals(RiskClass.COMMODITY) //
+        || riskClass.equals(RiskClass.FX)) {
       throw new IllegalStateException("tried to get Residual bucket for risk class without one: [" + riskClass + "]!");
     } else {
-      throw new IllegalStateException("tried to determine bucket for non-legal risk class: [" + riskClass +"]!");
+      throw new IllegalStateException("tried to determine bucket for non-legal risk class: [" + riskClass + "]!");
     }
   }
 

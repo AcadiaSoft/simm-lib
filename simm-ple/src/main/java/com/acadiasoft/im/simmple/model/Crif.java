@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,23 @@
 
 package com.acadiasoft.im.simmple.model;
 
+import static com.acadiasoft.im.simm.config.SimmCalculationType.SEGREGATED;
+import static com.acadiasoft.im.simm.config.SimmCalculationType.UNSEGREGATED;
+import static com.acadiasoft.im.simmple.util.StringUtils.containsIgnoreCase;
+
 import com.acadiasoft.im.base.model.imtree.identifiers.ImModelClass;
 import com.acadiasoft.im.schedule.models.DefaultScheduleSensitivity;
 import com.acadiasoft.im.schedule.models.ScheduleSensitivity;
 import com.acadiasoft.im.schedule.models.utils.ScheduleRiskType;
+import com.acadiasoft.im.simm.config.SimmCalculationType;
 import com.acadiasoft.im.simm.model.DefaultSensitivity;
 import com.acadiasoft.im.simm.model.Sensitivity;
 import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
 import com.acadiasoft.im.simm.model.imtree.identifiers.RiskClass;
 import com.acadiasoft.im.simmple.config.ImRole;
 import com.acadiasoft.im.simmple.config.SimmpleConfig;
-import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +46,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 public interface Crif extends Sensitivity, ScheduleSensitivity {
 
@@ -52,6 +59,8 @@ public interface Crif extends Sensitivity, ScheduleSensitivity {
   String INCLUDED = "included";
   String BLANK_REGULATOR_STRING = "";
   String ALL_REGULATORS_STRING = "SIMMPLE_ALL_REGS_WILDCARD";
+
+  public List<String> UNSEGREGATED_REGULATORS = Arrays.asList("SEC-unseg");
 
   public String getImModel();
 
@@ -71,8 +80,7 @@ public interface Crif extends Sensitivity, ScheduleSensitivity {
 
   default ScheduleSensitivity convertScheduleAmountForRole(SimmpleConfig config) {
     if (ImRole.SECURED.equals(config.imRole()) && this.isSchedulePv()) {
-      return new DefaultScheduleSensitivity(this, this.getTradeNotionalAsString(), this.getTradeCurrency(),
-        getAmountUsd(config.fxRate()).negate());
+      return new DefaultScheduleSensitivity(this, this.getTradeNotionalAsString(), this.getTradeCurrency(), getAmountUsd(config.fxRate()).negate());
     } else {
       return this;
     }
@@ -85,8 +93,8 @@ public interface Crif extends Sensitivity, ScheduleSensitivity {
 
   // -------------------- im model class methods ---------------------------
 
-  String MODEL_OMMITTED_FOR_NOTIONAL = "Tried to determine model from risk type since the model field was omitted" +
-    "but the risk type was notional which could be either SIMM or SCHEDULE";
+  String MODEL_OMITTED_FOR_NOTIONAL =
+      "Tried to determine model from risk type since the model field was omitted, but the risk type was notional which could be either SIMM or SCHEDULE";
   String UNKNOWN_RISK_TYPE = "Unknown risk type found while trying to identify omitted model: [%s]!";
 
   default ImModelClass getImModelIdentifier() {
@@ -95,7 +103,7 @@ public interface Crif extends Sensitivity, ScheduleSensitivity {
     if (model == null || model.equals(StringUtils.EMPTY)) {
       // TODO: if the notional string is ever change to differentiate between schedule and simm then we need to update this
       if (riskType.equalsIgnoreCase(ScheduleRiskType.SCHEDULE_NOTIONAL)) {
-        throw new IllegalStateException(MODEL_OMMITTED_FOR_NOTIONAL);
+        throw new IllegalStateException(MODEL_OMITTED_FOR_NOTIONAL);
       } else if (AddOnSubType.isAddOnSubType(riskType)) {
         return ImModelClass.SIMM;
       } else if (RiskClass.isSimmRiskType(riskType)) {
@@ -113,8 +121,7 @@ public interface Crif extends Sensitivity, ScheduleSensitivity {
   // ------------------ methods for regulation --------------------------
 
   default String getRegulation(ImRole role) {
-    String regulation = (ImRole.SECURED.equals(role)) ?
-      this.getCollectRegulation() : this.getPostRegulation();
+    String regulation = (ImRole.SECURED.equals(role)) ? this.getCollectRegulation() : this.getPostRegulation();
     regulation = regulation.replaceAll(BRACKET_REGEX, FIRST_CAPTURE_GROUP);
     regulation = regulation.replaceAll(QUOTE_REGEX, FIRST_CAPTURE_GROUP);
     return regulation.replaceAll(SPACE_REGEX, "");
@@ -127,24 +134,36 @@ public interface Crif extends Sensitivity, ScheduleSensitivity {
   default boolean containsRegulator(ImRole role, String toCheck) {
     String regulation = getRegulation(role);
     return (getRegulation(role).equalsIgnoreCase(ALL_REGULATORS_STRING))
-      || (toCheck.equalsIgnoreCase(INCLUDED) && (getPostRegulation().equalsIgnoreCase(INCLUDED) || getCollectRegulation().equalsIgnoreCase(INCLUDED)))
-      || (StringUtils.containsIgnoreCase(regulation, toCheck));
+        || (toCheck.equalsIgnoreCase(INCLUDED) && (getPostRegulation().equalsIgnoreCase(INCLUDED) || getCollectRegulation().equalsIgnoreCase(INCLUDED)))
+        || (StringUtils.containsIgnoreCase(regulation, toCheck));
   }
 
-  static Set<String> getRegulators(List<Crif> crifs, ImRole role) {
+  public static boolean filterBasedOnCalcType(String regulator, SimmCalculationType toCheck) {
+    if (StringUtils.isNotBlank(regulator)) {
+      if (UNSEGREGATED.equals(toCheck)) {
+        return containsIgnoreCase(UNSEGREGATED_REGULATORS, regulator);
+      } else if (SEGREGATED.equals(toCheck)) {
+        return !containsIgnoreCase(UNSEGREGATED_REGULATORS, regulator);
+      }
+    }
+    return true;
+  }
+
+  static Set<String> getRegulators(List<Crif> crifs, ImRole role, SimmCalculationType simmCalculationType) {
     // check which mode of calc we are in: all blank, 'included', or standard regs
-    Set<String> regulators = crifs.stream()
-      .map(crif -> crif.getRegulatorArray(role))
-      .flatMap(Stream::of)
-      .collect(Collectors.toSet());
+    Set<String> regulators = crifs.stream()//
+        .map(crif -> crif.getRegulatorArray(role))//
+        .flatMap(Stream::of)//
+        .filter(e -> filterBasedOnCalcType(e, simmCalculationType))//
+        .collect(Collectors.toSet());
 
     // we also need to check the  other roles regs because having all post regs blank but all collect regs filled
     // would not fall under the 'all blank' mode of calculation -- so add other role to the set we will check
     Set<String> modeCheck = new HashSet<>(regulators);
-    crifs.stream()
-      .map(crif -> crif.getRegulatorArray(role.swapRole()))
-      .flatMap(Stream::of)
-      .forEach(modeCheck::add);
+    crifs.stream()//
+        .map(crif -> crif.getRegulatorArray(role.swapRole()))//
+        .flatMap(Stream::of)//
+        .forEach(modeCheck::add);
 
     // remove the all regulators flag if it is present as it has no bearing on our mode check
     modeCheck.remove(ALL_REGULATORS_STRING);

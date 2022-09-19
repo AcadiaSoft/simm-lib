@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import java.util.Objects;
 
 public class DefaultScheduleIdentifier extends GroupClass implements ScheduleIdentifier {
 
+  private static final long serialVersionUID = 1L;
   private final String tradeId;
   private final String productClass;
   private final String riskType;
@@ -59,7 +60,7 @@ public class DefaultScheduleIdentifier extends GroupClass implements ScheduleIde
   }
 
   @Override
-  public String getProductClass(){
+  public String getProductClass() {
     return productClass;
   }
 
@@ -80,12 +81,13 @@ public class DefaultScheduleIdentifier extends GroupClass implements ScheduleIde
 
   @Override
   public boolean equals(Object other) {
-    if (!(other instanceof DefaultScheduleIdentifier)) return false;
+    if (!(other instanceof DefaultScheduleIdentifier))
+      return false;
     DefaultScheduleIdentifier id = (DefaultScheduleIdentifier) other;
-    return StringUtils.equalsIgnoreCase(tradeId, id.tradeId)
-      && StringUtils.equalsIgnoreCase(productClass, id.productClass)
-      && StringUtils.equalsIgnoreCase(valuationDate, id.valuationDate)
-      && StringUtils.equalsIgnoreCase(endDate, id.endDate);
+    return StringUtils.equalsIgnoreCase(tradeId, id.tradeId) //
+        && StringUtils.equalsIgnoreCase(productClass, id.productClass) //
+        && StringUtils.equalsIgnoreCase(valuationDate, id.valuationDate) //
+        && StringUtils.equalsIgnoreCase(endDate, id.endDate);
   }
 
   @Override

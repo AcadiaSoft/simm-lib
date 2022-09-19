@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,39 +43,37 @@ public class ParsingTest {
   public void testParsing() {
     String regString1 = "[CFTC,SEC]";
     String regString2 = "CFTC,SEC";
-    String regString3 = "SEC";
     Assert.assertEquals(Arrays.asList(regString2.split(",")), Arrays.asList(regString1.substring(1, regString1.length() - 1).split(",")));
   }
 
   @Test
   public void testBlankRegulators() {
     List<Crif> crifs = Arrays.asList(
-        new DefaultCrif("trade1", "2018-02-06", "", null, null,"SIMM-P", "Credit", "Risk_CreditQ", "XS0369461644", "3", "5y", "USD", "-90155", "USD", "-90155", "SEC", " "),
-        new DefaultCrif("trade1", "2018-02-06", "",null, null, "SIMM-P", "Credit", "Risk_CreditQ", "XS0369461644", "3", "3y", "USD", "-2015", "USD", "-2015", "SEC", "   "),
-        new DefaultCrif("trade1", "2018-02-06", "",null, null, "SIMM-P", "Credit", "Risk_CreditQ", "XS0369461644", "3", "1y", "USD", "123", "USD", "123", "SEC", "[ ]"),
-        new DefaultCrif("trade1", "2018-02-06", "",null, null, "SIMM-P", "Credit", "Risk_FX", "GBP", "", "", "", "64000", "USD", "64000", "SEC", "[]"),
-        new DefaultCrif("trade1", "2018-02-06", "",null, null,"SIMM-P", "Credit", "Risk_IRCurve", "EUR", "", "6m", "Libor6m", "3567", "USD", "3567", "SEC", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null,"SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "120000", "USD", "120000", "", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_FX", "USD", "", "", "", "-50000", "USD", "-50000", "", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "3m", "Libor3m", "10500", "USD", "10500", " ", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "6m", "Libor3m", "13540", "USD", "13540", "", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "1y", "Libor3m", "9500", "USD", "9500", "", "   "),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "2y", "Libor3m", "843", "USD", "843", "", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "3y", "Libor3m", "28", "USD", "28", "[]", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null,"SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "5y", "Libor3m", "-8000", "USD", "-8000", " ", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "3m", "Libor3m", "-1500", "USD", "-1500", "", "   "),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null,"SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "6m", "Libor3m", "-800", "USD", "-800", "   ", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null,"SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "1y", "Libor3m", "1230", "USD", "1230", "", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null,"SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "2y", "Libor3m", "4000", "USD", "4000", "   ", "   "),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "3y", "Libor3m", "4200", "USD", "4200", "", ""),
-        new DefaultCrif("trade2", "2018-02-06", "",null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "5y", "Libor3m", "10230", "USD", "10230", "", "[\"\", \"\"]")
-    );
+        new DefaultCrif("trade1", "2018-02-06", "", null, null, "SIMM-P", "Credit", "Risk_CreditQ", "XS0369461644", "3", "5y", "USD", "-90155", "USD", "-90155", "SEC", " "),
+        new DefaultCrif("trade1", "2018-02-06", "", null, null, "SIMM-P", "Credit", "Risk_CreditQ", "XS0369461644", "3", "3y", "USD", "-2015", "USD", "-2015", "SEC", "   "),
+        new DefaultCrif("trade1", "2018-02-06", "", null, null, "SIMM-P", "Credit", "Risk_CreditQ", "XS0369461644", "3", "1y", "USD", "123", "USD", "123", "SEC", "[ ]"),
+        new DefaultCrif("trade1", "2018-02-06", "", null, null, "SIMM-P", "Credit", "Risk_FX", "GBP", "", "", "", "64000", "USD", "64000", "SEC", "[]"),
+        new DefaultCrif("trade1", "2018-02-06", "", null, null, "SIMM-P", "Credit", "Risk_IRCurve", "EUR", "", "6m", "Libor6m", "3567", "USD", "3567", "SEC", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_FX", "GBP", "", "", "", "120000", "USD", "120000", "", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_FX", "USD", "", "", "", "-50000", "USD", "-50000", "", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "3m", "Libor3m", "10500", "USD", "10500", " ", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "6m", "Libor3m", "13540", "USD", "13540", "", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "1y", "Libor3m", "9500", "USD", "9500", "", "   "),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "2y", "Libor3m", "843", "USD", "843", "", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "3y", "Libor3m", "28", "USD", "28", "[]", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "GBP", "", "5y", "Libor3m", "-8000", "USD", "-8000", " ", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "3m", "Libor3m", "-1500", "USD", "-1500", "", "   "),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "6m", "Libor3m", "-800", "USD", "-800", "   ", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "1y", "Libor3m", "1230", "USD", "1230", "", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "2y", "Libor3m", "4000", "USD", "4000", "   ", "   "),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "3y", "Libor3m", "4200", "USD", "4200", "", ""),
+        new DefaultCrif("trade2", "2018-02-06", "", null, null, "SIMM-P", "RatesFX", "Risk_IRCurve", "USD", "", "5y", "Libor3m", "10230", "USD", "10230", "", "[\"\", \"\"]"));
 
     Set<String> set = new HashSet<>();
-    Assert.assertEquals(set, Crif.getRegulators(crifs, ImRole.SECURED));
+    Assert.assertEquals(set, Crif.getRegulators(crifs, ImRole.SECURED, null));
     Set<String> set2 = new HashSet<>();
     set2.add("SEC");
-    Assert.assertEquals(set2, Crif.getRegulators(crifs, ImRole.PLEDGOR));
+    Assert.assertEquals(set2, Crif.getRegulators(crifs, ImRole.PLEDGOR, null));
   }
 
 }

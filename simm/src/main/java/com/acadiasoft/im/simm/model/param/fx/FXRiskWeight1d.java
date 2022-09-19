@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,17 +29,16 @@ import com.acadiasoft.im.simm.model.imtree.identifiers.WeightingClass;
 import com.acadiasoft.im.simm.model.param.SimmFxRiskWeight;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * As defined in Appendix 1 section I of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class FXRiskWeight1d implements SimmFxRiskWeight {
 
-  private static final BigDecimal VEGA = new BigDecimal("0.099");
+  private static final BigDecimal VEGA = new BigDecimal("0.096");
 
   private static final Map<FXCurrencyVolatility, Map<FXCurrencyVolatility, BigDecimal>> WEIGHTS = new HashMap<>();
   private static final Map<FXCurrencyVolatility, BigDecimal> REGULAR = new HashMap<>();
@@ -47,14 +46,14 @@ public class FXRiskWeight1d implements SimmFxRiskWeight {
 
   static {
     REGULAR.put(REGULAR_VOLATILITY, new BigDecimal("1.8"));
-    REGULAR.put(HIGH_VOLATILITY, new BigDecimal("3"));
+    REGULAR.put(HIGH_VOLATILITY, new BigDecimal("3.2"));
     WEIGHTS.put(REGULAR_VOLATILITY, REGULAR);
 
-    HIGH.put(REGULAR_VOLATILITY, new BigDecimal("3"));
-    HIGH.put(HIGH_VOLATILITY, new BigDecimal("2.9"));
+    HIGH.put(REGULAR_VOLATILITY, new BigDecimal("3.2"));
+    HIGH.put(HIGH_VOLATILITY, new BigDecimal("3.4"));
     WEIGHTS.put(HIGH_VOLATILITY, HIGH);
   }
-  
+
   @Override
   public BigDecimal getDeltaRiskWeight(WeightingClass s, String calculationCurrency) {
     FXCurrencyVolatility calcCurrencyVolatility = FXCurrencyVolatility.get(calculationCurrency);

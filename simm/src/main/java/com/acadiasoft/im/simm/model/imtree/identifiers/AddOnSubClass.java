@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ import com.acadiasoft.im.base.model.imtree.identifiers.GroupClass;
 
 public class AddOnSubClass extends GroupClass {
 
+  private static final long serialVersionUID = 1L;
   private final AddOnSubType type;
   private final String name;
 
@@ -49,7 +50,8 @@ public class AddOnSubClass extends GroupClass {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof AddOnSubClass)) return false;
+    if (!(obj instanceof AddOnSubClass))
+      return false;
     AddOnSubClass other = (AddOnSubClass) obj;
     return type.equals(other.getType()) && name.equalsIgnoreCase(other.getName());
   }

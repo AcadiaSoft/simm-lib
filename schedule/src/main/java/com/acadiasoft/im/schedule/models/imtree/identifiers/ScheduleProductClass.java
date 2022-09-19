@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 public class ScheduleProductClass extends SiloClass {
 
+  private static final long serialVersionUID = 1L;
   public static final ScheduleProductClass FX = new ScheduleProductClass("FX");
   public static final ScheduleProductClass RATES = new ScheduleProductClass("Rates");
   public static final ScheduleProductClass CREDIT = new ScheduleProductClass("Credit");
@@ -37,17 +38,14 @@ public class ScheduleProductClass extends SiloClass {
   public static final ScheduleProductClass OTHER = new ScheduleProductClass("Other");
 
   private static final String UNKNOWN = "Tried to get a product for an unknown label: [%s]";
-  private static final Supplier<Stream<ScheduleProductClass>> ALL = () -> Stream.of(
-    FX, RATES, CREDIT, COMMODITY, EQUITY, OTHER
-  );
+  private static final Supplier<Stream<ScheduleProductClass>> ALL = () -> Stream.of(FX, RATES, CREDIT, COMMODITY, EQUITY, OTHER);
 
   private ScheduleProductClass(String label) {
     super(label);
   }
 
   public static ScheduleProductClass determineProductClass(String productClass) {
-    return ALL.get().filter(product -> product.label.equalsIgnoreCase(productClass)).findAny()
-      .orElseThrow(() -> new IllegalStateException(String.format(UNKNOWN, productClass)));
+    return ALL.get().filter(product -> product.label.equalsIgnoreCase(productClass)).findAny().orElseThrow(() -> new IllegalStateException(String.format(UNKNOWN, productClass)));
   }
 
 }

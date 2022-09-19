@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ import java.util.function.Predicate;
 
 public enum SimmpleCalculationType {
 
-  SIMM,
-  SCHEDULE,
+  SIMM, //
+  SCHEDULE, //
   BOTH;
 
   public static Predicate<Crif> calculateSimm(SimmpleConfig config) {

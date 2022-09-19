@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,14 +29,14 @@ import java.math.BigDecimal;
 
 public interface SimmHvr {
 
-  BigDecimal CM_HVR_ONE_DAY = new BigDecimal("0.67");
-  BigDecimal EQ_HVR_ONE_DAY = new BigDecimal("0.5");
-  BigDecimal FX_HVR_ONE_DAY = new BigDecimal("0.73");
-  BigDecimal IR_HVR_ONE_DAY = new BigDecimal("0.5");
+  BigDecimal CM_HVR_ONE_DAY = new BigDecimal("0.69");
+  BigDecimal EQ_HVR_ONE_DAY = new BigDecimal("0.54");
+  BigDecimal FX_HVR_ONE_DAY = new BigDecimal("0.7");
+  BigDecimal IR_HVR_ONE_DAY = new BigDecimal("0.51");
 
-  BigDecimal CM_HVR = new BigDecimal("0.64");
-  BigDecimal EQ_HVR = new BigDecimal("0.54");
-  BigDecimal FX_HVR = new BigDecimal("0.55");
+  BigDecimal CM_HVR = new BigDecimal("0.69");
+  BigDecimal EQ_HVR = new BigDecimal("0.58");
+  BigDecimal FX_HVR = new BigDecimal("0.52");
   BigDecimal IR_HVR = new BigDecimal("0.44");
 
   String BAD_RISK_CLASS = "tried to get HVR for non-HVR risk class: [%s]!";

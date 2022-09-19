@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,30 +31,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * As defined in Appendix 1 of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class EquityRiskWeight implements SimmRiskWeight {
 
   private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
+  private static final Map<BucketType, BigDecimal> VEGA_WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.EQ1,        new BigDecimal("25"));
-    WEIGHTS.put(BucketType.EQ2,        new BigDecimal("28"));
-    WEIGHTS.put(BucketType.EQ3,        new BigDecimal("30"));
-    WEIGHTS.put(BucketType.EQ4,        new BigDecimal("28"));
-    WEIGHTS.put(BucketType.EQ5,        new BigDecimal("23"));
-    WEIGHTS.put(BucketType.EQ6,        new BigDecimal("24"));
-    WEIGHTS.put(BucketType.EQ7,        new BigDecimal("29"));
-    WEIGHTS.put(BucketType.EQ8,        new BigDecimal("27"));
-    WEIGHTS.put(BucketType.EQ9,        new BigDecimal("31"));
-    WEIGHTS.put(BucketType.EQ10,       new BigDecimal("33"));
-    WEIGHTS.put(BucketType.EQ11,       new BigDecimal("19"));
-    WEIGHTS.put(BucketType.EQ12,       new BigDecimal("19"));
-    WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("33"));
-  }
+    WEIGHTS.put(BucketType.EQ1, new BigDecimal("26"));
+    WEIGHTS.put(BucketType.EQ2, new BigDecimal("28"));
+    WEIGHTS.put(BucketType.EQ3, new BigDecimal("34"));
+    WEIGHTS.put(BucketType.EQ4, new BigDecimal("28"));
+    WEIGHTS.put(BucketType.EQ5, new BigDecimal("23"));
+    WEIGHTS.put(BucketType.EQ6, new BigDecimal("25"));
+    WEIGHTS.put(BucketType.EQ7, new BigDecimal("29"));
+    WEIGHTS.put(BucketType.EQ8, new BigDecimal("27"));
+    WEIGHTS.put(BucketType.EQ9, new BigDecimal("32"));
+    WEIGHTS.put(BucketType.EQ10, new BigDecimal("32"));
+    WEIGHTS.put(BucketType.EQ11, new BigDecimal("18"));
+    WEIGHTS.put(BucketType.EQ12, new BigDecimal("18"));
+    WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("34"));
 
-  private static final BigDecimal VEGA = new BigDecimal("0.5");
-  private static final BigDecimal VEGA12 = new BigDecimal("0.98");
+    VEGA_WEIGHTS.put(BucketType.EQ1, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ2, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ3, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ4, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ5, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ6, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ7, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ8, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ9, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ10, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ11, new BigDecimal("0.45"));
+    VEGA_WEIGHTS.put(BucketType.EQ12, new BigDecimal("0.96"));
+    VEGA_WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("0.45"));
+  }
 
   @Override
   public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {
@@ -63,12 +76,7 @@ public class EquityRiskWeight implements SimmRiskWeight {
 
   @Override
   public BigDecimal getVegaRiskWeight(SensitivityIdentifier s) {
-    if (s.getBucket().equals("12")) {
-      // bucket 12 has its own VRW as per doc/ISDA-SIMM-v1.3.38 paragraph 57
-      return VEGA12;
-    } else {
-      return VEGA;
-    }
+    return VEGA_WEIGHTS.get(s.getBucketIdentifier().getBucketType());
   }
 
 }

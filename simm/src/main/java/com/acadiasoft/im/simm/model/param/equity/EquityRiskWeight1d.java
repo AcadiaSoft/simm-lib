@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * As defined in Appendix 1 of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class EquityRiskWeight1d implements SimmRiskWeight {
 
@@ -39,33 +40,33 @@ public class EquityRiskWeight1d implements SimmRiskWeight {
   private static final Map<BucketType, BigDecimal> VEGA_WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.EQ1,        new BigDecimal("8.3"));
-    WEIGHTS.put(BucketType.EQ2,        new BigDecimal("9.1"));
-    WEIGHTS.put(BucketType.EQ3,        new BigDecimal("9.8"));
-    WEIGHTS.put(BucketType.EQ4,        new BigDecimal("9"));
-    WEIGHTS.put(BucketType.EQ5,        new BigDecimal("7.7"));
-    WEIGHTS.put(BucketType.EQ6,        new BigDecimal("8.4"));
-    WEIGHTS.put(BucketType.EQ7,        new BigDecimal("9.3"));
-    WEIGHTS.put(BucketType.EQ8,        new BigDecimal("9.4"));
-    WEIGHTS.put(BucketType.EQ9,        new BigDecimal("9.9"));
-    WEIGHTS.put(BucketType.EQ10,       new BigDecimal("11"));
-    WEIGHTS.put(BucketType.EQ11,       new BigDecimal("6"));
-    WEIGHTS.put(BucketType.EQ12,       new BigDecimal("6"));
-    WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("11"));
-    
-    VEGA_WEIGHTS.put(BucketType.EQ1,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ2,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ3,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ4,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ5,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ6,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ7,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ8,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ9,                new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ10,               new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ11,               new BigDecimal("0.094"));
-    VEGA_WEIGHTS.put(BucketType.EQ12,               new BigDecimal("0.27") );
-    VEGA_WEIGHTS.put(BucketType.EQRESIDUAL,         new BigDecimal("0.094"));
+    WEIGHTS.put(BucketType.EQ1, new BigDecimal("9.3"));
+    WEIGHTS.put(BucketType.EQ2, new BigDecimal("9.7"));
+    WEIGHTS.put(BucketType.EQ3, new BigDecimal("10.0"));
+    WEIGHTS.put(BucketType.EQ4, new BigDecimal("9.2"));
+    WEIGHTS.put(BucketType.EQ5, new BigDecimal("7.7"));
+    WEIGHTS.put(BucketType.EQ6, new BigDecimal("8.5"));
+    WEIGHTS.put(BucketType.EQ7, new BigDecimal("9.5"));
+    WEIGHTS.put(BucketType.EQ8, new BigDecimal("9.6"));
+    WEIGHTS.put(BucketType.EQ9, new BigDecimal("10.0"));
+    WEIGHTS.put(BucketType.EQ10, new BigDecimal("10"));
+    WEIGHTS.put(BucketType.EQ11, new BigDecimal("5.9"));
+    WEIGHTS.put(BucketType.EQ12, new BigDecimal("5.9"));
+    WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("10.0"));
+
+    VEGA_WEIGHTS.put(BucketType.EQ1, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ2, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ3, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ4, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ5, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ6, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ7, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ8, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ9, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ10, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ11, new BigDecimal("0.093"));
+    VEGA_WEIGHTS.put(BucketType.EQ12, new BigDecimal("0.25"));
+    VEGA_WEIGHTS.put(BucketType.EQRESIDUAL, new BigDecimal("0.093"));
   }
 
   @Override

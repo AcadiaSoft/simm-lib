@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * As defined in Appendix 1 section d of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public enum InterestRateTenor {
 
@@ -36,14 +37,14 @@ public enum InterestRateTenor {
   _1M("1m"), //
   _3M("3m"), //
   _6M("6m"), //
-  _1YR("1y"), //
-  _2YR("2y"), //
-  _3YR("3y"), //
-  _5YR("5y"), //
-  _10YR("10y"), //
-  _15YR("15y"), //
-  _20YR("20y"), //
-  _30YR("30y");
+  _1Y("1y"), //
+  _2Y("2y"), //
+  _3Y("3y"), //
+  _5Y("5y"), //
+  _10Y("10y"), //
+  _15Y("15y"), //
+  _20Y("20y"), //
+  _30Y("30y");
 
   private static final List<InterestRateTenor> ALL = Arrays.asList(values());
 

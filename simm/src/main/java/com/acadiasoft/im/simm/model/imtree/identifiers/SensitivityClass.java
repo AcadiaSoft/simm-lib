@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class SensitivityClass extends BatchClass {
 
+  private static final long serialVersionUID = 1L;
   public static final SensitivityClass DELTA = new SensitivityClass("Delta");
   public static final SensitivityClass VEGA = new SensitivityClass("Vega");
   public static final SensitivityClass CURVATURE = new SensitivityClass("Curvature");

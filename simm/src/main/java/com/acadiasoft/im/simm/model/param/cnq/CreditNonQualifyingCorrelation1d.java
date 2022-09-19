@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,19 +33,19 @@ import org.apache.commons.lang3.StringUtils;
 import java.math.BigDecimal;
 
 /**
- * As defined in Appendix 1 of ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class CreditNonQualifyingCorrelation1d implements SimmBucketCorrelation, SimmSensitivityCorrelation {
-
-  public static final BigDecimal AGGREGATE_SAME = new BigDecimal("0.86");
-  public static final BigDecimal AGGREGATE_DIFF = new BigDecimal("0.33");
+  public static final BigDecimal AGGREGATE_SAME = new BigDecimal("0.82");
+  public static final BigDecimal AGGREGATE_DIFF = new BigDecimal("0.27");
   public static final BigDecimal RESIDUAL = new BigDecimal("0.5");
-  public static final BigDecimal NON_RESIDUAL_TO_NON_RESIDUAL = new BigDecimal("0.36");
+  public static final BigDecimal NON_RESIDUAL_TO_NON_RESIDUAL = new BigDecimal("0.4");
 
   @Override
   public BigDecimal getSensitivityCorrelation(WeightingClass si, WeightingClass sk) {
-    if (StringUtils.equalsIgnoreCase(DefaultSensitivity.RESIDUAL, si.getBucket())
-      || StringUtils.equalsIgnoreCase(DefaultSensitivity.RESIDUAL, sk.getBucket())) {
+    if (StringUtils.equalsIgnoreCase(DefaultSensitivity.RESIDUAL, si.getBucket()) //
+        || StringUtils.equalsIgnoreCase(DefaultSensitivity.RESIDUAL, sk.getBucket())) {
       return RESIDUAL;
     } else if (StringUtils.equalsIgnoreCase(si.getLabel2(), sk.getLabel2())) {
       return AGGREGATE_SAME;

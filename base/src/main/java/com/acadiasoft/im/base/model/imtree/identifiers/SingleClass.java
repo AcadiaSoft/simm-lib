@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,9 @@ package com.acadiasoft.im.base.model.imtree.identifiers;
 
 public class SingleClass extends DefaultIdentifier {
 
-  public SingleClass(String singleIdentifier)  {
+  private static final long serialVersionUID = 1L;
+
+  public SingleClass(String singleIdentifier) {
     super(singleIdentifier);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by alec.stewart on 8/9/17.
+ * @author joe.peterson
+ *
  */
 public class CreditNonQualifyingConcentrationRisk implements SimmConcentrationThreshold {
 
@@ -40,7 +41,7 @@ public class CreditNonQualifyingConcentrationRisk implements SimmConcentrationTh
   private static final String NOT_CLASSIFIED = "Residual";
 
   private static final Map<String, BigDecimal> DELTA_THRESHOLD = new HashMap<>();
-//    private static final Map<String, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
+  //    private static final Map<String, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
 
   static {
     DELTA_THRESHOLD.put(IG, new BigDecimal("9.5").multiply(ConcentrationRiskGroup.MM));
@@ -57,7 +58,7 @@ public class CreditNonQualifyingConcentrationRisk implements SimmConcentrationTh
 
   @Override
   public BigDecimal getVegaThreshold(String bucket) {
-    return new BigDecimal("85").multiply(ConcentrationRiskGroup.MM);
+    return new BigDecimal("145").multiply(ConcentrationRiskGroup.MM);
   }
 
   private String determineGroup(String bucket) {

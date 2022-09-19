@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -60,8 +60,7 @@ public interface ScheduleIdentifier {
   }
 
   default ScheduleIdentifier getScheduleTradeIdentifier() {
-    return new DefaultScheduleIdentifier(this.getTradeId(), this.getProductClass(), this.getRiskType(),
-      this.getValuationDateAsString(), this.getEndDateAsString());
+    return new DefaultScheduleIdentifier(this.getTradeId(), this.getProductClass(), this.getRiskType(), this.getValuationDateAsString(), this.getEndDateAsString());
   }
 
   // --------------------- default check methods -------------------

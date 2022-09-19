@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 /**
  *
  * @author alec.stewart
+ * @author joe.peterson
+ *
  */
 public class Schedule {
 
@@ -58,10 +60,12 @@ public class Schedule {
     return calculateWithPvs(notionals, pvs).getMargin();
   }
 
+  @SuppressWarnings("rawtypes")
   public static ImTree calculateTree(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
     return TotalMargin.build(calculateWithoutPvs(notionals, netGrossRate));
   }
 
+  @SuppressWarnings("rawtypes")
   public static ImTree calculateTree(List<ScheduleNotional> notionals, List<SchedulePv> pvs) {
     return TotalMargin.build(calculateWithPvs(notionals, pvs));
   }
@@ -74,10 +78,10 @@ public class Schedule {
   }
 
   public static ModelMargin calculateWithoutPvs(List<ScheduleNotional> notionals, BigDecimal netGrossRate) {
-    ScheduleConfig config = ScheduleConfig.Builder()
-      .netGrossRate(netGrossRate)
-      .scheduleCalculationType(ScheduleCalculationType.WITHOUT_PVS)
-      .build();
+    ScheduleConfig config = ScheduleConfig.Builder() //
+        .netGrossRate(netGrossRate) //
+        .scheduleCalculationType(ScheduleCalculationType.WITHOUT_PVS) //
+        .build();
     List<ScheduleSensitivity> sensitivities = notionals.stream().map(ScheduleNotional::of).collect(Collectors.toList());
     return ScheduleMargin.calculate(sensitivities, config);
   }

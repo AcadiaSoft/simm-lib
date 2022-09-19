@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,27 +51,27 @@ public class BasicImTreeSerializationIT {
 
   @Test
   public void testDeserialization() throws IOException {
-    String serialized = "{\n" +
-      "  \"level\" : \"2.Whatever\",\n" +
-      "  \"label\" : \"another\",\n" +
-      "  \"margin\" : 30.0,\n" +
-      "  \"children\" : [ {\n" +
-      "    \"level\" : \"2.Whatever\",\n" +
-      "    \"label\" : \"hello\",\n" +
-      "    \"margin\" : 3.0,\n" +
-      "    \"children\" : [ ]\n" +
-      "  }, {\n" +
-      "    \"level\" : \"2.Whatever\",\n" +
-      "    \"label\" : \"other\",\n" +
-      "    \"margin\" : 3.5,\n" +
-      "    \"children\" : [ ]\n" +
-      "  }, {\n" +
-      "    \"level\" : \"2.Whatever\",\n" +
-      "    \"label\" : \"new\",\n" +
-      "    \"margin\" : 5.0,\n" +
-      "    \"children\" : [ ]\n" +
-      "  } ]\n" +
-      "}";
+    String serialized = "{\n" + //
+        "  \"level\" : \"2.Whatever\",\n" + //
+        "  \"label\" : \"another\",\n" + //
+        "  \"margin\" : 30.0,\n" + //
+        "  \"children\" : [ {\n" + //
+        "    \"level\" : \"2.Whatever\",\n" + //
+        "    \"label\" : \"hello\",\n" + //
+        "    \"margin\" : 3.0,\n" + //
+        "    \"children\" : [ ]\n" + //
+        "  }, {\n" + //
+        "    \"level\" : \"2.Whatever\",\n" + //
+        "    \"label\" : \"other\",\n" + //
+        "    \"margin\" : 3.5,\n" + //
+        "    \"children\" : [ ]\n" + //
+        "  }, {\n" + //
+        "    \"level\" : \"2.Whatever\",\n" + //
+        "    \"label\" : \"new\",\n" + //
+        "    \"margin\" : 5.0,\n" + //
+        "    \"children\" : [ ]\n" + //
+        "  } ]\n" + //
+        "}";
 
     BasicImTree tree = new ObjectMapper().readValue(serialized, BasicImTree.class);
     Assert.assertEquals("2.Whatever", tree.getTreeLevel());
@@ -83,6 +83,9 @@ public class BasicImTreeSerializationIT {
   public void testCasting() throws IOException {
 
     class Impl extends ModelMargin {
+
+      private static final long serialVersionUID = 1L;
+
       public Impl(ImModelClass model, BigDecimal margin, List<SiloMargin> children) {
         super(model, margin, children);
       }

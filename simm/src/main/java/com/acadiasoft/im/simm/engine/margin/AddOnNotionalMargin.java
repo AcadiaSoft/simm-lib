@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 public class AddOnNotionalMargin extends GroupMargin {
 
+  private static final long serialVersionUID = 1L;
   private static final String LEVEL = "4.AddOnNotional";
 
   private AddOnNotionalMargin(AddOnSubClass addOnSubClass, BigDecimal margin) {
@@ -48,20 +49,15 @@ public class AddOnNotionalMargin extends GroupMargin {
 
   public static AddOnNotionalMargin calculate(List<Sensitivity> notionalAddOns, SimmConfig config) {
     AddOnSubClass subClass = AddOnSubClass.determineAddOnSubClass(AddOnSubType.NOTIONAL, AddOnSubType.NOTIONAL.getMarginIdentifier());
-    Map<String, NotionalFactor> factors = notionalAddOns.stream()
-      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR))
-      .collect(Collectors.toMap(NotionalFactor::getNotionalProduct, Function.identity()));
-    Map<String, List<Notional>> notionals = notionalAddOns.stream()
-      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL))
-      .collect(Collectors.groupingBy(Notional::getNotionalProduct, Collectors.toList()));
-    BigDecimal notionalMargin = factors.keySet().stream()
-        .filter(notionals::containsKey)
-        .map(product -> {
-          BigDecimal factor = factors.get(product).getPercentFactor();
-          BigDecimal productNotional = BigDecimalUtils.sum(notionals.get(product), n -> n.getAmountUsd(config.fxRate()).abs());
-          return factor.multiply(productNotional);
-        })
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    Map<String, NotionalFactor> factors = notionalAddOns.stream().filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR))
+        .collect(Collectors.toMap(NotionalFactor::getNotionalProduct, Function.identity()));
+    Map<String, List<Notional>> notionals = notionalAddOns.stream().filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL))
+        .collect(Collectors.groupingBy(Notional::getNotionalProduct, Collectors.toList()));
+    BigDecimal notionalMargin = factors.keySet().stream().filter(notionals::containsKey).map(product -> {
+      BigDecimal factor = factors.get(product).getPercentFactor();
+      BigDecimal productNotional = BigDecimalUtils.sum(notionals.get(product), n -> n.getAmountUsd(config.fxRate()).abs());
+      return factor.multiply(productNotional);
+    }).reduce(BigDecimal.ZERO, BigDecimal::add);
 
     return new AddOnNotionalMargin(subClass, notionalMargin);
   }

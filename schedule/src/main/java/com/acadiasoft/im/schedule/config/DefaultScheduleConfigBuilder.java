@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,19 +40,25 @@ public class DefaultScheduleConfigBuilder implements ScheduleConfigBuilder {
 
   @Override
   public ScheduleConfigBuilder fxRate(FxRate fx) {
-    if (fx != null) { this.fxRate = fx; }
+    if (fx != null) {
+      this.fxRate = fx;
+    }
     return this;
   }
 
   @Override
   public ScheduleConfigBuilder scheduleCalculationType(ScheduleCalculationType type) {
-    if (type != null) { this.calculationType = type; }
+    if (type != null) {
+      this.calculationType = type;
+    }
     return this;
   }
 
   @Override
   public ScheduleConfigBuilder netGrossRate(BigDecimal ngr) {
-    if (ngr != null) { this.ngr = ngr; }
+    if (ngr != null) {
+      this.ngr = ngr;
+    }
     return this;
   }
 

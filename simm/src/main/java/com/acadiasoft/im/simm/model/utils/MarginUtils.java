@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,18 +30,22 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * @author joe.peterson
+ *
+ */
 public class MarginUtils {
 
-  @SuppressWarnings("unchecked")
-  public static <E extends MarginIdentifier, T extends ImTree> BigDecimal
-  sumCorrelated(List<T> margins, Function<T, BigDecimal> getMargin, BiFunction<E, E, BigDecimal> correlate) {
-    return margins.stream()
-      .map(one -> margins.stream()
-        .filter(other -> !other.getMarginIdentifier().equals(one.getMarginIdentifier()))
-        .map(other -> correlate.apply((E) one.getMarginIdentifier(), (E) other.getMarginIdentifier())
-          .multiply(getMargin.apply(one))
-          .multiply(getMargin.apply(other)))
-        .reduce(BigDecimal.ZERO, BigDecimal::add)
-      ).reduce(BigDecimal.ZERO, BigDecimal::add);
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public static <E extends MarginIdentifier, T extends ImTree> BigDecimal sumCorrelated(List<T> margins, Function<T, BigDecimal> getMargin,
+      BiFunction<E, E, BigDecimal> correlate) {
+    return margins.stream() //
+        .map(one -> margins.stream() //
+            .filter(other -> !other.getMarginIdentifier().equals(one.getMarginIdentifier())) //
+            .map(other -> correlate.apply((E) one.getMarginIdentifier(), (E) other.getMarginIdentifier()) //
+                .multiply(getMargin.apply(one)) //
+                .multiply(getMargin.apply(other)))
+            .reduce(BigDecimal.ZERO, BigDecimal::add) //
+        ).reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 }

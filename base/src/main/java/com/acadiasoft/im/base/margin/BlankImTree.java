@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,8 @@ import java.util.Collections;
  * @author alec.stewart
  */
 public class BlankImTree extends TotalMargin {
+
+  private static final long serialVersionUID = 1L;
 
   private BlankImTree() {
     super(BigDecimal.ZERO, Collections.emptyList());

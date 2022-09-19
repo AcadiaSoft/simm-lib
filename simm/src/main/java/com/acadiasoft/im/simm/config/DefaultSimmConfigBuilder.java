@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,25 +43,33 @@ public class DefaultSimmConfigBuilder implements SimmConfigBuilder {
 
   @Override
   public SimmConfigBuilder fxRate(FxRate fx) {
-    if (fx != null) { this.fx = fx; }
+    if (fx != null) {
+      this.fx = fx;
+    }
     return this;
   }
 
   @Override
   public SimmConfigBuilder holdingPeriod(HoldingPeriod period) {
-    if (period != null) { this.holdingPeriod = period; }
+    if (period != null) {
+      this.holdingPeriod = period;
+    }
     return this;
   }
 
   @Override
   public SimmConfigBuilder simmCalculationType(SimmCalculationType type) {
-    if (type != null) { this.simmCalculationType = type; }
+    if (type != null) {
+      this.simmCalculationType = type;
+    }
     return this;
   }
 
   @Override
   public SimmConfigBuilder calculationCurrency(String calculationCurrency) {
-    if (calculationCurrency != null) { this.calculationCurrency = calculationCurrency; }
+    if (calculationCurrency != null) {
+      this.calculationCurrency = calculationCurrency;
+    }
     return this;
   }
 

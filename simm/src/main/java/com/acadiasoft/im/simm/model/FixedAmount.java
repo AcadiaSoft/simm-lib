@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,12 +28,11 @@ import com.acadiasoft.im.simm.model.imtree.identifiers.AddOnSubType;
 public interface FixedAmount extends CurrencyAmount {
 
   public static Sensitivity of(String amount, String amountCurrency, String amountUsd) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_FIXED_AMOUNT, null,
-      null, null, null, amount, amountCurrency, amountUsd);
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_FIXED_AMOUNT, null, null, null, null, amount, amountCurrency, amountUsd);
   }
 
   public static Sensitivity of(FixedAmount fixedAmount) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_FIXED_AMOUNT, null, null, null,
-      null, fixedAmount.getAmountAsString(), fixedAmount.getAmountCurrency(), fixedAmount.getAmountUsdAsString());
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_FIXED_AMOUNT, null, null, null, null, fixedAmount.getAmountAsString(), fixedAmount.getAmountCurrency(),
+        fixedAmount.getAmountUsdAsString());
   }
 }

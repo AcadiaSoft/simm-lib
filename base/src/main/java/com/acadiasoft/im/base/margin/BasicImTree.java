@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,31 +33,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author joe.peterson
+ *
+ */
 @SuppressWarnings("unchecked")
 public class BasicImTree implements ImTree<BasicIdentifier, BasicImTree> {
 
+  private static final long serialVersionUID = 1L;
   private final String level;
   private final BigDecimal margin;
   private final String identifier;
   private final List<BasicImTree> children;
 
   @JsonCreator
-  public BasicImTree(@JsonProperty("level") String level, @JsonProperty("label") String label,
-                     @JsonProperty("margin") BigDecimal margin, @JsonProperty("children") List<BasicImTree> children) {
+  public BasicImTree(@JsonProperty("level") String level, @JsonProperty("label") String label, @JsonProperty("margin") BigDecimal margin,
+      @JsonProperty("children") List<BasicImTree> children) {
     this.level = level;
     this.margin = margin;
     this.identifier = label;
     this.children = new ArrayList<>(children);
   }
 
+  @SuppressWarnings("rawtypes")
   public BasicImTree(ImTree<? extends MarginIdentifier, ? extends ImTree> tree) {
     this.level = tree.getTreeLevel();
     this.margin = tree.getMargin();
     this.identifier = tree.getMarginIdentifier().getMarginIdentifier();
     this.children = tree.getChildren().stream()
-      // FIXME: why does compiler require this cast??? should be redundant...
-      .map(t -> new BasicImTree((ImTree<MarginIdentifier, ImTree>) t))
-      .collect(Collectors.toList());
+        // FIXME: why does compiler require this cast??? should be redundant...
+        .map(t -> new BasicImTree((ImTree<MarginIdentifier, ImTree>) t)).collect(Collectors.toList());
   }
 
   @Override

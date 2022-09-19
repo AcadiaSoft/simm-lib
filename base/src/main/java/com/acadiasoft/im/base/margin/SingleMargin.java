@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,14 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author joe.peterson
+ *
+ */
+@SuppressWarnings("rawtypes")
 public abstract class SingleMargin implements ImTree<SingleClass, ImTree> {
 
+  private static final long serialVersionUID = 1L;
   private final String level;
   private final BigDecimal margin;
   private final SingleClass singleClass;

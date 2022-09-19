@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,8 @@ import java.math.BigDecimal;
 public interface SchedulePv extends ScheduleIdentifier, CurrencyAmount {
 
   static ScheduleSensitivity of(SchedulePv pv) {
-    return new DefaultScheduleSensitivity(pv.getTradeId(), pv.getProductClass(),
-      ScheduleRiskType.SCHEDULE_PV, pv.getValuationDateAsString(), pv.getEndDateAsString(),
-      pv.getAmountAsString(), pv.getAmountCurrency(), pv.getAmountUsdAsString());
+    return new DefaultScheduleSensitivity(pv.getTradeId(), pv.getProductClass(), ScheduleRiskType.SCHEDULE_PV, pv.getValuationDateAsString(), pv.getEndDateAsString(),
+        pv.getAmountAsString(), pv.getAmountCurrency(), pv.getAmountUsdAsString());
   }
 
   String BAD_CALL = "Risk type was not 'PV' as it was expected to be: [%s]";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,21 +33,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by alec.stewart on 8/9/17.
+ * @author joe.peterson
+ *
  */
 public class CreditQualifyingConcentrationRisk implements SimmConcentrationThreshold {
 
-  private static final List<String> SOVERIGN = Arrays.asList("1", "7");
+  private static final List<String> SOVEREIGN = Arrays.asList("1", "7");
   private static final List<String> CORPORATE = Arrays.asList("2", "3", "4", "5", "6", "8", "9", "10", "11", "12");
   private static final List<String> NOT_CLASSIFIED = Arrays.asList("Residual");
 
   private static final Map<List<String>, BigDecimal> DELTA_THRESHOLD = new HashMap<>();
-//    private static final Map<List<String>, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
+  //    private static final Map<List<String>, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
 
   static {
-    DELTA_THRESHOLD.put(SOVERIGN, new BigDecimal("0.49").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(CORPORATE, new BigDecimal("0.22").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("0.22").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(SOVEREIGN, new BigDecimal("0.91").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(CORPORATE, new BigDecimal("0.19").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("0.19").multiply(ConcentrationRiskGroup.MM));
 
     // NOTE: there is only one concentration threshold for all Credit Qualifying Vol
   }
@@ -59,12 +60,12 @@ public class CreditQualifyingConcentrationRisk implements SimmConcentrationThres
 
   @Override
   public BigDecimal getVegaThreshold(String bucket) {
-    return new BigDecimal("310").multiply(ConcentrationRiskGroup.MM);
+    return new BigDecimal("260").multiply(ConcentrationRiskGroup.MM);
   }
 
   private List<String> determineGroup(String bucket) {
-    if (SOVERIGN.contains(bucket)) {
-      return SOVERIGN;
+    if (SOVEREIGN.contains(bucket)) {
+      return SOVEREIGN;
     } else if (CORPORATE.contains(bucket)) {
       return CORPORATE;
     } else if (StringUtils.equalsIgnoreCase(bucket, "Residual")) {

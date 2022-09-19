@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,11 +30,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * As defined by Appendix 2, section 2.1 of Risk_Data_Standards_v1.25_(PUBLIC).pdf
- *
  * @author alec.stewart
+ * @author joe.peterson
+ *
  */
 public class DefaultSensitivity extends DefaultSensitivityIdentifier implements Serializable, Sensitivity {
+
+  private static final long serialVersionUID = 1L;
 
   public static final String RESIDUAL = "residual";
 
@@ -61,22 +63,20 @@ public class DefaultSensitivity extends DefaultSensitivityIdentifier implements 
     this.amountUsd = amountUsd.toPlainString();
   }
 
-  public DefaultSensitivity(String productClass, String riskType, String qualifier, String bucket, String label1, String label2,
-                            String amount, String amountCurrency, String amountUsd) {
-    this(null, productClass, riskType, qualifier, bucket, label1, label2, amount, amountCurrency, amountUsd,
-      SensitivityClass.determineByRiskType(riskType));
+  public DefaultSensitivity(String productClass, String riskType, String qualifier, String bucket, String label1, String label2, String amount, String amountCurrency,
+      String amountUsd) {
+    this(null, productClass, riskType, qualifier, bucket, label1, label2, amount, amountCurrency, amountUsd, SensitivityClass.determineByRiskType(riskType));
   }
 
-  public DefaultSensitivity(String productClass, String riskType, String qualifier, String bucket, String label1, String label2,
-                             String amount, String amountCurrency, String amountUsd, SensitivityClass sensitivityClass) {
+  public DefaultSensitivity(String productClass, String riskType, String qualifier, String bucket, String label1, String label2, String amount, String amountCurrency,
+      String amountUsd, SensitivityClass sensitivityClass) {
     this(null, productClass, riskType, qualifier, bucket, label1, label2, amount, amountCurrency, amountUsd, sensitivityClass);
   }
 
-  public DefaultSensitivity(String tradeId, String productClass, String riskType, String qualifier, String bucket, String label1, String label2,
-                            String amount, String amountCurrency, String amountUsd, SensitivityClass sensitivityClass) {
+  public DefaultSensitivity(String tradeId, String productClass, String riskType, String qualifier, String bucket, String label1, String label2, String amount,
+      String amountCurrency, String amountUsd, SensitivityClass sensitivityClass) {
     // set up the identifier values
-    super(tradeId, productClass, riskType, qualifier, bucket, label1, label2,
-      sensitivityClass, RiskClass.determineByRiskType(riskType));
+    super(tradeId, productClass, riskType, qualifier, bucket, label1, label2, sensitivityClass, RiskClass.determineByRiskType(riskType));
     checkSensitivityIdentifier(productClass, riskType, qualifier, bucket, label1, label2);
 
     // check and set the amounts - product multipliers and factors are value amounts

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import java.io.Serializable;
  */
 public enum ImRole implements Serializable {
 
-  SECURED("Secured"),
+  SECURED("Secured"), //
   PLEDGOR("Pledgor");
 
   private final String role;

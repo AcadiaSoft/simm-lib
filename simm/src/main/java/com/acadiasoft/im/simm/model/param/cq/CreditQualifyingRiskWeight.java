@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,31 +30,31 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * As defined in Appendix 1 of doc/ISDA-SIMM-2.0.pdf
+ * @author joe.peterson
+ *
  */
 public class CreditQualifyingRiskWeight implements SimmRiskWeight {
 
   private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.CRQ1,        new BigDecimal("81")  );
-    WEIGHTS.put(BucketType.CRQ2,        new BigDecimal("96")  );
-    WEIGHTS.put(BucketType.CRQ3,        new BigDecimal("86")  );
-    WEIGHTS.put(BucketType.CRQ4,        new BigDecimal("53")  );
-    WEIGHTS.put(BucketType.CRQ5,        new BigDecimal("59")  );
-    WEIGHTS.put(BucketType.CRQ6,        new BigDecimal("47")  );
-    WEIGHTS.put(BucketType.CRQ7,        new BigDecimal("181") );
-    WEIGHTS.put(BucketType.CRQ8,        new BigDecimal("452") );
-    WEIGHTS.put(BucketType.CRQ9,        new BigDecimal("252") );
-    WEIGHTS.put(BucketType.CRQ10,       new BigDecimal("261") );
-    WEIGHTS.put(BucketType.CRQ11,       new BigDecimal("218") );
-    WEIGHTS.put(BucketType.CRQ12,       new BigDecimal("195") );
-    WEIGHTS.put(BucketType.CRQRESIDUAL, new BigDecimal("452")  );
+    WEIGHTS.put(BucketType.CRQ1, new BigDecimal("75"));
+    WEIGHTS.put(BucketType.CRQ2, new BigDecimal("91"));
+    WEIGHTS.put(BucketType.CRQ3, new BigDecimal("78"));
+    WEIGHTS.put(BucketType.CRQ4, new BigDecimal("55"));
+    WEIGHTS.put(BucketType.CRQ5, new BigDecimal("67"));
+    WEIGHTS.put(BucketType.CRQ6, new BigDecimal("47"));
+    WEIGHTS.put(BucketType.CRQ7, new BigDecimal("187"));
+    WEIGHTS.put(BucketType.CRQ8, new BigDecimal("665"));
+    WEIGHTS.put(BucketType.CRQ9, new BigDecimal("262"));
+    WEIGHTS.put(BucketType.CRQ10, new BigDecimal("251"));
+    WEIGHTS.put(BucketType.CRQ11, new BigDecimal("172"));
+    WEIGHTS.put(BucketType.CRQ12, new BigDecimal("247"));
+    WEIGHTS.put(BucketType.CRQRESIDUAL, new BigDecimal("665"));
   }
 
-  private static final BigDecimal VEGA = new BigDecimal("0.73");
+  private static final BigDecimal VEGA = new BigDecimal("0.74");
 
   @Override
   public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {

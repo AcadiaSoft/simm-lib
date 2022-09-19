@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,7 @@ import java.io.Serializable;
  */
 public class DefaultCrif implements Crif, Serializable {
 
+  private static final long serialVersionUID = 1L;
   private final String tradeId;
   private final String imModel;
   private final String productClass;
@@ -56,37 +57,62 @@ public class DefaultCrif implements Crif, Serializable {
   private final String notionalCurrency;
 
   /**
-   *  Builds a line of CRIF data with all fields
+   * Builds a line of CRIF data with all fields
    *
-   * @param tradeId the id of the trade that the CRIF line belongs to
-   * @param valuationDate the valuation date of the trade
-   * @param endDate the end date of the trade
-   * @param notional the notional amount of the trade
-   * @param notionalCurrency the currency of the trade notional
-   * @param imModel the model that im will be calculated with for the trade
-   * @param productClass the product class of the trade
-   *                     (either SIMM: [RatesFX, Credit, Commdity, Equity] or Schedule: [Rates, FX, Credit, Commodity, Equity]
-   * @param riskType the risk type of the CRIF line as defined by the Common Risk Interchange Format
-   * @param qualifier the qualifier " . . . "
-   * @param bucket the bucket " . . . "
-   * @param label1 the label1 " . . . "
-   * @param label2 the label2 " . . . "
-   * @param amount the amount " . . . "
-   * @param amountCurrency the currency of the amount
-   * @param amountUSD the amount in USD
-   * @param postRegulation the regulator of the posting party (usually this is yourself)
-   * @param collectRegulation the regulator of the collecting party (usually this is a counter-party)
+   * @param tradeId
+   *          the id of the trade that the CRIF line belongs to
+   * @param valuationDate
+   *          the valuation date of the trade
+   * @param endDate
+   *          the end date of the trade
+   * @param notional
+   *          the notional amount of the trade
+   * @param notionalCurrency
+   *          the currency of the trade notional
+   * @param imModel
+   *          the model that im will be calculated with for the trade
+   * @param productClass
+   *          the product class of the trade (either SIMM: [RatesFX, Credit, Commdity, Equity] or Schedule: [Rates, FX,
+   *          Credit, Commodity, Equity]
+   * @param riskType
+   *          the risk type of the CRIF line as defined by the Common Risk Interchange Format
+   * @param qualifier
+   *          the qualifier " . . . "
+   * @param bucket
+   *          the bucket " . . . "
+   * @param label1
+   *          the label1 " . . . "
+   * @param label2
+   *          the label2 " . . . "
+   * @param amount
+   *          the amount " . . . "
+   * @param amountCurrency
+   *          the currency of the amount
+   * @param amountUSD
+   *          the amount in USD
+   * @param postRegulation
+   *          the regulator of the posting party (usually this is yourself)
+   * @param collectRegulation
+   *          the regulator of the collecting party (usually this is a counter-party)
    */
   @JsonCreator
-  public DefaultCrif(@JsonProperty("trade_id") String tradeId, @JsonProperty("valuation_date") String valuationDate,
-                     @JsonProperty("end_date") String endDate, @JsonProperty("notional") String notional,
-                     @JsonProperty("trade_currency") String notionalCurrency, @JsonProperty("im_model") String imModel,
-                     @JsonProperty("product_class") String productClass, @JsonProperty("risk_type") String riskType,
-                     @JsonProperty("qualifier") String qualifier, @JsonProperty("bucket") String bucket,
-                     @JsonProperty("label1") String label1, @JsonProperty("label2") String label2,
-                     @JsonProperty("amount") String amount, @JsonProperty("amount_currency") String amountCurrency,
-                     @JsonProperty("amount_usd") String amountUSD, @JsonProperty("post_regulation") String postRegulation,
-                     @JsonProperty("collect_regulation") String collectRegulation) {
+  public DefaultCrif(@JsonProperty("trade_id") String tradeId, //
+      @JsonProperty("valuation_date") String valuationDate, //
+      @JsonProperty("end_date") String endDate, //
+      @JsonProperty("notional") String notional, //
+      @JsonProperty("trade_currency") String notionalCurrency, //
+      @JsonProperty("im_model") String imModel, //
+      @JsonProperty("product_class") String productClass, //
+      @JsonProperty("risk_type") String riskType, //
+      @JsonProperty("qualifier") String qualifier, //
+      @JsonProperty("bucket") String bucket, //
+      @JsonProperty("label1") String label1, //
+      @JsonProperty("label2") String label2, //
+      @JsonProperty("amount") String amount, //
+      @JsonProperty("amount_currency") String amountCurrency, //
+      @JsonProperty("amount_usd") String amountUSD, //
+      @JsonProperty("post_regulation") String postRegulation, //
+      @JsonProperty("collect_regulation") String collectRegulation) {
     this.valuationDate = valuationDate;
     this.endDate = endDate;
     this.tradeId = tradeId;

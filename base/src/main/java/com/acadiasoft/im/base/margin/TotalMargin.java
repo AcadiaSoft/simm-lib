@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import java.util.List;
 
 public class TotalMargin implements ImTree<TotalClass, ModelMargin> {
 
+  private static final long serialVersionUID = 1L;
   private final static String LEVEL = "1.Total";
   private final BigDecimal margin;
   private final List<ModelMargin> children = new ArrayList<>();

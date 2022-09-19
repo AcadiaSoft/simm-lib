@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,20 +29,21 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * As defined in Appendix 1 section K of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class ProductClass extends SiloClass {
 
+  private static final long serialVersionUID = 1L;
   public static final ProductClass RATES_FX = new ProductClass("RatesFX", "Interest Rates and Foreign Exchange");
   public static final ProductClass CREDIT = new ProductClass("Credit", "Credit");
   public static final ProductClass EQUITY = new ProductClass("Equity", "Equity");
   public static final ProductClass COMMODITY = new ProductClass("Commodity", "Commodity");
+
   public static final ProductClass SINGLE = new ProductClass("Single", "The single product class that can contain all types");
 
   private static final String BAD_LABEL = "Unknown product class specified: [%s]";
-  private static final Supplier<Stream<ProductClass>> ALL = () -> Stream.of(
-    RATES_FX, CREDIT, EQUITY, COMMODITY
-  );
+  private static final Supplier<Stream<ProductClass>> ALL = () -> Stream.of(RATES_FX, CREDIT, EQUITY, COMMODITY);
 
   private final String description;
 
@@ -56,7 +57,6 @@ public class ProductClass extends SiloClass {
   }
 
   public static ProductClass determineProductClass(String label) {
-    return ALL.get().filter(product -> StringUtils.equalsIgnoreCase(label, product.label)).findAny()
-      .orElseThrow(() -> new IllegalStateException(String.format(BAD_LABEL, label)));
+    return ALL.get().filter(product -> StringUtils.equalsIgnoreCase(label, product.label)).findAny().orElseThrow(() -> new IllegalStateException(String.format(BAD_LABEL, label)));
   }
 }

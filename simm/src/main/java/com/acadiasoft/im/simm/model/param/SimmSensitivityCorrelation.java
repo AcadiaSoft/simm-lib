@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,7 @@ import java.math.BigDecimal;
 
 public interface SimmSensitivityCorrelation {
 
-  public static BigDecimal get(RiskClass riskClass, SensitivityClass sensitivityClass,
-                               WeightingClass r, WeightingClass s, String calculationCurrency) {
+  public static BigDecimal get(RiskClass riskClass, SensitivityClass sensitivityClass, WeightingClass r, WeightingClass s, String calculationCurrency) {
     if (riskClass.equals(RiskClass.INTEREST_RATE)) {
       return new InterestRateCorrelation().getSensitivityCorrelation(r, s);
     } else if (riskClass.equals(RiskClass.CREDIT_QUALIFYING)) {

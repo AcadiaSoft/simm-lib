@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ public enum ScheduleCalculationType {
 
   // either calculation is run with pvs and no input NGR, or it is run without and the NGR is given
 
-  WITH_PVS,
+  WITH_PVS, //
   WITHOUT_PVS
 
 }

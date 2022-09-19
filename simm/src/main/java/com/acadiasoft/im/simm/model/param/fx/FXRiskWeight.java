@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * As defined in Appendix 1 section I of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class FXRiskWeight implements SimmFxRiskWeight {
 
@@ -44,12 +45,12 @@ public class FXRiskWeight implements SimmFxRiskWeight {
   private static final Map<FXCurrencyVolatility, BigDecimal> HIGH = new HashMap<>();
 
   static {
-    REGULAR.put(REGULAR_VOLATILITY, new BigDecimal("7.3"));
-    REGULAR.put(HIGH_VOLATILITY, new BigDecimal("13"));
+    REGULAR.put(REGULAR_VOLATILITY, new BigDecimal("7.4"));
+    REGULAR.put(HIGH_VOLATILITY, new BigDecimal("13.6"));
     WEIGHTS.put(REGULAR_VOLATILITY, REGULAR);
 
-    HIGH.put(REGULAR_VOLATILITY, new BigDecimal("13"));
-    HIGH.put(HIGH_VOLATILITY, new BigDecimal("10.2"));
+    HIGH.put(REGULAR_VOLATILITY, new BigDecimal("13.6"));
+    HIGH.put(HIGH_VOLATILITY, new BigDecimal("14.6"));
     WEIGHTS.put(HIGH_VOLATILITY, HIGH);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 public class AddOnMargin extends SiloMargin {
 
+  private static final long serialVersionUID = 1L;
   private final static String LEVEL = "3.AddOn";
 
   private AddOnMargin(BigDecimal margin, List<GroupMargin> children) {
@@ -52,26 +53,25 @@ public class AddOnMargin extends SiloMargin {
   public static AddOnMargin calculate(List<Sensitivity> addOns, List<ProductMargin> marginByProduct, SimmConfig config) {
     List<GroupMargin> subAddOn = new ArrayList<>();
 
-    Map<MarginIdentifier, ProductMargin> mappedMargins = marginByProduct.stream()
-      .collect(Collectors.toMap(ProductMargin::getMarginIdentifier, Function.identity()));
-    addOns.stream().filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER))
-      .forEach(multiplier -> {
-        ProductClass productClass = config.useSingleProductClass() ? ProductClass.SINGLE : multiplier.getMultiplierProduct();
-        ProductMargin productMargin = mappedMargins.get(productClass);
-        subAddOn.add(ProductMultiplierMargin.calculate(multiplier, productMargin));
-      });
+    Map<MarginIdentifier, ProductMargin> mappedMargins = marginByProduct.stream() //
+        .collect(Collectors.toMap(ProductMargin::getMarginIdentifier, Function.identity()));
+    addOns.stream().filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER)).forEach(multiplier -> {
+      ProductClass productClass = config.useSingleProductClass() ? ProductClass.SINGLE : multiplier.getMultiplierProduct();
+      ProductMargin productMargin = mappedMargins.get(productClass);
+      subAddOn.add(ProductMultiplierMargin.calculate(multiplier, productMargin));
+    });
 
-    List<Sensitivity> notionalAddOns = addOns.stream()
-      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL)
-        || sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR))
-      .collect(Collectors.toList());
+    List<Sensitivity> notionalAddOns = addOns.stream() //
+        .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL) //
+            || sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR)) //
+        .collect(Collectors.toList());
     if (!notionalAddOns.isEmpty()) {
       subAddOn.add(AddOnNotionalMargin.calculate(notionalAddOns, config));
     }
 
-    List<FixedAmount> fixed = addOns.stream()
-      .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_FIXED_AMOUNT))
-      .collect(Collectors.toList());
+    List<FixedAmount> fixed = addOns.stream() //
+        .filter(sensitivity -> sensitivity.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_FIXED_AMOUNT)) //
+        .collect(Collectors.toList());
     if (!fixed.isEmpty()) {
       subAddOn.add(AddOnFixedMargin.calculate(fixed, config));
     }

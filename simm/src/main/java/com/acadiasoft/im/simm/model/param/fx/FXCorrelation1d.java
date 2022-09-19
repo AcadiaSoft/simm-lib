@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,27 +32,28 @@ import com.acadiasoft.im.simm.model.param.SimmFxSensitivityCorrelation;
 import java.math.BigDecimal;
 
 /**
- * As defined in Appendix 1 section I of doc/ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class FXCorrelation1d implements SimmBucketCorrelation, SimmFxSensitivityCorrelation {
+
 
   private static final BigDecimal[][] HIGH_CALC_CURRENCY_CORRELATIONS = {
       { // High
           new BigDecimal("0.5"), // High
-          new BigDecimal("0.39"), // Regular
+          new BigDecimal("0.54"), // Regular
       },
       { // Regular
-          new BigDecimal("0.39"), // High
+          new BigDecimal("0.54"), // High
           new BigDecimal("0.85"), // Regular
       } };
-
   private static final BigDecimal[][] REGULAR_CALC_CURRENCY_CORRELATIONS = {
       { // High
-          new BigDecimal("0.69"), // High
-          new BigDecimal("0.28"), // Regular
+          new BigDecimal("0.42"), // High
+          new BigDecimal("0.27"), // Regular
       },
       { // Regular
-          new BigDecimal("0.28"), // High
+          new BigDecimal("0.27"), // High
           new BigDecimal("0.5"), // Regular
       } };
 

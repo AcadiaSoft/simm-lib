@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,13 +32,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by alec.stewart on 8/8/17.
+ * @author joe.peterson
+ *
  */
 public class FXConcentrationRisk implements SimmConcentrationThreshold {
 
   private static final List<String> CATEGORY_1 = Arrays.asList("USD", "EUR", "JPY", "GBP", "AUD", "CHF", "CAD");
   private static final List<String> CATEGORY_2 = Arrays.asList("BRL", "CNY", "HKD", "INR", "KRW", "MXN", "NOK", "NZD", "RUB", "SEK", "SGD", "TRY", "ZAR");
-  private static final List<String> CATEGORY_3 = null; // all other currencies
+  private static final List<String> CATEGORY_3 = null;
 
   private static final Map<List<String>, BigDecimal> DELTA_THRESHOLD = new HashMap<>();
   private static final Map<List<String>, Map<List<String>, BigDecimal>> VEGA_THRESHOLD = new HashMap<>();
@@ -47,23 +48,22 @@ public class FXConcentrationRisk implements SimmConcentrationThreshold {
   private static final Map<List<String>, BigDecimal> CAT_3 = new HashMap<>();
 
   static {
-    DELTA_THRESHOLD.put(CATEGORY_1, new BigDecimal("8300").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(CATEGORY_2, new BigDecimal("1900").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(CATEGORY_3, new BigDecimal("240").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(CATEGORY_1, new BigDecimal("5100").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(CATEGORY_2, new BigDecimal("1200").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(CATEGORY_3, new BigDecimal("190").multiply(ConcentrationRiskGroup.MM));
 
-    CAT_1.put(CATEGORY_1, new BigDecimal("3000").multiply(ConcentrationRiskGroup.MM));
-    CAT_1.put(CATEGORY_2, new BigDecimal("1400").multiply(ConcentrationRiskGroup.MM));
-    CAT_1.put(CATEGORY_3, new BigDecimal("610").multiply(ConcentrationRiskGroup.MM));
+    CAT_1.put(CATEGORY_1, new BigDecimal("2800").multiply(ConcentrationRiskGroup.MM));
+    CAT_1.put(CATEGORY_2, new BigDecimal("1300").multiply(ConcentrationRiskGroup.MM));
+    CAT_1.put(CATEGORY_3, new BigDecimal("550").multiply(ConcentrationRiskGroup.MM));
+    CAT_2.put(CATEGORY_1, new BigDecimal("1300").multiply(ConcentrationRiskGroup.MM));
+    CAT_2.put(CATEGORY_2, new BigDecimal("490").multiply(ConcentrationRiskGroup.MM));
+    CAT_2.put(CATEGORY_3, new BigDecimal("310").multiply(ConcentrationRiskGroup.MM));
+    CAT_3.put(CATEGORY_1, new BigDecimal("550").multiply(ConcentrationRiskGroup.MM));
+    CAT_3.put(CATEGORY_2, new BigDecimal("310").multiply(ConcentrationRiskGroup.MM));
+    CAT_3.put(CATEGORY_3, new BigDecimal("200").multiply(ConcentrationRiskGroup.MM));
+
     VEGA_THRESHOLD.put(CATEGORY_1, CAT_1);
-
-    CAT_2.put(CATEGORY_1, new BigDecimal("1400").multiply(ConcentrationRiskGroup.MM));
-    CAT_2.put(CATEGORY_2, new BigDecimal("640").multiply(ConcentrationRiskGroup.MM));
-    CAT_2.put(CATEGORY_3, new BigDecimal("420").multiply(ConcentrationRiskGroup.MM));
     VEGA_THRESHOLD.put(CATEGORY_2, CAT_2);
-
-    CAT_3.put(CATEGORY_1, new BigDecimal("610").multiply(ConcentrationRiskGroup.MM));
-    CAT_3.put(CATEGORY_2, new BigDecimal("420").multiply(ConcentrationRiskGroup.MM));
-    CAT_3.put(CATEGORY_3, new BigDecimal("240").multiply(ConcentrationRiskGroup.MM));
     VEGA_THRESHOLD.put(CATEGORY_3, CAT_3);
   }
 

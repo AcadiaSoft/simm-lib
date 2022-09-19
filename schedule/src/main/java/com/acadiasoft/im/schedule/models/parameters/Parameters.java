@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ import com.acadiasoft.im.schedule.models.imtree.identifiers.ScheduleProductClass
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 /**
  *
  * @author alec.stewart

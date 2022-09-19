@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,73 +55,69 @@ public class Simmple {
   // NOTE: post regulator applies to the pledgor, collect regulator applies to the secured
 
   public static SimmpleResult calculateWorstOf(List<Crif> crifs, SimmpleConfig config) {
-    return Crif.getRegulators(crifs, config.imRole()).stream()
-      .map(regulator -> {
-        // get the list of crifs that contain this regulator
-        List<Crif> containsRegulator = crifs.stream()
-          .filter(crif -> crif.containsRegulator(config.imRole(), regulator))
+    return Crif.getRegulators(crifs, config.imRole(), config.simmCalculationType()).stream().map(regulator -> {
+      // get the list of crifs that contain this regulator
+      List<Crif> containsRegulator = crifs.stream() //
+          .filter(crif -> crif.containsRegulator(config.imRole(), regulator)) //
           .collect(Collectors.toList());
-        // calculate the simm exposure amount
-        List<Sensitivity> sensitivities = containsRegulator.stream()
-          .filter(SimmpleCalculationType.calculateSimm(config))
-          .filter(Crif.isSimm)
-          .map(crif -> crif.convertSensitivityAmountForRole(config))
+      // calculate the simm exposure amount
+      List<Sensitivity> sensitivities = containsRegulator.stream() //
+          .filter(SimmpleCalculationType.calculateSimm(config)) //
+          .filter(Crif.isSimm) //
+          .map(crif -> crif.convertSensitivityAmountForRole(config)) //
           .collect(Collectors.toList());
-        ModelMargin simm = Simm.calculate(sensitivities, config);
-        // calculate the schedule exposure amount
-        List<ScheduleSensitivity> scheduleSensitivities = containsRegulator.stream()
-          .filter(SimmpleCalculationType.calculateSchedule(config))
-          .filter(Crif.isSchedule)
-          .map(crif -> crif.convertScheduleAmountForRole(config))
+      ModelMargin simm = Simm.calculate(sensitivities, config);
+      // calculate the schedule exposure amount
+      List<ScheduleSensitivity> scheduleSensitivities = containsRegulator.stream() //
+          .filter(SimmpleCalculationType.calculateSchedule(config)) //
+          .filter(Crif.isSchedule) //
+          .map(crif -> crif.convertScheduleAmountForRole(config)) //
           .collect(Collectors.toList());
-        ModelMargin schedule = Schedule.calculate(scheduleSensitivities, config);
-        // return the total margin of these two models converted to the result currency
-        TotalMargin total = TotalMargin.build(simm, schedule);
-        return new SimmpleResult(total, regulator, config);
-      })
-      .sorted(Comparator.comparing(SimmpleResult::getRegulator))
-      .max(Comparator.comparing(result -> result.getImTree().getMargin().abs()))
-      .orElse(SimmpleResult.empty(config));
+      ModelMargin schedule = Schedule.calculate(scheduleSensitivities, config);
+      // return the total margin of these two models converted to the result currency
+      TotalMargin total = TotalMargin.build(simm, schedule);
+      return new SimmpleResult(total, regulator, config);
+    }) //
+        .sorted(Comparator.comparing(SimmpleResult::getRegulator)) //
+        .max(Comparator.comparing(result -> result.getImTree().getMargin().abs())) //
+        .orElse(SimmpleResult.empty(config));
   }
 
   // --------------------- legacy calculation functions ------------------------
 
-  public static SimmpleResult calculateWorstOf(List<Crif> crifs, String calculationCurrency, FxRate fx, String resultCurrency,
-                                               ImRole role, SimmCalculationType simmType, BigDecimal netGrossRate) {
-    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role)
-      .resultCurrency(resultCurrency).calculationCurrency(calculationCurrency).simmCalculationType(simmType)
-      .scheduleCalculationType(ScheduleCalculationType.WITHOUT_PVS).netGrossRate(netGrossRate)
-      .simmpleCalculationType(SimmpleCalculationType.BOTH).build();
+  public static SimmpleResult calculateWorstOf(List<Crif> crifs, String calculationCurrency, FxRate fx, String resultCurrency, ImRole role, SimmCalculationType simmType,
+      BigDecimal netGrossRate) {
+    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role) //
+        .resultCurrency(resultCurrency).calculationCurrency(calculationCurrency).simmCalculationType(simmType) //
+        .scheduleCalculationType(ScheduleCalculationType.WITHOUT_PVS).netGrossRate(netGrossRate) //
+        .simmpleCalculationType(SimmpleCalculationType.BOTH).build();
     return calculateWorstOf(crifs, config);
   }
 
-  public static SimmpleResult calculateWorstOf(List<Crif> crifs, String calculationCurrency, FxRate fx, String resultCurrency,
-                                               ImRole role, SimmCalculationType simmType) {
-    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role)
-      .resultCurrency(resultCurrency).calculationCurrency(calculationCurrency).simmCalculationType(simmType)
-      .scheduleCalculationType(ScheduleCalculationType.WITH_PVS).simmpleCalculationType(SimmpleCalculationType.BOTH).build();
+  public static SimmpleResult calculateWorstOf(List<Crif> crifs, String calculationCurrency, FxRate fx, String resultCurrency, ImRole role, SimmCalculationType simmType) {
+    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role) //
+        .resultCurrency(resultCurrency).calculationCurrency(calculationCurrency).simmCalculationType(simmType) //
+        .scheduleCalculationType(ScheduleCalculationType.WITH_PVS).simmpleCalculationType(SimmpleCalculationType.BOTH).build();
     return calculateWorstOf(crifs, config);
   }
 
-  public static SimmpleResult calculateScheduleWorstOf(List<Crif> crifs, FxRate fx, String resultCurrency,
-                                                       ImRole role, BigDecimal netGrossRate) {
-    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role).resultCurrency(resultCurrency)
-      .scheduleCalculationType(ScheduleCalculationType.WITHOUT_PVS).netGrossRate(netGrossRate)
-      .simmpleCalculationType(SimmpleCalculationType.SCHEDULE).build();
+  public static SimmpleResult calculateScheduleWorstOf(List<Crif> crifs, FxRate fx, String resultCurrency, ImRole role, BigDecimal netGrossRate) {
+    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role).resultCurrency(resultCurrency) //
+        .scheduleCalculationType(ScheduleCalculationType.WITHOUT_PVS).netGrossRate(netGrossRate) //
+        .simmpleCalculationType(SimmpleCalculationType.SCHEDULE).build();
     return calculateWorstOf(crifs, config);
   }
 
   public static SimmpleResult calculateScheduleWorstOf(List<Crif> crifs, FxRate fx, String resultCurrency, ImRole role) {
-    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role).resultCurrency(resultCurrency)
-      .scheduleCalculationType(ScheduleCalculationType.WITH_PVS).simmpleCalculationType(SimmpleCalculationType.SCHEDULE).build();
+    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role).resultCurrency(resultCurrency).scheduleCalculationType(ScheduleCalculationType.WITH_PVS)
+        .simmpleCalculationType(SimmpleCalculationType.SCHEDULE).build();
     return calculateWorstOf(crifs, config);
   }
 
-  public static SimmpleResult calculateSimmWorstOf(List<Crif> crifs, String calculationCurrency, FxRate fx, String resultCurrency,
-                                                   ImRole role, SimmCalculationType simmType) {
-    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role)
-      .resultCurrency(resultCurrency).calculationCurrency(calculationCurrency).simmCalculationType(simmType)
-      .simmpleCalculationType(SimmpleCalculationType.SIMM).build();
+  public static SimmpleResult calculateSimmWorstOf(List<Crif> crifs, String calculationCurrency, FxRate fx, String resultCurrency, ImRole role, SimmCalculationType simmType) {
+    SimmpleConfig config = SimmpleConfig.Builder().fxRate(fx).imRole(role) //
+        .resultCurrency(resultCurrency).calculationCurrency(calculationCurrency).simmCalculationType(simmType) //
+        .simmpleCalculationType(SimmpleCalculationType.SIMM).build();
     return calculateWorstOf(crifs, config);
   }
 

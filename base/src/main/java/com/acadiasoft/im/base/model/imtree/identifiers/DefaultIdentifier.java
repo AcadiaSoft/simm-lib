@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ import com.acadiasoft.im.base.model.imtree.MarginIdentifier;
 
 public class DefaultIdentifier implements MarginIdentifier {
 
+  private static final long serialVersionUID = 1L;
   protected final String label;
 
   public DefaultIdentifier(String label) {

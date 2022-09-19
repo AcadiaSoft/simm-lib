@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +29,16 @@ import com.acadiasoft.im.simm.model.imtree.identifiers.SensitivityClass;
 
 import java.math.BigDecimal;
 
-public interface Sensitivity
-  extends SensitivityIdentifier, CurrencyAmount, ProductMultiplier, Notional, NotionalFactor, FixedAmount {
+/**
+ * @author joe.peterson
+ *
+ */
+public interface Sensitivity extends SensitivityIdentifier, CurrencyAmount, ProductMultiplier, Notional, NotionalFactor, FixedAmount {
 
   // ------------------- static creation methods ---------------------------------
 
-  static Sensitivity of(String productClass, String riskType, String qualifier, String bucket, String label1, String label2,
-                        String amount, String amountCurrency, String amountUsd) {
+  static Sensitivity of(String productClass, String riskType, String qualifier, String bucket, String label1, String label2, String amount, String amountCurrency,
+      String amountUsd) {
     return new DefaultSensitivity(productClass, riskType, qualifier, bucket, label1, label2, amount, amountCurrency, amountUsd);
   }
 
@@ -46,8 +49,8 @@ public interface Sensitivity
   static Sensitivity curvatureFromVega(Sensitivity vega, SimmConfig config) {
     BigDecimal amount = vega.getAmount();
     BigDecimal amountUsd = vega.getAmountUsd(config.fxRate());
-    return new DefaultSensitivity(vega.getProductClass(), vega.getRiskType(), vega.getQualifier(), vega.getBucket(), vega.getLabel1(),
-      vega.getLabel2(), amount.toPlainString(), vega.getAmountCurrency(), amountUsd.toPlainString(), SensitivityClass.CURVATURE);
+    return new DefaultSensitivity(vega.getProductClass(), vega.getRiskType(), vega.getQualifier(), vega.getBucket(), vega.getLabel1(), vega.getLabel2(), amount.toPlainString(),
+        vega.getAmountCurrency(), amountUsd.toPlainString(), SensitivityClass.CURVATURE);
   }
 
   // ------------------- mapping default methods ---------------------------------
@@ -59,8 +62,8 @@ public interface Sensitivity
   }
 
   default String getNotionalProduct() {
-    if (this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR)
-      || this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL)) {
+    if (this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR) //
+        || this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL)) {
       // the qualifier is exactly the product name that this add on notional factor is associated with
       return this.getQualifier();
     } else {
@@ -69,8 +72,8 @@ public interface Sensitivity
   }
 
   default void checkAmountBasedOnRiskType(String amount, String amountCurrency) {
-    if (this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER)
-      || this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR)) {
+    if (this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER) //
+        || this.getRiskType().equalsIgnoreCase(AddOnSubType.ADD_ON_NOTIONAL_FACTOR)) {
       checkValueAmount(amount);
     } else {
       checkCurrencyAmount(amount, amountCurrency);

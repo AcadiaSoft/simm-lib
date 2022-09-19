@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,13 +38,11 @@ public interface ProductMultiplier extends Serializable, ValueAmount {
   String getQualifier();
 
   public static Sensitivity of(String productClass, String amount) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, productClass,
-      null, null, null, amount, null, null);
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, productClass, null, null, null, amount, null, null);
   }
 
   public static Sensitivity of(ProductMultiplier multiplier) {
-    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, multiplier.getQualifier(),
-      null, null, null, multiplier.getAmountAsString(), null, null);
+    return new DefaultSensitivity(null, AddOnSubType.ADD_ON_PRODUCT_MULTIPLIER, multiplier.getQualifier(), null, null, null, multiplier.getAmountAsString(), null, null);
   }
 
   default ProductClass getMultiplierProduct() {

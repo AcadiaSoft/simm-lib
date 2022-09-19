@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
  */
 public class RiskMargin extends GroupMargin {
 
+  private static final long serialVersionUID = 1L;
   private static final String LEVEL = "4.RiskClass";
 
   private RiskMargin(RiskClass riskClass, BigDecimal margin, List<BatchMargin> marginBySensitivityClass) {
@@ -49,8 +50,7 @@ public class RiskMargin extends GroupMargin {
 
   public static RiskMargin calculate(RiskClass riskClass, List<Sensitivity> sensitivities, SimmConfig config) {
     List<SensitivityMargin> marginBySensitivityClass = ListUtils.groupBy(sensitivities, SensitivityIdentifier::getSensitivityClass).entrySet().stream()
-      .map(entry -> SensitivityMargin.calculate(riskClass, entry.getKey(), entry.getValue(), config))
-      .collect(Collectors.toList());
+        .map(entry -> SensitivityMargin.calculate(riskClass, entry.getKey(), entry.getValue(), config)).collect(Collectors.toList());
     // we sum across the sensitivity margins in the Risk Class to get the total IM for that Risk Class
     // NOTE: since each Risk Class Margin only has the sensitivities associated with its own risk class, we can do a straight
     //    sum because all of the base corr sensitivities are in only the Credit Qualifying Risk Class by definition

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by alec.stewart on 8/8/17.
+ * @author joe.peterson
+ *
  */
 public class EquityConcentrationRisk implements SimmConcentrationThreshold {
 
@@ -48,19 +49,19 @@ public class EquityConcentrationRisk implements SimmConcentrationThreshold {
   private static final Map<List<String>, BigDecimal> VEGA_THRESHOLD = new HashMap<>();
 
   static {
-    DELTA_THRESHOLD.put(EMERGING_MARKETS_LARGE, new BigDecimal("9").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(DEVELOPED_MARKETS_LARGE, new BigDecimal("18").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(EMERGING_MARKETS_SMALL, new BigDecimal("1.2").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(DEVELOPED_MARKETS_SMALL, new BigDecimal("0.9").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(INDEXES_FUNDS_ETF_VOLINDEXES, new BigDecimal("1300").multiply(ConcentrationRiskGroup.MM));
-    DELTA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("0.9").multiply(ConcentrationRiskGroup.MM));
-
-    VEGA_THRESHOLD.put(EMERGING_MARKETS_LARGE, new BigDecimal("160").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(DEVELOPED_MARKETS_LARGE, new BigDecimal("1600").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(EMERGING_MARKETS_SMALL, new BigDecimal("38").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(DEVELOPED_MARKETS_SMALL, new BigDecimal("260").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(INDEXES_FUNDS_ETF_VOLINDEXES, new BigDecimal("7000").multiply(ConcentrationRiskGroup.MM));
-    VEGA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("38").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(EMERGING_MARKETS_LARGE, new BigDecimal("10").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(DEVELOPED_MARKETS_LARGE, new BigDecimal("21").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(EMERGING_MARKETS_SMALL, new BigDecimal("1.4").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(DEVELOPED_MARKETS_SMALL, new BigDecimal("0.6").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(INDEXES_FUNDS_ETF_VOLINDEXES, new BigDecimal("2100").multiply(ConcentrationRiskGroup.MM));
+    DELTA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("0.6").multiply(ConcentrationRiskGroup.MM));
+    
+    VEGA_THRESHOLD.put(EMERGING_MARKETS_LARGE, new BigDecimal("210").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(DEVELOPED_MARKETS_LARGE, new BigDecimal("1300").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(EMERGING_MARKETS_SMALL, new BigDecimal("40").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(DEVELOPED_MARKETS_SMALL, new BigDecimal("200").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(INDEXES_FUNDS_ETF_VOLINDEXES, new BigDecimal("5900").multiply(ConcentrationRiskGroup.MM));
+    VEGA_THRESHOLD.put(NOT_CLASSIFIED, new BigDecimal("40").multiply(ConcentrationRiskGroup.MM));
   }
 
   @Override

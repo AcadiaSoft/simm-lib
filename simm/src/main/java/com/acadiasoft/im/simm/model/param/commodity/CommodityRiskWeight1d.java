@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,33 +31,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * As defined in Appendix 1 of ISDA_SIMM_2.0_(PUBLIC).pdf
+ * @author joe.peterson
+ *
  */
 public class CommodityRiskWeight1d implements SimmRiskWeight {
 
   private static final Map<BucketType, BigDecimal> WEIGHTS = new HashMap<>();
 
   static {
-    WEIGHTS.put(BucketType.CM1,  new BigDecimal("6.3"));
-    WEIGHTS.put(BucketType.CM2,  new BigDecimal("9.1"));
-    WEIGHTS.put(BucketType.CM3,  new BigDecimal("8.1"));
-    WEIGHTS.put(BucketType.CM4,  new BigDecimal("7.2"));
-    WEIGHTS.put(BucketType.CM5,  new BigDecimal("10") );
-    WEIGHTS.put(BucketType.CM6,  new BigDecimal("8")  );
-    WEIGHTS.put(BucketType.CM7,  new BigDecimal("7.1"));
-    WEIGHTS.put(BucketType.CM8,  new BigDecimal("11") );
-    WEIGHTS.put(BucketType.CM9,  new BigDecimal("8.1"));
-    WEIGHTS.put(BucketType.CM10, new BigDecimal("16") );
+    WEIGHTS.put(BucketType.CM1, new BigDecimal("9.0"));
+    WEIGHTS.put(BucketType.CM2, new BigDecimal("9.1"));
+    WEIGHTS.put(BucketType.CM3, new BigDecimal("8.1"));
+    WEIGHTS.put(BucketType.CM4, new BigDecimal("7.2"));
+    WEIGHTS.put(BucketType.CM5, new BigDecimal("10"));
+    WEIGHTS.put(BucketType.CM6, new BigDecimal("8.2"));
+    WEIGHTS.put(BucketType.CM7, new BigDecimal("9.7"));
+    WEIGHTS.put(BucketType.CM8, new BigDecimal("10"));
+    WEIGHTS.put(BucketType.CM9, new BigDecimal("10"));
+    WEIGHTS.put(BucketType.CM10, new BigDecimal("16"));
     WEIGHTS.put(BucketType.CM11, new BigDecimal("6.2"));
-    WEIGHTS.put(BucketType.CM12, new BigDecimal("6.2"));
-    WEIGHTS.put(BucketType.CM13, new BigDecimal("4.7"));
-    WEIGHTS.put(BucketType.CM14, new BigDecimal("4.8"));
-    WEIGHTS.put(BucketType.CM15, new BigDecimal("3.8"));
-    WEIGHTS.put(BucketType.CM16, new BigDecimal("16") );
+    WEIGHTS.put(BucketType.CM12, new BigDecimal("6.5"));
+    WEIGHTS.put(BucketType.CM13, new BigDecimal("4.6"));
+    WEIGHTS.put(BucketType.CM14, new BigDecimal("4.6"));
+    WEIGHTS.put(BucketType.CM15, new BigDecimal("4.0"));
+    WEIGHTS.put(BucketType.CM16, new BigDecimal("16"));
     WEIGHTS.put(BucketType.CM17, new BigDecimal("5.1"));
   }
 
-  private static final BigDecimal VEGA = new BigDecimal("0.13");
+  private static final BigDecimal VEGA = new BigDecimal("0.16");
 
   @Override
   public BigDecimal getDeltaRiskWeight(SensitivityIdentifier s) {

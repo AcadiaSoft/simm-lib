@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AcadiaSoft, Inc.
+ * Copyright (c) 2022 Acadia, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,13 @@ import java.math.BigDecimal;
 
 public interface ScheduleSensitivity extends ScheduleNotional, SchedulePv {
 
-  static ScheduleSensitivity of(String tradeId, String notional, String notionalCurrency, String productClass, String riskType,
-                                String valuationDate, String endDate, String amount, String amountCurrency, String amountUsd) {
-    return new DefaultScheduleSensitivity(tradeId, notional, notionalCurrency, productClass, riskType,
-      valuationDate, endDate, amount, amountCurrency, amountUsd);
+  static ScheduleSensitivity of(String tradeId, String notional, String notionalCurrency, String productClass, String riskType, String valuationDate, String endDate, String amount,
+      String amountCurrency, String amountUsd) {
+    return new DefaultScheduleSensitivity(tradeId, notional, notionalCurrency, productClass, riskType, valuationDate, endDate, amount, amountCurrency, amountUsd);
   }
 
-  static ScheduleSensitivity of(String tradeId, String productClass, String riskType, String valuationDate, String endDate,
-                                 String amount, String amountCurrency, String amountUsd) {
+  static ScheduleSensitivity of(String tradeId, String productClass, String riskType, String valuationDate, String endDate, String amount, String amountCurrency,
+      String amountUsd) {
     return new DefaultScheduleSensitivity(tradeId, productClass, riskType, valuationDate, endDate, amount, amountCurrency, amountUsd);
   }
 
