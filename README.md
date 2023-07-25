@@ -1,22 +1,10 @@
 # Simm-Lib
 
-Simm-Lib is an implementation of version 2.5 of the value at risk Standard Initial
-Margin Model ([SIMM™ 2.5](https://www2.isda.org/functional-areas/wgmr-implementation/))
-developed by ISDA, see [here](https://www.isda.org/category/margin/isda-simm/) for methodology specifications.
-It has been built to be compatible with the Common
-Risk Interchange Format (CRIF) and it's correlation parameters and risk
-weights are interfaced to allow them to be easily exchanged. This makes
-Simm-Lib easy to deploy, as most users of Simm-Lib will already be
-generating CRIF files; easy to maintain, as the yearly updates to
-SIMM™ can be handled with only minor changes to Simm-Lib; and
-easy to experiment with, as custom model parameters can be created for
-Simm-Lib and implemented with the same minor changes as the yearly updates.
+Simm-Lib is an implementation of version 2.5 and all previous versions of the value at risk Standard Initial Margin Model ([SIMM™ 2.5](https://www2.isda.org/functional-areas/wgmr-implementation/)) developed by ISDA, see [here](https://www.isda.org/category/margin/isda-simm/) for methodology specifications. For all future versions of SIMM, visit [Open-Source Risk Engine](https://github.com/OpenSourceRisk/Engine).
 
-Users of Simm-Lib who wish to deploy it for commercial purposes
-will need to obtain a license from ISDA to use ISDA SIMM™ to
-calculate initial margin for their or their clients’ non-cleared
-derivatives transactions. Please contact isdalegal@isda.org for more
-information on licensing the ISDA SIMM™.
+ORE is the same analytics library that powers [Acadia’s](https://www.acadia.inc/) hosted daily [UMR Risk Suite](https://www.acadia.inc/product-suite/risk-suite) supporting the latest version ISDA SIMM v2.5A as well as all previous versions, and contains much broader pricing and integrated market/credit risk functionality for derivatives, structured products, and other traded instruments.
+
+Users of Simm-Lib who wish to deploy it for commercial purposes will need to obtain a license from ISDA to use ISDA SIMM™ to calculate initial margin for their or their clients’ non-cleared derivatives transactions. Please contact isdalegal@isda.org for more information on licensing the ISDA SIMM™.
 
 ### Updates: 2022-09-12
 - SIMM v2.5 - full recalibration and industry backtesting of the methodology 
